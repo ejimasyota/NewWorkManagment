@@ -8,7 +8,7 @@
  * 定数定義
  * ========================================================================== */
 /** APIベースURL */
-const API_BASE_URL = '/Back/Api';
+const API_BASE_URL = "/Back/Api";
 
 /** 1ページあたりの表示件数 */
 const RECORDS_PER_PAGE = 15;
@@ -131,7 +131,7 @@ function PullDownList(Type) {
       { value: 10, label: "スポーツ" },
       { value: 11, label: "歴史" },
       { value: 12, label: "学園" },
-      { value: 13, label: "その他" }
+      { value: 13, label: "その他" },
     ],
     /** レビュー評価区分 */
     Review: [
@@ -139,22 +139,22 @@ function PullDownList(Type) {
       { value: 1, label: "◎" },
       { value: 2, label: "〇" },
       { value: 3, label: "△" },
-      { value: 4, label: "✕" }
+      { value: 4, label: "✕" },
     ],
     /** 性別区分 */
     Gender: [
       { value: 0, label: "未設定" },
       { value: 1, label: "男性" },
       { value: 2, label: "女性" },
-      { value: 3, label: "その他" }
+      { value: 3, label: "その他" },
     ],
     /** 起承転結区分 */
     PlotStructure: [
       { value: 0, label: "起" },
       { value: 1, label: "承" },
       { value: 2, label: "転" },
-      { value: 3, label: "結" }
-    ]
+      { value: 3, label: "結" },
+    ],
   };
 
   const List = DataMap[Type];
@@ -174,14 +174,12 @@ function PullDownList(Type) {
     Items = List.slice();
   }
 
-  return Items
-    .map((Item, Idx) => {
-      if (Idx === 0) {
-        return `<option value="${Item.value}" selected data-placeholder="true">${Item.label}</option>`;
-      }
-      return `<option value="${Item.value}">${Item.label}</option>`;
-    })
-    .join("");
+  return Items.map((Item, Idx) => {
+    if (Idx === 0) {
+      return `<option value="${Item.value}" selected data-placeholder="true">${Item.label}</option>`;
+    }
+    return `<option value="${Item.value}">${Item.label}</option>`;
+  }).join("");
 }
 
 /**
@@ -214,12 +212,15 @@ async function CallApi(Endpoint, Method = "GET", Data = null) {
     const Options = {
       method: Method,
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     };
     if (Data && Method !== "GET") {
       Options.body = JSON.stringify(Data);
     }
+    console.log("API_BASE_URL:", API_BASE_URL);
+    console.log("Endpoint:", Endpoint);
+    console.log("Options:", Options);
     const Response = await fetch(`${API_BASE_URL}${Endpoint}`, Options);
     const Result = await Response.json();
     if (!Response.ok) {
@@ -288,7 +289,10 @@ function ResetSessionTimer() {
 function SessionTimeout() {
   const CurrentPath = window.location.pathname;
   sessionStorage.setItem("LastPath", CurrentPath);
-  ShowInfoDialog("セッションタイムアウト", "一定時間操作がなかったため、ログアウトしました。");
+  ShowInfoDialog(
+    "セッションタイムアウト",
+    "一定時間操作がなかったため、ログアウトしました。"
+  );
   setTimeout(() => {
     window.location.href = "/index.html";
   }, 2000);
@@ -391,7 +395,8 @@ function CreatePagination(TotalRecords, CurrentPage, OnPageChange) {
 
   for (let i = StartPage; i <= EndPage; i++) {
     const PageButton = document.createElement("button");
-    PageButton.className = "PaginationButton" + (i === CurrentPage ? " Active" : "");
+    PageButton.className =
+      "PaginationButton" + (i === CurrentPage ? " Active" : "");
     PageButton.textContent = i;
     PageButton.onclick = () => OnPageChange(i);
     Container.appendChild(PageButton);
@@ -466,7 +471,9 @@ function CreateButton(Options = {}) {
   Button.className = `ButtonClass ${Options.className || "PrimaryButton"}`;
   if (Options.id) Button.id = Options.id;
   if (Options.icon) {
-    Button.innerHTML = `<i class="fas fa-${Options.icon}"></i> ${Options.text || ""}`;
+    Button.innerHTML = `<i class="fas fa-${Options.icon}"></i> ${
+      Options.text || ""
+    }`;
   } else {
     Button.textContent = Options.text || "";
   }
@@ -527,7 +534,8 @@ function InitializePage() {
   if (!document.querySelector('link[href*="font-awesome"]')) {
     const FontAwesome = document.createElement("link");
     FontAwesome.rel = "stylesheet";
-    FontAwesome.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
+    FontAwesome.href =
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
     document.head.appendChild(FontAwesome);
   }
 }
