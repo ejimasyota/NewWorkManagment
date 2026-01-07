@@ -1,0 +1,797 @@
+/**
+ * Common.css
+ * 共通スタイルシート
+ * レスポンシブ対応・フォーム・ボタン・テーブル等の共通スタイルを定義
+ */
+
+/* ==========================================================================
+ * リセット・基本設定
+ * ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+  font-size: 14px;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+/* ==========================================================================
+ * レイアウト
+ * ========================================================================== */
+.PageContainer {
+  display: flex;
+  min-height: 100vh;
+}
+
+.MainContent {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.CenterContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* ==========================================================================
+ * サイドバー
+ * ========================================================================== */
+.Sidebar {
+  width: 250px;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+}
+
+.SidebarHeader {
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid #34495e;
+}
+
+.SidebarHeader h1 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.SidebarMenu {
+  flex: 1;
+  padding: 10px 0;
+}
+
+.SidebarItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  background: none;
+  color: #ecf0f1;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+}
+
+.SidebarItem:hover {
+  background-color: #34495e;
+}
+
+.SidebarItem.Active {
+  background-color: #3498db;
+}
+
+.SidebarItem i {
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+}
+
+.SidebarFooter {
+  padding: 15px 20px;
+  border-top: 1px solid #34495e;
+}
+
+/* ==========================================================================
+ * カード・パネル
+ * ========================================================================== */
+.Card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.CardSmall {
+  width: 100%;
+  max-width: 400px;
+}
+
+.CardMedium {
+  width: 100%;
+  max-width: 600px;
+}
+
+.CardLarge {
+  width: 100%;
+  max-width: 900px;
+}
+
+.CardTitle {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
+}
+
+.ContentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.ContentTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* ==========================================================================
+ * フォーム要素
+ * ========================================================================== */
+.FormGroup {
+  margin-bottom: 20px;
+}
+
+.InputForm {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.InputForm:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.InputForm:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.InputForm::placeholder {
+  color: #999;
+}
+
+.SelectForm {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.SelectForm:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.TextAreaForm {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  min-height: 100px;
+  resize: none;
+  transition: border-color 0.2s ease;
+}
+
+.TextAreaForm:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.InputWithButton {
+  display: flex;
+  gap: 10px;
+}
+
+.InputWithButton .InputForm {
+  flex: 1;
+}
+
+/* ==========================================================================
+ * ボタン
+ * ========================================================================== */
+.ButtonClass {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ButtonClass:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.PrimaryButton {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.PrimaryButton:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+.SecondaryButton {
+  background-color: #95a5a6;
+  color: #fff;
+}
+
+.SecondaryButton:hover:not(:disabled) {
+  background-color: #7f8c8d;
+}
+
+.SuccessButton {
+  background-color: #27ae60;
+  color: #fff;
+}
+
+.SuccessButton:hover:not(:disabled) {
+  background-color: #219a52;
+}
+
+.DangerButton {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.DangerButton:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+.WarningButton {
+  background-color: #f39c12;
+  color: #fff;
+}
+
+.WarningButton:hover:not(:disabled) {
+  background-color: #d68910;
+}
+
+.SaveButton {
+  background-color: #27ae60;
+  color: #fff;
+}
+
+.SaveButton:hover:not(:disabled) {
+  background-color: #219a52;
+}
+
+.CloseButton {
+  background-color: #95a5a6;
+  color: #fff;
+}
+
+.CloseButton:hover:not(:disabled) {
+  background-color: #7f8c8d;
+}
+
+.ClearButton {
+  background-color: #f39c12;
+  color: #fff;
+}
+
+.ClearButton:hover:not(:disabled) {
+  background-color: #d68910;
+}
+
+.DeleteButton {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.DeleteButton:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+.ButtonGroup {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.ButtonGroupCenter {
+  justify-content: center;
+}
+
+.ButtonGroupRight {
+  justify-content: flex-end;
+}
+
+.ButtonGroupSpaceBetween {
+  justify-content: space-between;
+}
+
+.ButtonSmall {
+  padding: 8px 16px;
+  font-size: 12px;
+}
+
+.ButtonFull {
+  width: 100%;
+}
+
+/* ==========================================================================
+ * テーブル
+ * ========================================================================== */
+.TableContainer {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.DataTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.DataTable thead {
+  background-color: #34495e;
+  color: #fff;
+}
+
+.DataTable th {
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.DataTable tbody tr {
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+}
+
+.DataTable tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.DataTable td {
+  padding: 12px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.DataTable .ActionCell {
+  white-space: nowrap;
+}
+
+.CellButton {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-right: 5px;
+  transition: opacity 0.2s ease;
+}
+
+.CellButton:hover {
+  opacity: 0.8;
+}
+
+.CellButtonPrimary {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.CellButtonDanger {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.CellButtonWarning {
+  background-color: #f39c12;
+  color: #fff;
+}
+
+.CellButtonSuccess {
+  background-color: #27ae60;
+  color: #fff;
+}
+
+/* ==========================================================================
+ * ページネーション
+ * ========================================================================== */
+.PaginationContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.PaginationButton {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.PaginationButton:hover:not(:disabled) {
+  background-color: #3498db;
+  color: #fff;
+  border-color: #3498db;
+}
+
+.PaginationButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.PaginationButton.Active {
+  background-color: #3498db;
+  color: #fff;
+  border-color: #3498db;
+}
+
+.PaginationInfo {
+  color: #666;
+  font-size: 14px;
+}
+
+.RecordCount {
+  margin-bottom: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ==========================================================================
+ * ダイアログ
+ * ========================================================================== */
+.DialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.DialogContainer {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px;
+  position: relative;
+}
+
+.DialogSmall {
+  width: 90%;
+  max-width: 400px;
+}
+
+.DialogMedium {
+  width: 90%;
+  max-width: 600px;
+}
+
+.DialogLarge {
+  width: 90%;
+  max-width: 800px;
+}
+
+.DialogTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.DialogContent {
+  margin-bottom: 20px;
+}
+
+.DialogButtonArea {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ==========================================================================
+ * スピナー
+ * ========================================================================== */
+.SpinnerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.Spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: SpinnerAnimation 1s linear infinite;
+}
+
+@keyframes SpinnerAnimation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+ * 画像ボックス
+ * ========================================================================== */
+.ImageBox {
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.ImageBox:hover {
+  border-color: #3498db;
+}
+
+.ImageBox img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.ImageBoxPlaceholder {
+  color: #999;
+  text-align: center;
+}
+
+.ImageBoxPlaceholder i {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+/* ==========================================================================
+ * チェックボックス
+ * ========================================================================== */
+.CheckboxWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.CheckboxInput {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+ * ユーティリティ
+ * ========================================================================== */
+.TextCenter {
+  text-align: center;
+}
+
+.TextRight {
+  text-align: right;
+}
+
+.TextLeft {
+  text-align: left;
+}
+
+.MarginTop10 {
+  margin-top: 10px;
+}
+
+.MarginTop20 {
+  margin-top: 20px;
+}
+
+.MarginBottom10 {
+  margin-bottom: 10px;
+}
+
+.MarginBottom20 {
+  margin-bottom: 20px;
+}
+
+.Hidden {
+  display: none !important;
+}
+
+.LinkText {
+  color: #3498db;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.LinkText:hover {
+  text-decoration: underline;
+}
+
+.ErrorText {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.SuccessText {
+  color: #27ae60;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* ==========================================================================
+ * レスポンシブ対応
+ * ========================================================================== */
+@media screen and (max-width: 768px) {
+  .Sidebar {
+    position: fixed;
+    left: -250px;
+    height: 100%;
+    z-index: 100;
+  }
+
+  .Sidebar.Open {
+    left: 0;
+  }
+
+  .MainContent {
+    padding: 15px;
+  }
+
+  .Card {
+    padding: 20px;
+  }
+
+  .CardTitle {
+    font-size: 20px;
+  }
+
+  .ContentHeader {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .ButtonGroup {
+    flex-wrap: wrap;
+  }
+
+  .DataTable th,
+  .DataTable td {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .DialogContainer {
+    padding: 20px;
+    margin: 10px;
+  }
+
+  .PaginationContainer {
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .InputForm,
+  .SelectForm,
+  .TextAreaForm {
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+
+  .ButtonClass {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .CardSmall,
+  .CardMedium,
+  .CardLarge {
+    max-width: 100%;
+  }
+}
+
+/* ==========================================================================
+ * メニュートグルボタン（モバイル用）
+ * ========================================================================== */
+.MenuToggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 101;
+  background-color: #2c3e50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .MenuToggle {
+    display: block;
+  }
+}
+
+/* ==========================================================================
+ * オーバーレイ（モバイルメニュー用）
+ * ========================================================================== */
+.SidebarOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
+.SidebarOverlay.Open {
+  display: block;
+}

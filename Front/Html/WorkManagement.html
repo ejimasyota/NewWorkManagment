@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作品管理 | 作品管理システム</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../Css/Common.css">
+  <style>
+    /**
+     * 作品管理画面固有スタイル
+     */
+    .ContentArea {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      min-height: calc(100vh - 80px);
+    }
+
+    .WorkTitle {
+      font-size: 18px;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      padding: 10px 15px;
+      background-color: #ecf0f1;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .WorkTitle i {
+      color: #3498db;
+    }
+
+    .SidebarSubMenu {
+      padding-left: 20px;
+      font-size: 13px;
+    }
+
+    .SidebarSubMenu .SidebarItem {
+      padding: 10px 15px;
+    }
+
+    .SidebarDivider {
+      height: 1px;
+      background-color: #34495e;
+      margin: 10px 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- メニュートグルボタン（モバイル用） -->
+  <button class="MenuToggle" id="MenuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- サイドバーオーバーレイ（モバイル用） -->
+  <div class="SidebarOverlay" id="SidebarOverlay"></div>
+
+  <div class="PageContainer">
+    <!-- サイドバー -->
+    <nav class="Sidebar" id="Sidebar">
+      <div class="SidebarHeader">
+        <h1><i class="fas fa-book-open"></i> 作品管理</h1>
+      </div>
+      <div class="SidebarMenu">
+        <!-- メイン機能 -->
+        <button class="SidebarItem" id="MenuBackToMain">
+          <i class="fas fa-arrow-left"></i> メインへ戻る
+        </button>
+
+        <div class="SidebarDivider"></div>
+
+        <!-- 作品設定 -->
+        <button class="SidebarItem Active" id="MenuWorkInfo">
+          <i class="fas fa-info-circle"></i> 作品共通情報
+        </button>
+        <button class="SidebarItem" id="MenuCharacter">
+          <i class="fas fa-user"></i> キャラ設定
+        </button>
+        <button class="SidebarItem" id="MenuOrganization">
+          <i class="fas fa-building"></i> 組織設定
+        </button>
+        <button class="SidebarItem" id="MenuTeam">
+          <i class="fas fa-users"></i> チーム設定
+        </button>
+        <button class="SidebarItem" id="MenuRace">
+          <i class="fas fa-dna"></i> 種族設定
+        </button>
+        <button class="SidebarItem" id="MenuClass">
+          <i class="fas fa-medal"></i> 階級設定
+        </button>
+
+        <div class="SidebarDivider"></div>
+
+        <!-- 世界観設定 -->
+        <button class="SidebarItem" id="MenuCalendar">
+          <i class="fas fa-calendar-alt"></i> 元号設定
+        </button>
+        <button class="SidebarItem" id="MenuTimeline">
+          <i class="fas fa-stream"></i> 年表設定
+        </button>
+        <button class="SidebarItem" id="MenuStage">
+          <i class="fas fa-map-marked-alt"></i> 舞台設定
+        </button>
+        <button class="SidebarItem" id="MenuBuilding">
+          <i class="fas fa-landmark"></i> 建物設定
+        </button>
+
+        <div class="SidebarDivider"></div>
+
+        <!-- 能力・装備 -->
+        <button class="SidebarItem" id="MenuPower">
+          <i class="fas fa-bolt"></i> 能力設定
+        </button>
+        <button class="SidebarItem" id="MenuWeapon">
+          <i class="fas fa-shield-alt"></i> 武器設定
+        </button>
+        <button class="SidebarItem" id="MenuMove">
+          <i class="fas fa-fire"></i> 技設定
+        </button>
+
+        <div class="SidebarDivider"></div>
+
+        <!-- ストーリー・その他 -->
+        <button class="SidebarItem" id="MenuSerif">
+          <i class="fas fa-comment"></i> セリフ設定
+        </button>
+        <button class="SidebarItem" id="MenuRelation">
+          <i class="fas fa-project-diagram"></i> 相関図作成
+        </button>
+        <button class="SidebarItem" id="MenuStory">
+          <i class="fas fa-book"></i> ストーリー作成
+        </button>
+        <button class="SidebarItem" id="MenuPlot">
+          <i class="fas fa-sitemap"></i> プロット作成
+        </button>
+        <button class="SidebarItem" id="MenuClue">
+          <i class="fas fa-puzzle-piece"></i> 伏線メモ
+        </button>
+
+        <div class="SidebarDivider"></div>
+
+        <!-- 管理 -->
+        <button class="SidebarItem" id="MenuReview">
+          <i class="fas fa-star"></i> 作品レビュー
+        </button>
+        <button class="SidebarItem" id="MenuMemo">
+          <i class="fas fa-sticky-note"></i> 作品作成用メモ
+        </button>
+        <button class="SidebarItem" id="MenuSchedule">
+          <i class="fas fa-tasks"></i> スケジュール
+        </button>
+        <button class="SidebarItem" id="MenuParticipants">
+          <i class="fas fa-user-friends"></i> 参加者一覧
+        </button>
+        <button class="SidebarItem" id="MenuHistory">
+          <i class="fas fa-history"></i> 更新履歴
+        </button>
+      </div>
+      <div class="SidebarFooter">
+        <button class="SidebarItem" id="MenuLogout">
+          <i class="fas fa-sign-out-alt"></i> ログアウト
+        </button>
+      </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="MainContent">
+      <div class="ContentArea" id="ContentArea">
+        <!-- 動的にコンテンツが挿入される -->
+      </div>
+    </main>
+  </div>
+
+  <script src="../Js/Common.js"></script>
+  <script src="../Js/Dialog.js"></script>
+  <script>
+    /**
+     * WorkManagement.js
+     * 作品管理画面の処理
+     */
+
+    /** グローバル変数 */
+    let WorkInfo = null;
+    let IsCreator = false;
+    let IsAdmin = false;
+    let CurrentPage = 1;
+
+    /**
+     * ページ読み込み時の初期化処理
+     */
+    document.addEventListener("DOMContentLoaded", function() {
+      InitializeWorkManagementPage();
+    });
+
+    /**
+     * 作品管理画面の初期化
+     */
+    async function InitializeWorkManagementPage() {
+      /** セッションチェック */
+      const UserId = sessionStorage.getItem("UserId");
+      const WorkId = sessionStorage.getItem("WorkId");
+
+      if (!UserId || !WorkId) {
+        window.location.href = "/index.html";
+        return;
+      }
+
+      IsAdmin = sessionStorage.getItem("AuthFlg") === "true";
+
+      /** メニューイベント設定 */
+      SetupMenuEvents();
+
+      /** モバイルメニュートグル */
+      SetupMobileMenu();
+
+      /** セッション監視開始 */
+      StartSessionMonitor();
+
+      /** 作品情報取得 */
+      await LoadWorkInfo();
+
+      /** 利用者区分チェック */
+      await CheckUserPermission();
+
+      /** 初期表示：作品共通情報 */
+      ShowWorkCommonInfo();
+    }
+
+    /**
+     * 作品情報を読み込み
+     */
+    async function LoadWorkInfo() {
+      try {
+        const WorkId = sessionStorage.getItem("WorkId");
+        const Response = await CallApi(`/GetWorkInfo.php?WorkId=${encodeURIComponent(WorkId)}`, "GET");
+
+        if (Response.Success) {
+          WorkInfo = Response.Data;
+        } else {
+          await ShowErrorDialog(Response.Message || "作品情報の取得に失敗しました");
+          window.location.href = "Main.html";
+        }
+      } catch (Error) {
+        await ShowErrorDialog("作品情報の取得中にエラーが発生しました");
+        window.location.href = "Main.html";
+      }
+    }
+
+    /**
+     * 利用者区分チェック
+     */
+    async function CheckUserPermission() {
+      try {
+        const UserId = sessionStorage.getItem("UserId");
+        const WorkId = sessionStorage.getItem("WorkId");
+        const Response = await CallApi(`/GetUserPermission.php?WorkId=${encodeURIComponent(WorkId)}&UserId=${encodeURIComponent(UserId)}`, "GET");
+
+        if (Response.Success) {
+          IsCreator = Response.IsCreator;
+        }
+      } catch (Error) {
+        console.error("権限チェックエラー:", Error);
+      }
+    }
+
+    /**
+     * 編集権限があるかチェック
+     * @returns {boolean} 編集権限があるかどうか
+     */
+    function CanEdit() {
+      return IsCreator || IsAdmin;
+    }
+
+    /**
+     * メニューイベントの設定
+     */
+    function SetupMenuEvents() {
+      /** メインへ戻る */
+      document.getElementById("MenuBackToMain").addEventListener("click", function() {
+        window.location.href = "Main.html";
+      });
+
+      /** 各メニュー項目 */
+      document.getElementById("MenuWorkInfo").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowWorkCommonInfo();
+      });
+
+      document.getElementById("MenuCharacter").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowCharacterSetting();
+      });
+
+      document.getElementById("MenuOrganization").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowOrganizationSetting();
+      });
+
+      document.getElementById("MenuTeam").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowTeamSetting();
+      });
+
+      document.getElementById("MenuRace").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowRaceSetting();
+      });
+
+      document.getElementById("MenuClass").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowClassSetting();
+      });
+
+      document.getElementById("MenuCalendar").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowCalendarSetting();
+      });
+
+      document.getElementById("MenuTimeline").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowTimelineSetting();
+      });
+
+      document.getElementById("MenuStage").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowStageSetting();
+      });
+
+      document.getElementById("MenuBuilding").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowBuildingSetting();
+      });
+
+      document.getElementById("MenuPower").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowPowerSetting();
+      });
+
+      document.getElementById("MenuWeapon").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowWeaponSetting();
+      });
+
+      document.getElementById("MenuMove").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowMoveSetting();
+      });
+
+      document.getElementById("MenuSerif").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowSerifSetting();
+      });
+
+      document.getElementById("MenuRelation").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowRelationDiagram();
+      });
+
+      document.getElementById("MenuStory").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowStoryCreation();
+      });
+
+      document.getElementById("MenuPlot").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowPlotCreation();
+      });
+
+      document.getElementById("MenuClue").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowClueMemo();
+      });
+
+      document.getElementById("MenuReview").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowWorkReview();
+      });
+
+      document.getElementById("MenuMemo").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowWorkMemo();
+      });
+
+      document.getElementById("MenuSchedule").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowSchedule();
+      });
+
+      document.getElementById("MenuParticipants").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowParticipants();
+      });
+
+      document.getElementById("MenuHistory").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowUpdateHistory();
+      });
+
+      document.getElementById("MenuLogout").addEventListener("click", HandleLogout);
+    }
+
+    /**
+     * モバイルメニューの設定
+     */
+    function SetupMobileMenu() {
+      const Toggle = document.getElementById("MenuToggle");
+      const Sidebar = document.getElementById("Sidebar");
+      const Overlay = document.getElementById("SidebarOverlay");
+
+      Toggle.addEventListener("click", function() {
+        Sidebar.classList.toggle("Open");
+        Overlay.classList.toggle("Open");
+      });
+
+      Overlay.addEventListener("click", function() {
+        Sidebar.classList.remove("Open");
+        Overlay.classList.remove("Open");
+      });
+    }
+
+    /**
+     * アクティブメニューの設定
+     * @param {HTMLElement} Element アクティブにする要素
+     */
+    function SetActiveMenu(Element) {
+      document.querySelectorAll(".SidebarItem").forEach(Item => {
+        Item.classList.remove("Active");
+      });
+      Element.classList.add("Active");
+
+      document.getElementById("Sidebar").classList.remove("Open");
+      document.getElementById("SidebarOverlay").classList.remove("Open");
+    }
+
+    /**
+     * ログアウト処理
+     */
+    async function HandleLogout() {
+      const Confirmed = await ShowConfirmDialog("ログアウトしますか？");
+      if (Confirmed) {
+        sessionStorage.clear();
+        window.location.href = "/index.html";
+      }
+    }
+
+    /**
+     * コンテンツヘッダーを生成
+     * @param {string} Title タイトル
+     * @param {string} Icon アイコン
+     * @returns {string} HTML文字列
+     */
+    function CreateContentHeader(Title, Icon) {
+      const WorkTitle = WorkInfo ? WorkInfo.WorkTitle : "";
+      return `
+        <div class="WorkTitle">
+          <i class="fas fa-book"></i>
+          <span>${TruncateText(WorkTitle, 30)}</span>
+        </div>
+        <div class="ContentHeader">
+          <h2 class="ContentTitle"><i class="fas fa-${Icon}"></i> ${Title}</h2>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+     * 作品共通情報
+     * ========================================================================== */
+    /**
+     * 作品共通情報画面を表示
+     */
+    function ShowWorkCommonInfo() {
+      const ContentArea = document.getElementById("ContentArea");
+      const CanEditFlg = CanEdit();
+
+      ContentArea.innerHTML = `
+        ${CreateContentHeader("作品共通情報", "info-circle")}
+        <div class="FormGroup">
+          <input type="text" class="InputForm" id="WorkTitle" placeholder="作品名" value="${WorkInfo?.WorkTitle || ""}" ${!CanEditFlg ? "disabled" : ""}>
+        </div>
+        <div class="FormGroup">
+          <select class="SelectForm" id="Genre" ${!CanEditFlg ? "disabled" : ""}>
+            ${PullDownList("Genre")}
+          </select>
+        </div>
+        ${CanEditFlg ? `
+        <div class="ButtonGroup">
+          <button class="ButtonClass SaveButton" id="SaveWorkInfoButton">
+            <i class="fas fa-save"></i> 保存
+          </button>
+        </div>
+        ` : ""}
+      `;
+
+      if (WorkInfo) {
+        document.getElementById("Genre").value = WorkInfo.Genre;
+      }
+
+      if (CanEditFlg) {
+        document.getElementById("SaveWorkInfoButton").addEventListener("click", SaveWorkInfo);
+      }
+    }
+
+    /**
+     * 作品情報を保存
+     */
+    async function SaveWorkInfo() {
+      const WorkTitle = document.getElementById("WorkTitle").value.trim();
+      const Genre = document.getElementById("Genre").value;
+
+      if (!WorkTitle) {
+        await ShowErrorDialog("作品名を入力してください");
+        return;
+      }
+
+      try {
+        const UserId = sessionStorage.getItem("UserId");
+        const WorkId = sessionStorage.getItem("WorkId");
+        const Response = await CallApi("/UpdateWorkInfo.php", "POST", {
+          WorkId: WorkId,
+          WorkTitle: WorkTitle,
+          Genre: parseInt(Genre),
+          UserId: UserId
+        });
+
+        if (Response.Success) {
+          await ShowInfoDialog("保存完了", "作品情報を保存しました");
+          await LoadWorkInfo();
+          ShowWorkCommonInfo();
+        } else {
+          await ShowErrorDialog(Response.Message || "保存に失敗しました");
+        }
+      } catch (Error) {
+        await ShowErrorDialog("保存中にエラーが発生しました");
+      }
+    }
+
+    /* ==========================================================================
+     * プレースホルダー関数（各画面の実装）
+     * ========================================================================== */
+    function ShowCharacterSetting() {
+      ShowPlaceholder("キャラ設定", "user");
+    }
+
+    function ShowOrganizationSetting() {
+      ShowPlaceholder("組織設定", "building");
+    }
+
+    function ShowTeamSetting() {
+      ShowPlaceholder("チーム設定", "users");
+    }
+
+    function ShowRaceSetting() {
+      ShowPlaceholder("種族設定", "dna");
+    }
+
+    function ShowClassSetting() {
+      ShowPlaceholder("階級設定", "medal");
+    }
+
+    function ShowCalendarSetting() {
+      ShowPlaceholder("元号設定", "calendar-alt");
+    }
+
+    function ShowTimelineSetting() {
+      ShowPlaceholder("年表設定", "stream");
+    }
+
+    function ShowStageSetting() {
+      ShowPlaceholder("舞台設定", "map-marked-alt");
+    }
+
+    function ShowBuildingSetting() {
+      ShowPlaceholder("建物設定", "landmark");
+    }
+
+    function ShowPowerSetting() {
+      ShowPlaceholder("能力設定", "bolt");
+    }
+
+    function ShowWeaponSetting() {
+      ShowPlaceholder("武器設定", "shield-alt");
+    }
+
+    function ShowMoveSetting() {
+      ShowPlaceholder("技設定", "fire");
+    }
+
+    function ShowSerifSetting() {
+      ShowPlaceholder("セリフ設定", "comment");
+    }
+
+    function ShowRelationDiagram() {
+      ShowPlaceholder("相関図作成", "project-diagram");
+    }
+
+    function ShowStoryCreation() {
+      ShowPlaceholder("ストーリー作成", "book");
+    }
+
+    function ShowPlotCreation() {
+      ShowPlaceholder("プロット作成", "sitemap");
+    }
+
+    function ShowClueMemo() {
+      ShowPlaceholder("伏線メモ", "puzzle-piece");
+    }
+
+    function ShowWorkReview() {
+      ShowPlaceholder("作品レビュー", "star");
+    }
+
+    function ShowWorkMemo() {
+      ShowPlaceholder("作品作成用メモ", "sticky-note");
+    }
+
+    function ShowSchedule() {
+      ShowPlaceholder("スケジュール", "tasks");
+    }
+
+    function ShowParticipants() {
+      ShowPlaceholder("参加者一覧", "user-friends");
+    }
+
+    function ShowUpdateHistory() {
+      ShowPlaceholder("更新履歴", "history");
+    }
+
+    /**
+     * プレースホルダー画面を表示
+     * @param {string} Title タイトル
+     * @param {string} Icon アイコン
+     */
+    function ShowPlaceholder(Title, Icon) {
+      const ContentArea = document.getElementById("ContentArea");
+      ContentArea.innerHTML = `
+        ${CreateContentHeader(Title, Icon)}
+        <div style="text-align: center; padding: 50px; color: #999;">
+          <i class="fas fa-${Icon}" style="font-size: 60px; margin-bottom: 20px;"></i>
+          <p>この機能は準備中です</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
