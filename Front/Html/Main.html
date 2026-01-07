@@ -279,7 +279,6 @@
       try {
         const UserId = sessionStorage.getItem("UserId");
         const Response = await CallApi(`/GetProjectList.php?UserId=${encodeURIComponent(UserId)}`, "GET");
-
         if (Response.Success) {
           ProjectList = Response.Data || [];
           RenderProjectTable();
@@ -287,6 +286,7 @@
           await ShowErrorDialog(Response.Message || "プロジェクト一覧の取得に失敗しました");
         }
       } catch (Error) {
+        console.error(Error);
         await ShowErrorDialog("プロジェクト一覧の取得中にエラーが発生しました");
       }
     }

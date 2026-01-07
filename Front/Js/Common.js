@@ -96,13 +96,13 @@ function FormatTimestamp(Timestamp) {
   if (!Timestamp) {
     return "";
   }
-  const Date = new Date(Timestamp);
-  if (isNaN(Date.getTime())) {
+  const DateInstance = new Date(Timestamp);
+  if (isNaN(DateInstance.getTime())) {
     return "";
   }
-  const Year = Date.getFullYear();
-  const Month = String(Date.getMonth() + 1).padStart(2, "0");
-  const Day = String(Date.getDate()).padStart(2, "0");
+  const Year = DateInstance.getFullYear();
+  const Month = String(DateInstance.getMonth() + 1).padStart(2, "0");
+  const Day = String(DateInstance.getDate()).padStart(2, "0");
   return `${Year}年${Month}月${Day}日`;
 }
 
