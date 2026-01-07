@@ -216,7 +216,7 @@
         if (Response.Success) {
           /** ログイン成功：セッション情報を保存してメイン画面へ遷移 */
           sessionStorage.setItem("UserId", UserId);
-          if (Response.IsAdmin) {
+          if (Response.Data.IsAdmin) {
             sessionStorage.setItem("AuthFlg", "true");
           }
 
