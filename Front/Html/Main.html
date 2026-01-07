@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>メイン | 作品管理システム</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../Css/Common.css">
+  <style>
+    /**
+     * メイン画面固有スタイル
+     */
+    .ContentArea {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      min-height: calc(100vh - 80px);
+    }
+
+    .WelcomeMessage {
+      font-size: 16px;
+      color: #7f8c8d;
+      margin-bottom: 5px;
+    }
+
+    .UserIdDisplay {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .ActionButtons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .ProjectTable {
+      margin-top: 20px;
+    }
+
+    .FeedbackDetailArea {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .FeedbackDetailArea .FormGroup {
+      margin-bottom: 0;
+    }
+
+    @media screen and (max-width: 768px) {
+      .FeedbackDetailArea {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- メニュートグルボタン（モバイル用） -->
+  <button class="MenuToggle" id="MenuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- サイドバーオーバーレイ（モバイル用） -->
+  <div class="SidebarOverlay" id="SidebarOverlay"></div>
+
+  <div class="PageContainer">
+    <!-- サイドバー -->
+    <nav class="Sidebar" id="Sidebar">
+      <div class="SidebarHeader">
+        <h1><i class="fas fa-book-open"></i> 作品管理</h1>
+      </div>
+      <div class="SidebarMenu">
+        <button class="SidebarItem Active" id="MenuWorkManagement">
+          <i class="fas fa-folder-open"></i> 作品管理
+        </button>
+        <button class="SidebarItem" id="MenuFeedback">
+          <i class="fas fa-comment-dots"></i> フィードバック投稿
+        </button>
+        <button class="SidebarItem Hidden" id="MenuMemberList">
+          <i class="fas fa-users"></i> 会員一覧
+        </button>
+        <button class="SidebarItem Hidden" id="MenuAdminList">
+          <i class="fas fa-user-shield"></i> 管理者一覧
+        </button>
+        <button class="SidebarItem Hidden" id="MenuFeedbackList">
+          <i class="fas fa-inbox"></i> フィードバック一覧
+        </button>
+      </div>
+      <div class="SidebarFooter">
+        <button class="SidebarItem" id="MenuLogout">
+          <i class="fas fa-sign-out-alt"></i> ログアウト
+        </button>
+      </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="MainContent">
+      <div class="ContentArea" id="ContentArea">
+        <!-- 動的にコンテンツが挿入される -->
+      </div>
+    </main>
+  </div>
+
+  <script src="../Js/Common.js"></script>
+  <script src="../Js/Dialog.js"></script>
+  <script>
+    /**
+     * Main.js
+     * メイン画面の処理
+     */
+
+    /** グローバル変数 */
+    let CurrentPage = 1;
+    let ProjectList = [];
+    let MemberList = [];
+    let AdminList = [];
+    let FeedbackList = [];
+
+    /**
+     * ページ読み込み時の初期化処理
+     */
+    document.addEventListener("DOMContentLoaded", function() {
+      InitializeMainPage();
+    });
+
+    /**
+     * メイン画面の初期化
+     */
+    function InitializeMainPage() {
+      /** セッションチェック */
+      const UserId = sessionStorage.getItem("UserId");
+      if (!UserId) {
+        window.location.href = "/index.html";
+        return;
+      }
+
+      /** 管理者メニューの表示制御 */
+      const IsAdmin = sessionStorage.getItem("AuthFlg") === "true";
+      if (IsAdmin) {
+        document.getElementById("MenuMemberList").classList.remove("Hidden");
+        document.getElementById("MenuAdminList").classList.remove("Hidden");
+        document.getElementById("MenuFeedbackList").classList.remove("Hidden");
+      }
+
+      /** メニューイベント設定 */
+      SetupMenuEvents();
+
+      /** モバイルメニュートグル */
+      SetupMobileMenu();
+
+      /** セッション監視開始 */
+      StartSessionMonitor();
+
+      /** 初期表示：作品管理 */
+      ShowWorkManagement();
+    }
+
+    /**
+     * メニューイベントの設定
+     */
+    function SetupMenuEvents() {
+      document.getElementById("MenuWorkManagement").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowWorkManagement();
+      });
+
+      document.getElementById("MenuFeedback").addEventListener("click", async function() {
+        const Result = await ShowFeedbackDialog();
+        if (Result) {
+          await PostFeedback(Result);
+        }
+      });
+
+      document.getElementById("MenuMemberList").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowMemberList();
+      });
+
+      document.getElementById("MenuAdminList").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowAdminList();
+      });
+
+      document.getElementById("MenuFeedbackList").addEventListener("click", function() {
+        SetActiveMenu(this);
+        ShowFeedbackList();
+      });
+
+      document.getElementById("MenuLogout").addEventListener("click", HandleLogout);
+    }
+
+    /**
+     * モバイルメニューの設定
+     */
+    function SetupMobileMenu() {
+      const Toggle = document.getElementById("MenuToggle");
+      const Sidebar = document.getElementById("Sidebar");
+      const Overlay = document.getElementById("SidebarOverlay");
+
+      Toggle.addEventListener("click", function() {
+        Sidebar.classList.toggle("Open");
+        Overlay.classList.toggle("Open");
+      });
+
+      Overlay.addEventListener("click", function() {
+        Sidebar.classList.remove("Open");
+        Overlay.classList.remove("Open");
+      });
+    }
+
+    /**
+     * アクティブメニューの設定
+     * @param {HTMLElement} Element アクティブにする要素
+     */
+    function SetActiveMenu(Element) {
+      document.querySelectorAll(".SidebarItem").forEach(Item => {
+        Item.classList.remove("Active");
+      });
+      Element.classList.add("Active");
+
+      /** モバイルメニューを閉じる */
+      document.getElementById("Sidebar").classList.remove("Open");
+      document.getElementById("SidebarOverlay").classList.remove("Open");
+    }
+
+    /**
+     * ログアウト処理
+     */
+    async function HandleLogout() {
+      const Confirmed = await ShowConfirmDialog("ログアウトしますか？");
+      if (Confirmed) {
+        sessionStorage.clear();
+        window.location.href = "/index.html";
+      }
+    }
+
+    /* ==========================================================================
+     * 作品管理
+     * ========================================================================== */
+    /**
+     * 作品管理画面を表示
+     */
+    async function ShowWorkManagement() {
+      CurrentPage = 1;
+      const ContentArea = document.getElementById("ContentArea");
+
+      ContentArea.innerHTML = `
+        <div class="ContentHeader">
+          <h2 class="ContentTitle"><i class="fas fa-folder-open"></i> 作品管理</h2>
+        </div>
+        <p class="WelcomeMessage">ようこそ、<span class="UserIdDisplay">${sessionStorage.getItem("UserId")}</span> さん</p>
+        <div class="ActionButtons">
+          <button class="ButtonClass SuccessButton" id="CreateWorkButton">
+            <i class="fas fa-plus"></i> 作品作成
+          </button>
+          <button class="ButtonClass PrimaryButton" id="JoinProjectButton">
+            <i class="fas fa-sign-in-alt"></i> プロジェクト参加
+          </button>
+        </div>
+        <div id="RecordCountArea"></div>
+        <div class="TableContainer" id="ProjectTableArea"></div>
+        <div id="PaginationArea"></div>
+      `;
+
+      document.getElementById("CreateWorkButton").addEventListener("click", HandleCreateWork);
+      document.getElementById("JoinProjectButton").addEventListener("click", HandleJoinProject);
+
+      await LoadProjectList();
+    }
+
+    /**
+     * プロジェクト一覧を読み込み
+     */
+    async function LoadProjectList() {
+      try {
+        const UserId = sessionStorage.getItem("UserId");
+        const Response = await CallApi(`/GetProjectList.php?UserId=${encodeURIComponent(UserId)}`, "GET");
+        if (Response.Success) {
+          ProjectList = Response.Data || [];
+          RenderProjectTable();
+        } else {
+          await ShowErrorDialog(Response.Message || "プロジェクト一覧の取得に失敗しました");
+        }
+      } catch (Error) {
+        console.error(Error);
+        await ShowErrorDialog("プロジェクト一覧の取得中にエラーが発生しました");
+      }
+    }
+
+    /**
+     * プロジェクトテーブルを描画
+     */
+    function RenderProjectTable() {
+      const TableArea = document.getElementById("ProjectTableArea");
+      const RecordCountArea = document.getElementById("RecordCountArea");
+      const PaginationArea = document.getElementById("PaginationArea");
+
+      /** 件数表示 */
+      RecordCountArea.innerHTML = "";
+      RecordCountArea.appendChild(CreateRecordCount(ProjectList.length));
+
+      /** テーブル作成 */
+      const Table = document.createElement("table");
+      Table.className = "DataTable";
+
+      /** ヘッダー */
+      const Thead = document.createElement("thead");
+      Thead.innerHTML = `
+        <tr>
+          <th>作品名</th>
+          <th>ジャンル</th>
+          <th>作成者</th>
+          <th>作成日</th>
+          <th>最終更新者</th>
+          <th>更新年月日</th>
+          <th class="ActionCell">操作</th>
+        </tr>
+      `;
+      Table.appendChild(Thead);
+
+      /** ボディ */
+      const Tbody = document.createElement("tbody");
+      const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE;
+      const EndIndex = Math.min(StartIndex + RECORDS_PER_PAGE, ProjectList.length);
+      const PageData = ProjectList.slice(StartIndex, EndIndex);
+
+      if (PageData.length === 0) {
+        const EmptyRow = document.createElement("tr");
+        EmptyRow.innerHTML = '<td colspan="7" style="text-align: center; color: #999;">データがありません</td>';
+        Tbody.appendChild(EmptyRow);
+      } else {
+        PageData.forEach((Project, Index) => {
+          const Row = document.createElement("tr");
+          Row.innerHTML = `
+            <td title="${Project.WorkTitle}">${TruncateText(Project.WorkTitle, 15)}</td>
+            <td>${GetKeyInfo("Genre", Project.Genre)}</td>
+            <td>${Project.RegistUser || "-"}</td>
+            <td>${FormatTimestamp(Project.RegistDate)}</td>
+            <td>${Project.UpdateUser || "-"}</td>
+            <td>${FormatTimestamp(Project.UpdateDate)}</td>
+            <td class="ActionCell">
+              <button class="CellButton CellButtonPrimary" data-action="move" data-index="${StartIndex + Index}">
+                <i class="fas fa-arrow-right"></i> 移動
+              </button>
+              <button class="CellButton CellButtonWarning" data-action="copy" data-index="${StartIndex + Index}">
+                <i class="fas fa-copy"></i> ID発行
+              </button>
+              <button class="CellButton CellButtonDanger" data-action="delete" data-index="${StartIndex + Index}">
+                <i class="fas fa-trash"></i> 削除
+              </button>
+            </td>
+          `;
+          Tbody.appendChild(Row);
+        });
+      }
+      Table.appendChild(Tbody);
+
+      TableArea.innerHTML = "";
+      TableArea.appendChild(Table);
+
+      /** イベント設定 */
+      TableArea.querySelectorAll("[data-action]").forEach(Button => {
+        Button.addEventListener("click", HandleProjectAction);
+      });
+
+      /** ページネーション */
+      PaginationArea.innerHTML = "";
+      PaginationArea.appendChild(CreatePagination(ProjectList.length, CurrentPage, (Page) => {
+        CurrentPage = Page;
+        RenderProjectTable();
+      }));
+    }
+
+    /**
+     * プロジェクトアクション処理
+     * @param {Event} E イベント
+     */
+    async function HandleProjectAction(E) {
+      const Action = E.currentTarget.dataset.action;
+      const Index = parseInt(E.currentTarget.dataset.index);
+      const Project = ProjectList[Index];
+
+      switch (Action) {
+        case "move":
+          if (Project.ProjectLockFlg) {
+            await ShowErrorDialog("このプロジェクトには参加できません");
+            return;
+          }
+          sessionStorage.setItem("WorkId", Project.WorkId);
+          window.location.href = "WorkManagement.html";
+          break;
+
+        case "copy":
+          const Success = await CopyToClipboard(Project.WorkId);
+          if (Success) {
+            await ShowInfoDialog("ID発行", "作品IDを発行しました");
+          } else {
+            await ShowErrorDialog("クリップボードへのコピーに失敗しました");
+          }
+          break;
+
+        case "delete":
+          const Confirmed = await ShowConfirmDialog("この作品を削除しますか？");
+          if (Confirmed) {
+            await DeleteProject(Project.WorkId);
+          }
+          break;
+      }
+    }
+
+    /**
+     * 作品作成処理
+     */
+    async function HandleCreateWork() {
+      const WorkData = await ShowWorkCreateDialog();
+      if (WorkData) {
+        try {
+          const UserId = sessionStorage.getItem("UserId");
+          const Response = await CallApi("/CreateWork.php", "POST", {
+            WorkTitle: WorkData.WorkTitle,
+            Genre: WorkData.Genre,
+            UserId: UserId
+          });
+
+          if (Response.Success) {
+            await ShowInfoDialog("作品作成", "作品を作成しました");
+            await LoadProjectList();
+          } else {
+            await ShowErrorDialog(Response.Message || "作品の作成に失敗しました");
+          }
+        } catch (Error) {
+          await ShowErrorDialog("作品作成中にエラーが発生しました");
+        }
+      }
+    }
+
+    /**
+     * プロジェクト参加処理
+     */
+    async function HandleJoinProject() {
+      const WorkId = await ShowProjectJoinDialog();
+      if (WorkId) {
+        try {
+          const UserId = sessionStorage.getItem("UserId");
+          const Response = await CallApi("/JoinProject.php", "POST", {
+            WorkId: WorkId,
+            UserId: UserId
+          });
+
+          if (Response.Success) {
+            await ShowInfoDialog("プロジェクト参加", "プロジェクトに参加しました");
+            await LoadProjectList();
+          } else {
+            await ShowErrorDialog(Response.Message || "プロジェクト参加に失敗しました");
+          }
+        } catch (Error) {
+          await ShowErrorDialog("プロジェクト参加中にエラーが発生しました");
+        }
+      }
+    }
+
+    /**
+     * プロジェクト削除処理
+     * @param {string} WorkId 作品ID
+     */
+    async function DeleteProject(WorkId) {
+      try {
+        const UserId = sessionStorage.getItem("UserId");
+        const Response = await CallApi("/DeleteProject.php", "POST", {
+          WorkId: WorkId,
+          UserId: UserId
+        });
+
+        if (Response.Success) {
+          await ShowInfoDialog("削除完了", "プロジェクトを削除しました");
+          await LoadProjectList();
+        } else {
+          await ShowErrorDialog(Response.Message || "削除に失敗しました");
+        }
+      } catch (Error) {
+        await ShowErrorDialog("削除中にエラーが発生しました");
+      }
+    }
+
+    /**
+     * フィードバック投稿処理
+     * @param {Object} FeedbackData フィードバックデータ
+     */
+    async function PostFeedback(FeedbackData) {
+      try {
+        const UserId = sessionStorage.getItem("UserId");
+        const Response = await CallApi("/PostFeedback.php", "POST", {
+          UserId: UserId,
+          Title: FeedbackData.Title,
+          Content: FeedbackData.Content
+        });
+
+        if (Response.Success) {
+          await ShowInfoDialog("投稿完了", "フィードバックを投稿しました");
+        } else {
+          await ShowErrorDialog(Response.Message || "投稿に失敗しました");
+        }
+      } catch (Error) {
+        await ShowErrorDialog("投稿中にエラーが発生しました");
+      }
+    }
+
+    /* ==========================================================================
+     * 会員一覧（管理者のみ）
+     * ========================================================================== */
+    /**
+     * 会員一覧画面を表示
+     */
+    async function ShowMemberList() {
+      CurrentPage = 1;
+      const ContentArea = document.getElementById("ContentArea");
+
+      ContentArea.innerHTML = `
+        <div class="ContentHeader">
+          <h2 class="ContentTitle"><i class="fas fa-users"></i> 会員一覧</h2>
+        </div>
+        <div id="RecordCountArea"></div>
+        <div class="TableContainer" id="MemberTableArea"></div>
+        <div id="PaginationArea"></div>
+      `;
+
+      await LoadMemberList();
+    }
+
+    /**
+     * 会員一覧を読み込み
+     */
+    async function LoadMemberList() {
+      try {
+        const Response = await CallApi("/GetMemberList.php", "GET");
+
+        if (Response.Success) {
+          MemberList = Response.Data || [];
+          RenderMemberTable();
+        } else {
+          await ShowErrorDialog(Response.Message || "会員一覧の取得に失敗しました");
+        }
+      } catch (Error) {
+        await ShowErrorDialog("会員一覧の取得中にエラーが発生しました");
+      }
+    }
+
+    /**
+     * 会員テーブルを描画
+     */
+    function RenderMemberTable() {
+      const TableArea = document.getElementById("MemberTableArea");
+      const RecordCountArea = document.getElementById("RecordCountArea");
+      const PaginationArea = document.getElementById("PaginationArea");
+
+      RecordCountArea.innerHTML = "";
+      RecordCountArea.appendChild(CreateRecordCount(MemberList.length));
+
+      const Table = document.createElement("table");
+      Table.className = "DataTable";
+
+      const Thead = document.createElement("thead");
+      Thead.innerHTML = `
+        <tr>
+          <th>ユーザーID</th>
+          <th>登録年月日</th>
+          <th>更新年月日</th>
+          <th>更新者</th>
+          <th class="ActionCell">操作</th>
+        </tr>
+      `;
+      Table.appendChild(Thead);
+
+      const Tbody = document.createElement("tbody");
+      const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE;
+      const EndIndex = Math.min(StartIndex + RECORDS_PER_PAGE, MemberList.length);
+      const PageData = MemberList.slice(StartIndex, EndIndex);
+
+      if (PageData.length === 0) {
+        const EmptyRow = document.createElement("tr");
+        EmptyRow.innerHTML = '<td colspan="5" style="text-align: center; color: #999;">データがありません</td>';
+        Tbody.appendChild(EmptyRow);
+      } else {
+        PageData.forEach((Member, Index) => {
+          const Row = document.createElement("tr");
+          const ButtonClass = Member.AccountLockFlg ? "CellButtonSuccess" : "CellButtonDanger";
+          const ButtonText = Member.AccountLockFlg ? "復旧" : "ロック";
+          const ButtonIcon = Member.AccountLockFlg ? "unlock" : "lock";
+
+          Row.innerHTML = `
+            <td>${Member.UserId}</td>
+            <td>${FormatTimestamp(Member.RegistDate)}</td>
+            <td>${FormatTimestamp(Member.UpdateDate)}</td>
+            <td>${Member.UpdateUser || "-"}</td>
+            <td class="ActionCell">
+              <button class="CellButton ${ButtonClass}" data-action="toggle-lock" data-index="${StartIndex + Index}">
+                <i class="fas fa-${ButtonIcon}"></i> ${ButtonText}
+              </button>
+            </td>
+          `;
+          Tbody.appendChild(Row);
+        });
+      }
+      Table.appendChild(Tbody);
+
+      TableArea.innerHTML = "";
+      TableArea.appendChild(Table);
+
+      TableArea.querySelectorAll("[data-action]").forEach(Button => {
+        Button.addEventListener("click", HandleMemberAction);
+      });
+
+      PaginationArea.innerHTML = "";
+      PaginationArea.appendChild(CreatePagination(MemberList.length, CurrentPage, (Page) => {
+        CurrentPage = Page;
+        RenderMemberTable();
+      }));
+    }
+
+    /**
+     * 会員アクション処理
+     * @param {Event} E イベント
+     */
+    async function HandleMemberAction(E) {
+      const Index = parseInt(E.currentTarget.dataset.index);
+      const Member = MemberList[Index];
+      const NewLockStatus = !Member.AccountLockFlg;
+      const ActionText = NewLockStatus ? "ロック" : "復旧";
+
+      const Confirmed = await ShowConfirmDialog(`このアカウントを${ActionText}しますか？`);
+      if (Confirmed) {
+        try {
+          const AdminUserId = sessionStorage.getItem("UserId");
+          const Response = await CallApi("/UpdateAccountLock.php", "POST", {
+            UserId: Member.UserId,
+            AccountLockFlg: NewLockStatus,
+            AdminUserId: AdminUserId
+          });
+
+          if (Response.Success) {
+            await ShowInfoDialog("更新完了", `アカウントを${ActionText}しました`);
+            await LoadMemberList();
+          } else {
+            await ShowErrorDialog(Response.Message || "更新に失敗しました");
+          }
+        } catch (Error) {
+          await ShowErrorDialog("更新中にエラーが発生しました");
+        }
+      }
+    }
+
+    /* ==========================================================================
+     * 管理者一覧（管理者のみ）
+     * ========================================================================== */
+    /**
+     * 管理者一覧画面を表示
+     */
+    async function ShowAdminList() {
+      CurrentPage = 1;
+      const ContentArea = document.getElementById("ContentArea");
+
+      ContentArea.innerHTML = `
+        <div class="ContentHeader">
+          <h2 class="ContentTitle"><i class="fas fa-user-shield"></i> 管理者一覧</h2>
+        </div>
+        <div id="RecordCountArea"></div>
+        <div class="TableContainer" id="AdminTableArea"></div>
+        <div id="PaginationArea"></div>
+      `;
+
+      await LoadAdminList();
+    }
+
+    /**
+     * 管理者一覧を読み込み
+     */
+    async function LoadAdminList() {
+      try {
+        const Response = await CallApi("/GetAdminList.php", "GET");
+
+        if (Response.Success) {
+          AdminList = Response.Data || [];
+          RenderAdminTable();
+        } else {
+          await ShowErrorDialog(Response.Message || "管理者一覧の取得に失敗しました");
+        }
+      } catch (Error) {
+        await ShowErrorDialog("管理者一覧の取得中にエラーが発生しました");
+      }
+    }
+
+    /**
+     * 管理者テーブルを描画
+     */
+    function RenderAdminTable() {
+      const TableArea = document.getElementById("AdminTableArea");
+      const RecordCountArea = document.getElementById("RecordCountArea");
+      const PaginationArea = document.getElementById("PaginationArea");
+
+      RecordCountArea.innerHTML = "";
+      RecordCountArea.appendChild(CreateRecordCount(AdminList.length));
+
+      const Table = document.createElement("table");
+      Table.className = "DataTable";
+
+      const Thead = document.createElement("thead");
+      Thead.innerHTML = `
+        <tr>
+          <th>ユーザーID</th>
+          <th>登録年月日</th>
+        </tr>
+      `;
+      Table.appendChild(Thead);
+
+      const Tbody = document.createElement("tbody");
+      const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE;
+      const EndIndex = Math.min(StartIndex + RECORDS_PER_PAGE, AdminList.length);
+      const PageData = AdminList.slice(StartIndex, EndIndex);
+
+      if (PageData.length === 0) {
+        const EmptyRow = document.createElement("tr");
+        EmptyRow.innerHTML = '<td colspan="2" style="text-align: center; color: #999;">データがありません</td>';
+        Tbody.appendChild(EmptyRow);
+      } else {
+        PageData.forEach(Admin => {
+          const Row = document.createElement("tr");
+          Row.innerHTML = `
+            <td>${Admin.UserId}</td>
+            <td>${FormatTimestamp(Admin.RegistDate)}</td>
+          `;
+          Tbody.appendChild(Row);
+        });
+      }
+      Table.appendChild(Tbody);
+
+      TableArea.innerHTML = "";
+      TableArea.appendChild(Table);
+
+      PaginationArea.innerHTML = "";
+      PaginationArea.appendChild(CreatePagination(AdminList.length, CurrentPage, (Page) => {
+        CurrentPage = Page;
+        RenderAdminTable();
+      }));
+    }
+
+    /* ==========================================================================
+     * フィードバック一覧（管理者のみ）
+     * ========================================================================== */
+    /**
+     * フィードバック一覧画面を表示
+     */
+    async function ShowFeedbackList() {
+      CurrentPage = 1;
+      const ContentArea = document.getElementById("ContentArea");
+
+      ContentArea.innerHTML = `
+        <div class="ContentHeader">
+          <h2 class="ContentTitle"><i class="fas fa-inbox"></i> フィードバック一覧</h2>
+        </div>
+        <div class="FeedbackDetailArea">
+          <div class="FormGroup">
+            <input type="text" class="InputForm" id="FeedbackTitleDisplay" placeholder="タイトル" disabled>
+          </div>
+          <div></div>
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="FeedbackContentDisplay" placeholder="内容" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="FeedbackDetailButton">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <button class="ButtonClass SaveButton" id="SaveFeedbackButton">
+            <i class="fas fa-save"></i> 保存
+          </button>
+        </div>
+        <input type="hidden" id="FeedbackContentHidden">
+        <div id="RecordCountArea"></div>
+        <div class="TableContainer" id="FeedbackTableArea"></div>
+        <div id="PaginationArea"></div>
+      `;
+
+      document.getElementById("FeedbackDetailButton").addEventListener("click", async () => {
+        const Content = document.getElementById("FeedbackContentHidden").value;
+        await ShowInputAreaDialog(Content, true);
+      });
+
+      document.getElementById("SaveFeedbackButton").addEventListener("click", SaveFeedbackStatus);
+
+      await LoadFeedbackList();
+    }
+
+    /**
+     * フィードバック一覧を読み込み
+     */
+    async function LoadFeedbackList() {
+      try {
+        const Response = await CallApi("/GetFeedbackList.php", "GET");
+
+        if (Response.Success) {
+          FeedbackList = Response.Data || [];
+          RenderFeedbackTable();
+        } else {
+          await ShowErrorDialog(Response.Message || "フィードバック一覧の取得に失敗しました");
+        }
+      } catch (Error) {
+        await ShowErrorDialog("フィードバック一覧の取得中にエラーが発生しました");
+      }
+    }
+
+    /**
+     * フィードバックテーブルを描画
+     */
+    function RenderFeedbackTable() {
+      const TableArea = document.getElementById("FeedbackTableArea");
+      const RecordCountArea = document.getElementById("RecordCountArea");
+      const PaginationArea = document.getElementById("PaginationArea");
+
+      RecordCountArea.innerHTML = "";
+      RecordCountArea.appendChild(CreateRecordCount(FeedbackList.length));
+
+      const Table = document.createElement("table");
+      Table.className = "DataTable";
+
+      const Thead = document.createElement("thead");
+      Thead.innerHTML = `
+        <tr>
+          <th>タイトル</th>
+          <th>内容</th>
+          <th>投稿年月日</th>
+          <th>対応年月日</th>
+          <th>対応者</th>
+          <th>対応状況</th>
+        </tr>
+      `;
+      Table.appendChild(Thead);
+
+      const Tbody = document.createElement("tbody");
+      const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE;
+      const EndIndex = Math.min(StartIndex + RECORDS_PER_PAGE, FeedbackList.length);
+      const PageData = FeedbackList.slice(StartIndex, EndIndex);
+
+      if (PageData.length === 0) {
+        const EmptyRow = document.createElement("tr");
+        EmptyRow.innerHTML = '<td colspan="6" style="text-align: center; color: #999;">データがありません</td>';
+        Tbody.appendChild(EmptyRow);
+      } else {
+        PageData.forEach((Feedback, Index) => {
+          const Row = document.createElement("tr");
+          Row.style.cursor = "pointer";
+          Row.dataset.index = StartIndex + Index;
+
+          Row.innerHTML = `
+            <td title="${Feedback.Title}">${TruncateText(Feedback.Title, 20)}</td>
+            <td title="${Feedback.Content}">${TruncateText(Feedback.Content, 20)}</td>
+            <td>${FormatTimestamp(Feedback.RegistDate)}</td>
+            <td>${FormatTimestamp(Feedback.UpdateDate)}</td>
+            <td>${Feedback.UpdateUser || "-"}</td>
+            <td>
+              <input type="checkbox" class="CheckboxInput" data-feedback-id="${Feedback.FeedBackId}" ${Feedback.ResponseFlg ? "checked" : ""}>
+            </td>
+          `;
+
+          Row.addEventListener("dblclick", () => {
+            document.getElementById("FeedbackTitleDisplay").value = Feedback.Title;
+            document.getElementById("FeedbackContentDisplay").value = TruncateText(Feedback.Content, 30);
+            document.getElementById("FeedbackContentHidden").value = Feedback.Content;
+          });
+
+          Tbody.appendChild(Row);
+        });
+      }
+      Table.appendChild(Tbody);
+
+      TableArea.innerHTML = "";
+      TableArea.appendChild(Table);
+
+      PaginationArea.innerHTML = "";
+      PaginationArea.appendChild(CreatePagination(FeedbackList.length, CurrentPage, (Page) => {
+        CurrentPage = Page;
+        RenderFeedbackTable();
+      }));
+    }
+
+    /**
+     * フィードバック対応状況を保存
+     */
+    async function SaveFeedbackStatus() {
+      try {
+        const Checkboxes = document.querySelectorAll(".CheckboxInput[data-feedback-id]");
+        const Updates = [];
+
+        Checkboxes.forEach(Checkbox => {
+          const FeedbackId = Checkbox.dataset.feedbackId;
+          const OriginalFeedback = FeedbackList.find(F => F.FeedBackId == FeedbackId);
+          if (OriginalFeedback && OriginalFeedback.ResponseFlg !== Checkbox.checked) {
+            Updates.push({
+              FeedBackId: FeedbackId,
+              ResponseFlg: Checkbox.checked
+            });
+          }
+        });
+
+        if (Updates.length === 0) {
+          await ShowInfoDialog("確認", "変更はありません");
+          return;
+        }
+
+        const AdminUserId = sessionStorage.getItem("UserId");
+        const Response = await CallApi("/UpdateFeedbackStatus.php", "POST", {
+          Updates: Updates,
+          AdminUserId: AdminUserId
+        });
+
+        if (Response.Success) {
+          await ShowInfoDialog("保存完了", "対応状況を保存しました");
+          await LoadFeedbackList();
+        } else {
+          await ShowErrorDialog(Response.Message || "保存に失敗しました");
+        }
+      } catch (Error) {
+        await ShowErrorDialog("保存中にエラーが発生しました");
+      }
+    }
+  </script>
+</body>
+</html>

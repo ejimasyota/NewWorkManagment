@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ログイン | 作品管理システム</title>
+  <title>会員登録 | 作品管理システム</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="Front/Css/Common.css">
+  <link rel="stylesheet" href="../Css/Common.css">
   <style>
     /**
-     * ログイン画面固有スタイル
+     * 会員登録画面固有スタイル
      */
-    .LoginContainer {
+    .RegistrationContainer {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -19,7 +19,7 @@
       padding: 20px;
     }
 
-    .LoginCard {
+    .RegistrationCard {
       background-color: #fff;
       border-radius: 12px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -28,7 +28,7 @@
       max-width: 400px;
     }
 
-    .LoginTitle {
+    .RegistrationTitle {
       font-size: 28px;
       font-weight: 700;
       text-align: center;
@@ -36,61 +36,67 @@
       color: #2c3e50;
     }
 
-    .LoginSubtitle {
+    .RegistrationSubtitle {
       text-align: center;
       color: #7f8c8d;
       margin-bottom: 30px;
       font-size: 14px;
     }
 
-    .LoginForm .FormGroup {
+    .RegistrationForm .FormGroup {
       margin-bottom: 20px;
     }
 
-    .LoginForm .InputForm {
+    .RegistrationForm .InputForm {
       padding: 14px 15px;
       font-size: 15px;
     }
 
-    .LoginForm .ButtonClass {
+    .RegistrationForm .ButtonClass {
       padding: 14px 24px;
       font-size: 16px;
     }
 
-    .LoginButtonGroup {
+    .RegistrationButtonGroup {
       display: flex;
       flex-direction: column;
       gap: 12px;
       margin-top: 25px;
     }
 
-    .LoginIcon {
+    .RegistrationIcon {
       font-size: 50px;
       color: #667eea;
       text-align: center;
       margin-bottom: 20px;
     }
 
+    .HintText {
+      font-size: 12px;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+
     @media screen and (max-width: 480px) {
-      .LoginCard {
+      .RegistrationCard {
         padding: 30px 20px;
       }
-      .LoginTitle {
+      .RegistrationTitle {
         font-size: 24px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="LoginContainer">
-    <div class="LoginCard">
-      <div class="LoginIcon">
-        <i class="fas fa-book-open"></i>
+  <div class="RegistrationContainer">
+    <div class="RegistrationCard">
+      <div class="RegistrationIcon">
+        <i class="fas fa-user-plus"></i>
       </div>
-      <h1 class="LoginTitle">作品管理システム</h1>
-      <p class="LoginSubtitle">アカウントにログインしてください</p>
+      <h1 class="RegistrationTitle">会員登録</h1>
+      <p class="RegistrationSubtitle">新規アカウントを作成してください</p>
 
-      <form class="LoginForm" id="LoginForm" onsubmit="return false;">
+      <form class="RegistrationForm" id="RegistrationForm" onsubmit="return false;">
         <div class="FormGroup">
           <input
             type="text"
@@ -100,6 +106,7 @@
             maxlength="12"
             autocomplete="username"
           >
+          <p class="HintText">大文字・記号・数値を含む12桁</p>
         </div>
 
         <div class="FormGroup">
@@ -109,61 +116,62 @@
             id="Password"
             placeholder="パスワード（12桁）"
             maxlength="12"
-            autocomplete="current-password"
+            autocomplete="new-password"
           >
+          <p class="HintText">ユーザーIDと異なる12桁</p>
         </div>
 
-        <div class="LoginButtonGroup">
-          <button type="submit" class="ButtonClass PrimaryButton ButtonFull" id="LoginButton">
-            <i class="fas fa-sign-in-alt"></i> ログイン
+        <div class="RegistrationButtonGroup">
+          <button type="submit" class="ButtonClass SuccessButton ButtonFull" id="RegisterButton">
+            <i class="fas fa-check"></i> 登録
           </button>
-          <button type="button" class="ButtonClass SecondaryButton ButtonFull" id="RegisterButton">
-            <i class="fas fa-user-plus"></i> 会員登録
+          <button type="button" class="ButtonClass SecondaryButton ButtonFull" id="BackToLoginButton">
+            <i class="fas fa-arrow-left"></i> ログインへ
           </button>
         </div>
       </form>
     </div>
   </div>
 
-  <script src="Front/Js/Common.js"></script>
-  <script src="Front/Js/Dialog.js"></script>
+  <script src="../Js/Common.js"></script>
+  <script src="../Js/Dialog.js"></script>
   <script>
     /**
-     * Login.js
-     * ログイン画面の処理
+     * Registration.js
+     * 会員登録画面の処理
      */
 
     /**
      * ページ読み込み時の初期化処理
      */
     document.addEventListener("DOMContentLoaded", function() {
-      InitializeLoginPage();
+      InitializeRegistrationPage();
     });
 
     /**
-     * ログイン画面の初期化
+     * 会員登録画面の初期化
      */
-    function InitializeLoginPage() {
-      /** ログインボタンのイベント設定 */
-      document.getElementById("LoginButton").addEventListener("click", HandleLogin);
+    function InitializeRegistrationPage() {
+      /** 登録ボタンのイベント設定 */
+      document.getElementById("RegisterButton").addEventListener("click", HandleRegistration);
 
-      /** 会員登録ボタンのイベント設定 */
-      document.getElementById("RegisterButton").addEventListener("click", function() {
-        window.location.href = "Front/Html/Registration.html";
+      /** ログインへボタンのイベント設定 */
+      document.getElementById("BackToLoginButton").addEventListener("click", function() {
+        window.location.href = "/index.html";
       });
 
-      /** Enterキーでログイン */
-      document.getElementById("LoginForm").addEventListener("keypress", function(E) {
+      /** Enterキーで登録 */
+      document.getElementById("RegistrationForm").addEventListener("keypress", function(E) {
         if (E.key === "Enter") {
-          HandleLogin();
+          HandleRegistration();
         }
       });
     }
 
     /**
-     * ログイン処理
+     * 会員登録処理
      */
-    async function HandleLogin() {
+    async function HandleRegistration() {
       const UserId = document.getElementById("UserId").value.trim();
       const Password = document.getElementById("Password").value.trim();
 
@@ -208,31 +216,19 @@
 
       /** API呼び出し */
       try {
-        const Response = await CallApi("/Login.php", "POST", {
+        const Response = await CallApi("/Registration.php", "POST", {
           UserId: UserId,
           Password: Password
         });
 
         if (Response.Success) {
-          /** ログイン成功：セッション情報を保存してメイン画面へ遷移 */
-          sessionStorage.setItem("UserId", UserId);
-          if (Response.Data.IsAdmin) {
-            sessionStorage.setItem("AuthFlg", "true");
-          }
-
-          /** 以前のパスがあればそこへ遷移 */
-          const LastPath = sessionStorage.getItem("LastPath");
-          if (LastPath && LastPath !== "/index.html") {
-            sessionStorage.removeItem("LastPath");
-            window.location.href = LastPath;
-          } else {
-            window.location.href = "Front/Html/Main.html";
-          }
+          await ShowInfoDialog("登録完了", "会員登録が完了しました。ログイン画面へ移動します。");
+          window.location.href = "/index.html";
         } else {
-          await ShowErrorDialog(Response.Message || "ログインに失敗しました");
+          await ShowErrorDialog(Response.Message || "登録に失敗しました");
         }
       } catch (Error) {
-        await ShowErrorDialog(Error.message || "ログイン処理中にエラーが発生しました");
+        await ShowErrorDialog(Error.message || "登録処理中にエラーが発生しました");
       }
     }
   </script>

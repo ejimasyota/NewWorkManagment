@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>作品管理 | 作品管理システム</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../Css/Common.css" />
+    <style>
+      /**
+     * 作品管理画面固有スタイル
+     */
+      .ContentArea {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        min-height: calc(100vh - 80px);
+      }
+
+      .WorkTitle {
+        font-size: 18px;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        background-color: #ecf0f1;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .WorkTitle i {
+        color: #3498db;
+      }
+
+      .SidebarSubMenu {
+        padding-left: 20px;
+        font-size: 13px;
+      }
+
+      .SidebarSubMenu .SidebarItem {
+        padding: 10px 15px;
+      }
+
+      .SidebarDivider {
+        height: 1px;
+        background-color: #34495e;
+        margin: 10px 15px;
+      }
+
+      /* カレンダーUI */
+      .CalendarContainer {
+        margin-top: 20px;
+      }
+
+      .CalendarHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #3498db;
+        border-radius: 8px;
+        color: #fff;
+      }
+
+      .CalendarHeader h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .CalendarNavButton {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: #fff;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.2s;
+      }
+
+      .CalendarNavButton:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .CalendarGrid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        background-color: #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .CalendarDayHeader {
+        background-color: #34495e;
+        color: #fff;
+        text-align: center;
+        padding: 10px 5px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .CalendarDayHeader.Sunday {
+        color: #ff6b6b;
+      }
+      .CalendarDayHeader.Saturday {
+        color: #74b9ff;
+      }
+
+      .CalendarDay {
+        background-color: #fff;
+        min-height: 80px;
+        padding: 5px;
+        cursor: pointer;
+        transition: background 0.2s;
+        position: relative;
+      }
+
+      .CalendarDay:hover {
+        background-color: #ecf0f1;
+      }
+
+      .CalendarDay.OtherMonth {
+        background-color: #f8f9fa;
+        color: #aaa;
+      }
+
+      .CalendarDay.Today {
+        background-color: #fff9c4;
+      }
+
+      .CalendarDayNumber {
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .CalendarDay.Sunday .CalendarDayNumber {
+        color: #e74c3c;
+      }
+      .CalendarDay.Saturday .CalendarDayNumber {
+        color: #3498db;
+      }
+
+      .CalendarEvent {
+        font-size: 10px;
+        padding: 2px 4px;
+        margin-bottom: 2px;
+        border-radius: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        color: #fff;
+        background-color: #3498db;
+      }
+
+      .CalendarEvent:hover {
+        opacity: 0.8;
+      }
+
+      .CalendarMoreEvents {
+        font-size: 10px;
+        color: #666;
+        text-align: center;
+        margin-top: 2px;
+      }
+
+      /* スケジュール詳細モーダル */
+      .ScheduleModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .ScheduleModalContent {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .ScheduleModalHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .ScheduleModalHeader h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #2c3e50;
+      }
+
+      .ScheduleModalClose {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #999;
+      }
+
+      .ScheduleModalClose:hover {
+        color: #333;
+      }
+
+      .ColorPicker {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+
+      .ColorOption {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: transform 0.2s, border-color 0.2s;
+      }
+
+      .ColorOption:hover {
+        transform: scale(1.1);
+      }
+
+      .ColorOption.Selected {
+        border-color: #2c3e50;
+      }
+
+      @media screen and (max-width: 768px) {
+        .CalendarDay {
+          min-height: 60px;
+          padding: 3px;
+        }
+        .CalendarDayNumber {
+          font-size: 10px;
+        }
+        .CalendarEvent {
+          font-size: 8px;
+          padding: 1px 2px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- メニュートグルボタン（モバイル用） -->
+    <button class="MenuToggle" id="MenuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- サイドバーオーバーレイ（モバイル用） -->
+    <div class="SidebarOverlay" id="SidebarOverlay"></div>
+
+    <div class="PageContainer">
+      <!-- サイドバー -->
+      <nav class="Sidebar" id="Sidebar">
+        <div class="SidebarHeader">
+          <h1><i class="fas fa-book-open"></i> 作品管理</h1>
+        </div>
+        <div class="SidebarMenu">
+          <!-- メイン機能 -->
+          <button class="SidebarItem" id="MenuBackToMain">
+            <i class="fas fa-arrow-left"></i> メインへ戻る
+          </button>
+
+          <div class="SidebarDivider"></div>
+
+          <!-- 作品設定 -->
+          <button class="SidebarItem Active" id="MenuWorkInfo">
+            <i class="fas fa-info-circle"></i> 作品共通情報
+          </button>
+          <button class="SidebarItem" id="MenuCharacter">
+            <i class="fas fa-user"></i> キャラ設定
+          </button>
+          <button class="SidebarItem" id="MenuOrganization">
+            <i class="fas fa-building"></i> 組織設定
+          </button>
+          <button class="SidebarItem" id="MenuTeam">
+            <i class="fas fa-users"></i> チーム設定
+          </button>
+          <button class="SidebarItem" id="MenuRace">
+            <i class="fas fa-dna"></i> 種族設定
+          </button>
+          <button class="SidebarItem" id="MenuClass">
+            <i class="fas fa-medal"></i> 階級設定
+          </button>
+
+          <div class="SidebarDivider"></div>
+
+          <!-- 世界観設定 -->
+          <button class="SidebarItem" id="MenuCalendar">
+            <i class="fas fa-calendar-alt"></i> 元号設定
+          </button>
+          <button class="SidebarItem" id="MenuTimeline">
+            <i class="fas fa-stream"></i> 年表設定
+          </button>
+          <button class="SidebarItem" id="MenuStage">
+            <i class="fas fa-map-marked-alt"></i> 舞台設定
+          </button>
+          <button class="SidebarItem" id="MenuBuilding">
+            <i class="fas fa-landmark"></i> 建物設定
+          </button>
+
+          <div class="SidebarDivider"></div>
+
+          <!-- 能力・装備 -->
+          <button class="SidebarItem" id="MenuPower">
+            <i class="fas fa-bolt"></i> 能力設定
+          </button>
+          <button class="SidebarItem" id="MenuWeapon">
+            <i class="fas fa-shield-alt"></i> 武器設定
+          </button>
+          <button class="SidebarItem" id="MenuMove">
+            <i class="fas fa-fire"></i> 技設定
+          </button>
+
+          <div class="SidebarDivider"></div>
+
+          <!-- ストーリー・その他 -->
+          <button class="SidebarItem" id="MenuSerif">
+            <i class="fas fa-comment"></i> セリフ設定
+          </button>
+          <button class="SidebarItem" id="MenuRelation">
+            <i class="fas fa-project-diagram"></i> 相関図作成
+          </button>
+          <button class="SidebarItem" id="MenuStory">
+            <i class="fas fa-book"></i> ストーリー作成
+          </button>
+          <button class="SidebarItem" id="MenuPlot">
+            <i class="fas fa-sitemap"></i> プロット作成
+          </button>
+          <button class="SidebarItem" id="MenuClue">
+            <i class="fas fa-puzzle-piece"></i> 伏線メモ
+          </button>
+
+          <div class="SidebarDivider"></div>
+
+          <!-- 管理 -->
+          <button class="SidebarItem" id="MenuReview">
+            <i class="fas fa-star"></i> 作品レビュー
+          </button>
+          <button class="SidebarItem" id="MenuMemo">
+            <i class="fas fa-sticky-note"></i> 作品作成用メモ
+          </button>
+          <button class="SidebarItem" id="MenuSchedule">
+            <i class="fas fa-tasks"></i> スケジュール
+          </button>
+          <button class="SidebarItem" id="MenuParticipants">
+            <i class="fas fa-user-friends"></i> 参加者一覧
+          </button>
+          <button class="SidebarItem" id="MenuHistory">
+            <i class="fas fa-history"></i> 更新履歴
+          </button>
+        </div>
+        <div class="SidebarFooter">
+          <button class="SidebarItem" id="MenuLogout">
+            <i class="fas fa-sign-out-alt"></i> ログアウト
+          </button>
+        </div>
+      </nav>
+
+      <!-- メインコンテンツ -->
+      <main class="MainContent">
+        <div class="ContentArea" id="ContentArea">
+          <!-- 動的にコンテンツが挿入される -->
+        </div>
+      </main>
+    </div>
+
+    <script src="../Js/Common.js"></script>
+    <script src="../Js/Dialog.js"></script>
+    <script>
+      /**
+       * WorkManagement.js
+       * 作品管理画面の処理
+       */
+
+      /** グローバル変数 */
+      let WorkInfo = null;
+      let IsCreator = false;
+      let IsAdmin = false;
+      let IsAssistant = false;
+      let CurrentPage = 1;
+      let TimelineList = [];
+      let ScheduleList = [];
+      let ReviewList = [];
+      let SelectedTimelineId = null;
+      let SelectedScheduleId = null;
+      let SelectedReviewId = null;
+
+      /**
+       * ページ読み込み時の初期化処理
+       */
+      document.addEventListener("DOMContentLoaded", function () {
+        InitializeWorkManagementPage();
+      });
+
+      /**
+       * 作品管理画面の初期化
+       */
+      async function InitializeWorkManagementPage() {
+        /** セッションチェック */
+        const UserId = sessionStorage.getItem("UserId");
+        const WorkId = sessionStorage.getItem("WorkId");
+
+        if (!UserId || !WorkId) {
+          window.location.href = "/index.html";
+          return;
+        }
+
+        IsAdmin = sessionStorage.getItem("AuthFlg") === "true";
+
+        /** メニューイベント設定 */
+        SetupMenuEvents();
+
+        /** モバイルメニュートグル */
+        SetupMobileMenu();
+
+        /** セッション監視開始 */
+        StartSessionMonitor();
+
+        /** 作品情報取得 */
+        await LoadWorkInfo();
+
+        /** 利用者区分チェック */
+        await CheckUserPermission();
+
+        /** 初期表示：作品共通情報 */
+        ShowWorkCommonInfo();
+      }
+
+      /**
+       * 作品情報を読み込み
+       */
+      async function LoadWorkInfo() {
+        try {
+          const WorkId = sessionStorage.getItem("WorkId");
+          const Response = await CallApi(
+            `/GetWorkInfo.php?WorkId=${encodeURIComponent(WorkId)}`,
+            "GET"
+          );
+
+          if (Response.Success) {
+            WorkInfo = Response.Data;
+          } else {
+            await ShowErrorDialog(
+              Response.Message || "作品情報の取得に失敗しました"
+            );
+            window.location.href = "Main.html";
+          }
+        } catch (Error) {
+          await ShowErrorDialog("作品情報の取得中にエラーが発生しました");
+          window.location.href = "Main.html";
+        }
+      }
+
+      /**
+       * 利用者区分チェック
+       */
+      async function CheckUserPermission() {
+        try {
+          const UserId = sessionStorage.getItem("UserId");
+          const WorkId = sessionStorage.getItem("WorkId");
+          const Response = await CallApi(
+            `/GetUserPermission.php?WorkId=${encodeURIComponent(
+              WorkId
+            )}&UserId=${encodeURIComponent(UserId)}`,
+            "GET"
+          );
+
+          if (Response.Success) {
+            IsCreator = Response.IsCreator;
+            IsAssistant = !Response.IsCreator;
+          }
+        } catch (Error) {
+          console.error("権限チェックエラー:", Error);
+        }
+      }
+
+      /**
+       * 編集権限があるかチェック（作成者または管理者）
+       * @returns {boolean} 編集権限があるかどうか
+       */
+      function CanEdit() {
+        return IsCreator || IsAdmin;
+      }
+
+      /**
+       * レビュー編集権限があるかチェック（アシスタントまたは管理者）
+       * @returns {boolean} レビュー編集権限があるかどうか
+       */
+      function CanEditReview() {
+        return IsAssistant || IsAdmin;
+      }
+
+      /**
+       * メニューイベントの設定
+       */
+      function SetupMenuEvents() {
+        /** メインへ戻る */
+        document
+          .getElementById("MenuBackToMain")
+          .addEventListener("click", function () {
+            window.location.href = "Main.html";
+          });
+
+        /** 各メニュー項目 */
+        document
+          .getElementById("MenuWorkInfo")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowWorkCommonInfo();
+          });
+
+        document
+          .getElementById("MenuCharacter")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowCharacterSetting();
+          });
+
+        document
+          .getElementById("MenuOrganization")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowOrganizationSetting();
+          });
+
+        document
+          .getElementById("MenuTeam")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowTeamSetting();
+          });
+
+        document
+          .getElementById("MenuRace")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowRaceSetting();
+          });
+
+        document
+          .getElementById("MenuClass")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowClassSetting();
+          });
+
+        document
+          .getElementById("MenuCalendar")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowCalendarSetting();
+          });
+
+        document
+          .getElementById("MenuTimeline")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowTimelineSetting();
+          });
+
+        document
+          .getElementById("MenuStage")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowStageSetting();
+          });
+
+        document
+          .getElementById("MenuBuilding")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowBuildingSetting();
+          });
+
+        document
+          .getElementById("MenuPower")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowPowerSetting();
+          });
+
+        document
+          .getElementById("MenuWeapon")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowWeaponSetting();
+          });
+
+        document
+          .getElementById("MenuMove")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowMoveSetting();
+          });
+
+        document
+          .getElementById("MenuSerif")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowSerifSetting();
+          });
+
+        document
+          .getElementById("MenuRelation")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowRelationDiagram();
+          });
+
+        document
+          .getElementById("MenuStory")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowStoryCreation();
+          });
+
+        document
+          .getElementById("MenuPlot")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowPlotCreation();
+          });
+
+        document
+          .getElementById("MenuClue")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowClueMemo();
+          });
+
+        document
+          .getElementById("MenuReview")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowWorkReview();
+          });
+
+        document
+          .getElementById("MenuMemo")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowWorkMemo();
+          });
+
+        document
+          .getElementById("MenuSchedule")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowSchedule();
+          });
+
+        document
+          .getElementById("MenuParticipants")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowParticipants();
+          });
+
+        document
+          .getElementById("MenuHistory")
+          .addEventListener("click", function () {
+            SetActiveMenu(this);
+            ShowUpdateHistory();
+          });
+
+        document
+          .getElementById("MenuLogout")
+          .addEventListener("click", HandleLogout);
+      }
+
+      /**
+       * モバイルメニューの設定
+       */
+      function SetupMobileMenu() {
+        const Toggle = document.getElementById("MenuToggle");
+        const Sidebar = document.getElementById("Sidebar");
+        const Overlay = document.getElementById("SidebarOverlay");
+
+        Toggle.addEventListener("click", function () {
+          Sidebar.classList.toggle("Open");
+          Overlay.classList.toggle("Open");
+        });
+
+        Overlay.addEventListener("click", function () {
+          Sidebar.classList.remove("Open");
+          Overlay.classList.remove("Open");
+        });
+      }
+
+      /**
+       * アクティブメニューの設定
+       * @param {HTMLElement} Element アクティブにする要素
+       */
+      function SetActiveMenu(Element) {
+        document.querySelectorAll(".SidebarItem").forEach((Item) => {
+          Item.classList.remove("Active");
+        });
+        Element.classList.add("Active");
+
+        document.getElementById("Sidebar").classList.remove("Open");
+        document.getElementById("SidebarOverlay").classList.remove("Open");
+      }
+
+      /**
+       * ログアウト処理
+       */
+      async function HandleLogout() {
+        const Confirmed = await ShowConfirmDialog("ログアウトしますか？");
+        if (Confirmed) {
+          sessionStorage.clear();
+          window.location.href = "/index.html";
+        }
+      }
+
+      /**
+       * コンテンツヘッダーを生成
+       * @param {string} Title タイトル
+       * @param {string} Icon アイコン
+       * @returns {string} HTML文字列
+       */
+      function CreateContentHeader(Title, Icon) {
+        const WorkTitle = WorkInfo ? WorkInfo.WorkTitle : "";
+        return `
+        <div class="WorkTitle">
+          <i class="fas fa-book"></i>
+          <span>${TruncateText(WorkTitle, 30)}</span>
+        </div>
+        <div class="ContentHeader">
+          <h2 class="ContentTitle"><i class="fas fa-${Icon}"></i> ${Title}</h2>
+        </div>
+      `;
+      }
+
+      /* ==========================================================================
+       * 作品共通情報
+       * ========================================================================== */
+      /**
+       * 作品共通情報画面を表示
+       */
+      function ShowWorkCommonInfo() {
+        const ContentArea = document.getElementById("ContentArea");
+        const CanEditFlg = CanEdit();
+
+        ContentArea.innerHTML = `
+        ${CreateContentHeader("作品共通情報", "info-circle")}
+        <div class="FormGroup">
+          <input type="text" class="InputForm" id="WorkTitle" placeholder="作品名" value="${
+            WorkInfo?.WorkTitle || ""
+          }" ${!CanEditFlg ? "disabled" : ""}>
+        </div>
+        <div class="FormGroup">
+          <select class="SelectForm" id="Genre" ${
+            !CanEditFlg ? "disabled" : ""
+          }>
+            ${PullDownList("Genre")}
+          </select>
+        </div>
+        ${
+          CanEditFlg
+            ? `
+        <div class="ButtonGroup">
+          <button class="ButtonClass SaveButton" id="SaveWorkInfoButton">
+            <i class="fas fa-save"></i> 保存
+          </button>
+        </div>
+        `
+            : ""
+        }
+      `;
+
+        if (WorkInfo) {
+          document.getElementById("Genre").value = WorkInfo.Genre;
+        }
+
+        if (CanEditFlg) {
+          document
+            .getElementById("SaveWorkInfoButton")
+            .addEventListener("click", SaveWorkInfo);
+        }
+      }
+
+      /**
+       * 作品情報を保存
+       */
+      async function SaveWorkInfo() {
+        const WorkTitle = document.getElementById("WorkTitle").value.trim();
+        const Genre = document.getElementById("Genre").value;
+
+        if (!WorkTitle) {
+          await ShowErrorDialog("作品名を入力してください");
+          return;
+        }
+
+        try {
+          const UserId = sessionStorage.getItem("UserId");
+          const WorkId = sessionStorage.getItem("WorkId");
+          const Response = await CallApi("/UpdateWorkInfo.php", "POST", {
+            WorkId: WorkId,
+            WorkTitle: WorkTitle,
+            Genre: parseInt(Genre),
+            UserId: UserId,
+          });
+
+          if (Response.Success) {
+            await ShowInfoDialog("保存完了", "作品情報を保存しました");
+            await LoadWorkInfo();
+            ShowWorkCommonInfo();
+          } else {
+            await ShowErrorDialog(Response.Message || "保存に失敗しました");
+          }
+        } catch (Error) {
+          await ShowErrorDialog("保存中にエラーが発生しました");
+        }
+      }
+
+      /* ==========================================================================
+       * プレースホルダー関数（各画面の実装）
+       * ========================================================================== */
+      function ShowCharacterSetting() {
+        ShowPlaceholder("キャラ設定", "user");
+      }
+
+      function ShowOrganizationSetting() {
+        ShowPlaceholder("組織設定", "building");
+      }
+
+      function ShowTeamSetting() {
+        ShowPlaceholder("チーム設定", "users");
+      }
+
+      function ShowRaceSetting() {
+        ShowPlaceholder("種族設定", "dna");
+      }
+
+      function ShowClassSetting() {
+        ShowPlaceholder("階級設定", "medal");
+      }
+
+      function ShowCalendarSetting() {
+        ShowPlaceholder("元号設定", "calendar-alt");
+      }
+
+      /* ==========================================================================
+       * 年表設定 (6.1 TimelineInfo)
+       * ========================================================================== */
+      async function ShowTimelineSetting() {
+        CurrentPage = 1;
+        SelectedTimelineId = null;
+        const ContentArea = document.getElementById("ContentArea");
+        const CanEditFlg = CanEdit();
+
+        ContentArea.innerHTML = `
+        ${CreateContentHeader("年表設定", "stream")}
+        <div class="FormGroup">
+          <input type="text" class="InputForm" id="TimelineTitle" placeholder="出来事タイトル" maxlength="255" ${
+            !CanEditFlg ? "disabled" : ""
+          }>
+        </div>
+        <div class="FormGroup InputWithButton">
+          <input type="text" class="InputForm" id="TimelineEventDate" placeholder="発生時期" readonly ${
+            !CanEditFlg ? "disabled" : ""
+          }>
+          ${
+            CanEditFlg
+              ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineEventDateBtn"><i class="fas fa-calendar"></i></button>`
+              : ""
+          }
+        </div>
+        <div class="FormGroup InputWithButton">
+          <input type="text" class="InputForm" id="TimelineEndDate" placeholder="終了時期（任意）" readonly ${
+            !CanEditFlg ? "disabled" : ""
+          }>
+          ${
+            CanEditFlg
+              ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineEndDateBtn"><i class="fas fa-calendar"></i></button>`
+              : ""
+          }
+        </div>
+        <div class="FormGroup InputWithButton">
+          <input type="text" class="InputForm" id="TimelineContent" placeholder="内容" disabled>
+          <button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineContentBtn"><i class="fas fa-edit"></i></button>
+        </div>
+        <input type="hidden" id="TimelineContentHidden">
+        ${
+          CanEditFlg
+            ? `
+        <div class="ButtonGroup">
+          <button class="ButtonClass ClearButton" id="TimelineClearButton"><i class="fas fa-sync"></i> クリア</button>
+          <button class="ButtonClass SaveButton" id="TimelineSaveButton"><i class="fas fa-save"></i> 保存</button>
+          <button class="ButtonClass DeleteButton Hidden" id="TimelineDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+        </div>
+        `
+            : ""
+        }
+        <div id="RecordCountArea" class="MarginTop20"></div>
+        <div class="TableContainer" id="TimelineTableArea"></div>
+        <div id="PaginationArea"></div>
+      `;
+
+        if (CanEditFlg) {
+          const DatePickerInstance = new DatePicker();
+          document
+            .getElementById("TimelineEventDateBtn")
+            .addEventListener("click", () =>
+              DatePickerInstance.OpenDialog("TimelineEventDate")
+            );
+          document
+            .getElementById("TimelineEndDateBtn")
+            .addEventListener("click", () =>
+              DatePickerInstance.OpenDialog("TimelineEndDate")
+            );
+          document
+            .getElementById("TimelineClearButton")
+            .addEventListener("click", ClearTimelineForm);
+          document
+            .getElementById("TimelineSaveButton")
+            .addEventListener("click", SaveTimeline);
+          document
+            .getElementById("TimelineDeleteButton")
+            .addEventListener("click", DeleteTimeline);
+        }
+        document
+          .getElementById("TimelineContentBtn")
+          .addEventListener("click", async () => {
+            const Result = await ShowInputAreaDialog(
+              document.getElementById("TimelineContentHidden").value,
+              !CanEditFlg
+            );
+            if (Result !== null && CanEditFlg) {
+              document.getElementById("TimelineContentHidden").value = Result;
+              document.getElementById("TimelineContent").value = TruncateText(
+                Result,
+                30
+              );
+            }
+          });
+        await LoadTimelineList();
+      }
+
+      async function LoadTimelineList() {
+        try {
+          const WorkId = sessionStorage.getItem("WorkId");
+          const Response = await CallApi(
+            `/GetTimelineList.php?WorkId=${encodeURIComponent(WorkId)}`,
+            "GET"
+          );
+          if (Response.Success) {
+            TimelineList = Response.Data || [];
+            RenderTimelineTable();
+          } else {
+            await ShowErrorDialog(
+              Response.Message || "年表一覧の取得に失敗しました"
+            );
+          }
+        } catch (Error) {
+          console.error(Error);
+          await ShowErrorDialog("年表一覧の取得中にエラーが発生しました");
+        }
+      }
+      function RenderTimelineTable() {
+        const TableArea = document.getElementById("TimelineTableArea");
+        const RecordCountArea = document.getElementById("RecordCountArea");
+        const PaginationArea = document.getElementById("PaginationArea");
+        RecordCountArea.innerHTML = "";
+        RecordCountArea.appendChild(CreateRecordCount(TimelineList.length));
+        const Table = document.createElement("table");
+        Table.className = "DataTable";
+        const Thead = document.createElement("thead");
+        Thead.innerHTML = `<tr><th>タイトル</th><th>発生時期</th><th>終了時期</th><th>内容</th></tr>`;
+        Table.appendChild(Thead);
+        const Tbody = document.createElement("tbody");
+        const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE;
+        const EndIndex = Math.min(
+          StartIndex + RECORDS_PER_PAGE,
+          TimelineList.length
+        );
+        const PageData = TimelineList.slice(StartIndex, EndIndex);
+        if (PageData.length === 0) {
+          Tbody.innerHTML =
+            '<tr><td colspan="4" style="text-align:center;color:#999;">データがありません</td></tr>';
+        } else {
+          PageData.forEach((Item, Idx) => {
+            const Row = document.createElement("tr");
+            Row.style.cursor = "pointer";
+            Row.dataset.index = StartIndex + Idx;
+            Row.innerHTML = `<td title="${Item.Title}">${TruncateText(
+              Item.Title,
+              20
+            )}</td><td>${FormatDate(Item.EventDate)}</td><td>${
+              FormatDate(Item.EndDate) || "-"
+            }</td><td title="${Item.Content || ""}">${
+              TruncateText(Item.Content, 20) || "-"
+            }</td>`;
+            Row.addEventListener("dblclick", () =>
+              SelectTimeline(StartIndex + Idx)
+            );
+            Tbody.appendChild(Row);
+          });
+        }
+        Table.appendChild(Tbody);
+        TableArea.innerHTML = "";
+        TableArea.appendChild(Table);
+        PaginationArea.innerHTML = "";
+        PaginationArea.appendChild(
+          CreatePagination(TimelineList.length, CurrentPage, (Page) => {
+            CurrentPage = Page;
+            RenderTimelineTable();
+          })
+        );
+      }
+
+      function SelectTimeline(Index) {
+        const Item = TimelineList[Index];
+        SelectedTimelineId = Item.TimeId;
+        document.getElementById("TimelineTitle").value = Item.Title;
+        document.getElementById("TimelineEventDate").value =
+          Item.EventDate || "";
+        document.getElementById("TimelineEndDate").value = Item.EndDate || "";
+        document.getElementById("TimelineContent").value = TruncateText(
+          Item.Content,
+          30
+        );
+        document.getElementById("TimelineContentHidden").value =
+          Item.Content || "";
+        const DeleteBtn = document.getElementById("TimelineDeleteButton");
+        if (DeleteBtn) DeleteBtn.classList.remove("Hidden");
+      }
+
+      function ClearTimelineForm() {
+        SelectedTimelineId = null;
+        document.getElementById("TimelineTitle").value = "";
+        document.getElementById("TimelineEventDate").value = "";
+        document.getElementById("TimelineEndDate").value = "";
+        document.getElementById("TimelineContent").value = "";
+        document.getElementById("TimelineContentHidden").value = "";
+        const DeleteBtn = document.getElementById("TimelineDeleteButton");
+        if (DeleteBtn) DeleteBtn.classList.add("Hidden");
+      }
+
+      async function SaveTimeline() {
+        const Title = document.getElementById("TimelineTitle").value.trim();
+        const EventDate = document
+          .getElementById("TimelineEventDate")
+          .value.trim();
+        if (!Title) {
+          await ShowErrorDialog("タイトルを入力してください");
+          return;
+        }
+        if (!EventDate) {
+          await ShowErrorDialog("発生時期を入力してください");
+          return;
+        }
+        try {
+          const Response = await CallApi("/SaveTimeline.php", "POST", {
+            TimeId: SelectedTimelineId,
+            WorkId: sessionStorage.getItem("WorkId"),
+            Title: Title,
+            EventDate: EventDate,
+            EndDate: document.getElementById("TimelineEndDate").value.trim(),
+            Content: document.getElementById("TimelineContentHidden").value,
+            UserId: sessionStorage.getItem("UserId"),
+          });
+          if (Response.Success) {
+            await ShowInfoDialog("保存完了", "年表を保存しました");
+            ClearTimelineForm();
+            await LoadTimelineList();
+          } else {
+            await ShowErrorDialog(Response.Message || "保存に失敗しました");
+          }
+        } catch (Error) {
+          await ShowErrorDialog("保存中にエラーが発生しました");
+        }
+      }
+
+      async function DeleteTimeline() {
+        if (!SelectedTimelineId) return;
+        if (!(await ShowConfirmDialog("この年表を削除しますか？"))) return;
+        try {
+          const Response = await CallApi("/DeleteTimeline.php", "POST", {
+            TimeId: SelectedTimelineId,
+            UserId: sessionStorage.getItem("UserId"),
+          });
+          if (Response.Success) {
+            await ShowInfoDialog("削除完了", "年表を削除しました");
+            ClearTimelineForm();
+            await LoadTimelineList();
+          } else {
+            await ShowErrorDialog(Response.Message || "削除に失敗しました");
+          }
+        } catch (Error) {
+          await ShowErrorDialog("削除中にエラーが発生しました");
+        }
+      }
+
+      function ShowStageSetting() {
+        ShowPlaceholder("舞台設定", "map-marked-alt");
+      }
+
+      function ShowBuildingSetting() {
+        ShowPlaceholder("建物設定", "landmark");
+      }
+
+      function ShowPowerSetting() {
+        ShowPlaceholder("能力設定", "bolt");
+      }
+
+      function ShowWeaponSetting() {
+        ShowPlaceholder("武器設定", "shield-alt");
+      }
+
+      function ShowMoveSetting() {
+        ShowPlaceholder("技設定", "fire");
+      }
+
+      function ShowSerifSetting() {
+        ShowPlaceholder("セリフ設定", "comment");
+      }
+
+      function ShowRelationDiagram() {
+        ShowPlaceholder("相関図作成", "project-diagram");
+      }
+
+      function ShowStoryCreation() {
+        ShowPlaceholder("ストーリー作成", "book");
+      }
+
+      function ShowPlotCreation() {
+        ShowPlaceholder("プロット作成", "sitemap");
+      }
+
+      function ShowClueMemo() {
+        ShowPlaceholder("伏線メモ", "puzzle-piece");
+      }
+
+      /* ==========================================================================
+       * 作品レビュー (7.3 ReviewInfo)
+       * ========================================================================== */
+      async function ShowWorkReview() {
+        CurrentPage = 1;
+        SelectedReviewId = null;
+        const ContentArea = document.getElementById("ContentArea");
+        const CanEditFlg = CanEditReview();
+        ContentArea.innerHTML = `
+        ${CreateContentHeader("作品レビュー", "star")}
+        <div class="FormGroup"><input type="text" class="InputForm" id="ReviewerName" placeholder="レビュアー名" maxlength="150" ${
+          !CanEditFlg ? "disabled" : ""
+        }></div>
+        <div class="FormGroup"><select class="SelectForm" id="ReviewEvaluation" ${
+          !CanEditFlg ? "disabled" : ""
+        }>${PullDownList("Review")}</select></div>
+        <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ReviewContent" placeholder="レビュー内容" disabled><button class="ButtonClass SecondaryButton ButtonSmall" id="ReviewContentBtn"><i class="fas fa-edit"></i></button></div>
+        <input type="hidden" id="ReviewContentHidden">
+        ${
+          CanEditFlg
+            ? `<div class="ButtonGroup"><button class="ButtonClass ClearButton" id="ReviewClearButton"><i class="fas fa-sync"></i> クリア</button><button class="ButtonClass SaveButton" id="ReviewSaveButton"><i class="fas fa-save"></i> 保存</button><button class="ButtonClass DeleteButton Hidden" id="ReviewDeleteButton"><i class="fas fa-trash"></i> 削除</button></div>`
+            : ""
+        }
+        <div id="RecordCountArea" class="MarginTop20"></div><div class="TableContainer" id="ReviewTableArea"></div><div id="PaginationArea"></div>
+      `;
+        if (CanEditFlg) {
+          document
+            .getElementById("ReviewClearButton")
+            .addEventListener("click", ClearReviewForm);
+          document
+            .getElementById("ReviewSaveButton")
+            .addEventListener("click", SaveReview);
+          document
+            .getElementById("ReviewDeleteButton")
+            .addEventListener("click", DeleteReview);
+        }
+        document
+          .getElementById("ReviewContentBtn")
+          .addEventListener("click", async () => {
+            const Result = await ShowInputAreaDialog(
+              document.getElementById("ReviewContentHidden").value,
+              !CanEditFlg
+            );
+            if (Result !== null && CanEditFlg) {
+              document.getElementById("ReviewContentHidden").value = Result;
+              document.getElementById("ReviewContent").value = TruncateText(
+                Result,
+                30
+              );
+            }
+          });
+        await LoadReviewList();
+      }
+
+      async function LoadReviewList() {
+        try {
+          const Response = await CallApi(
+            `/GetReviewList.php?WorkId=${encodeURIComponent(
+              sessionStorage.getItem("WorkId")
+            )}`,
+            "GET"
+          );
+          if (Response.Success) {
+            ReviewList = Response.Data || [];
+            RenderReviewTable();
+          } else {
+            await ShowErrorDialog(
+              Response.Message || "レビュー一覧の取得に失敗しました"
+            );
+          }
+        } catch (Error) {
+          console.error(Error);
+          await ShowErrorDialog("レビュー一覧の取得中にエラーが発生しました");
+        }
+      }
+
+      function RenderReviewTable() {
+        const TableArea = document.getElementById("ReviewTableArea");
+        const RecordCountArea = document.getElementById("RecordCountArea");
+        const PaginationArea = document.getElementById("PaginationArea");
+        RecordCountArea.innerHTML = "";
+        RecordCountArea.appendChild(CreateRecordCount(ReviewList.length));
+        const Table = document.createElement("table");
+        Table.className = "DataTable";
+        const Thead = document.createElement("thead");
+        Thead.innerHTML = `<tr><th>レビュアー</th><th>評価</th><th>内容</th><th>登録日</th></tr>`;
+        Table.appendChild(Thead);
+        const Tbody = document.createElement("tbody");
+        const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE;
+        const EndIndex = Math.min(
+          StartIndex + RECORDS_PER_PAGE,
+          ReviewList.length
+        );
+        const PageData = ReviewList.slice(StartIndex, EndIndex);
+        if (PageData.length === 0) {
+          Tbody.innerHTML =
+            '<tr><td colspan="4" style="text-align:center;color:#999;">データがありません</td></tr>';
+        } else {
+          PageData.forEach((Item, Idx) => {
+            const Row = document.createElement("tr");
+            Row.style.cursor = "pointer";
+            Row.innerHTML = `<td>${
+              Item.ReviewerName || "-"
+            }</td><td>${GetKeyInfo("Review", Item.Evaluation)}</td><td title="${
+              Item.ReviewContent || ""
+            }">${TruncateText(
+              Item.ReviewContent,
+              25
+            )}</td><td>${FormatTimestamp(Item.RegistDate)}</td>`;
+            Row.addEventListener("dblclick", () =>
+              SelectReview(StartIndex + Idx)
+            );
+            Tbody.appendChild(Row);
+          });
+        }
+        Table.appendChild(Tbody);
+        TableArea.innerHTML = "";
+        TableArea.appendChild(Table);
+        PaginationArea.innerHTML = "";
+        PaginationArea.appendChild(
+          CreatePagination(ReviewList.length, CurrentPage, (Page) => {
+            CurrentPage = Page;
+            RenderReviewTable();
+          })
+        );
+      }
+
+      function SelectReview(Index) {
+        const Item = ReviewList[Index];
+        SelectedReviewId = Item.ReviewId;
+        document.getElementById("ReviewerName").value = Item.ReviewerName || "";
+        document.getElementById("ReviewEvaluation").value = Item.Evaluation;
+        document.getElementById("ReviewContent").value = TruncateText(
+          Item.ReviewContent,
+          30
+        );
+        document.getElementById("ReviewContentHidden").value =
+          Item.ReviewContent || "";
+        const DeleteBtn = document.getElementById("ReviewDeleteButton");
+        if (DeleteBtn) DeleteBtn.classList.remove("Hidden");
+      }
+
+      function ClearReviewForm() {
+        SelectedReviewId = null;
+        document.getElementById("ReviewerName").value = "";
+        document.getElementById("ReviewEvaluation").value = "0";
+        document.getElementById("ReviewContent").value = "";
+        document.getElementById("ReviewContentHidden").value = "";
+        const DeleteBtn = document.getElementById("ReviewDeleteButton");
+        if (DeleteBtn) DeleteBtn.classList.add("Hidden");
+      }
+
+      async function SaveReview() {
+        const ReviewContent = document
+          .getElementById("ReviewContentHidden")
+          .value.trim();
+        const Evaluation = document.getElementById("ReviewEvaluation").value;
+        if (!ReviewContent) {
+          await ShowErrorDialog("レビュー内容を入力してください");
+          return;
+        }
+        if (Evaluation === "0") {
+          await ShowErrorDialog("評価を選択してください");
+          return;
+        }
+        try {
+          const Response = await CallApi("/SaveReview.php", "POST", {
+            ReviewId: SelectedReviewId,
+            WorkId: sessionStorage.getItem("WorkId"),
+            ReviewerName: document.getElementById("ReviewerName").value.trim(),
+            ReviewContent: ReviewContent,
+            Evaluation: parseInt(Evaluation),
+            UserId: sessionStorage.getItem("UserId"),
+          });
+          if (Response.Success) {
+            await ShowInfoDialog("保存完了", "レビューを保存しました");
+            ClearReviewForm();
+            await LoadReviewList();
+          } else {
+            await ShowErrorDialog(Response.Message || "保存に失敗しました");
+          }
+        } catch (Error) {
+          await ShowErrorDialog("保存中にエラーが発生しました");
+        }
+      }
+
+      async function DeleteReview() {
+        if (!SelectedReviewId) return;
+        if (!(await ShowConfirmDialog("このレビューを削除しますか？"))) return;
+        try {
+          const Response = await CallApi("/DeleteReview.php", "POST", {
+            ReviewId: SelectedReviewId,
+            UserId: sessionStorage.getItem("UserId"),
+          });
+          if (Response.Success) {
+            await ShowInfoDialog("削除完了", "レビューを削除しました");
+            ClearReviewForm();
+            await LoadReviewList();
+          } else {
+            await ShowErrorDialog(Response.Message || "削除に失敗しました");
+          }
+        } catch (Error) {
+          await ShowErrorDialog("削除中にエラーが発生しました");
+        }
+      }
+
+      function ShowWorkMemo() {
+        ShowPlaceholder("作品作成用メモ", "sticky-note");
+      }
+
+      /* ==========================================================================
+       * スケジュール (7.1 ScheduleInfo) - カレンダーUI
+       * ========================================================================== */
+      let CalendarYear = new Date().getFullYear();
+      let CalendarMonth = new Date().getMonth();
+      const ScheduleColors = [
+        "#3498db",
+        "#e74c3c",
+        "#2ecc71",
+        "#9b59b6",
+        "#f39c12",
+        "#1abc9c",
+        "#e91e63",
+        "#00bcd4",
+      ];
+
+      async function ShowSchedule() {
+        SelectedScheduleId = null;
+        const ContentArea = document.getElementById("ContentArea");
+        ContentArea.innerHTML = `
+        ${CreateContentHeader("スケジュール", "tasks")}
+        <div class="CalendarContainer">
+          <div class="CalendarHeader">
+            <button class="CalendarNavButton" id="CalendarPrev"><i class="fas fa-chevron-left"></i></button>
+            <h3 id="CalendarTitle"></h3>
+            <button class="CalendarNavButton" id="CalendarNext"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="CalendarGrid" id="CalendarGrid"></div>
+        </div>
+        <div id="RecordCountArea" class="MarginTop20"></div>
+      `;
+        document
+          .getElementById("CalendarPrev")
+          .addEventListener("click", () => {
+            CalendarMonth--;
+            if (CalendarMonth < 0) {
+              CalendarMonth = 11;
+              CalendarYear--;
+            }
+            RenderCalendar();
+          });
+        document
+          .getElementById("CalendarNext")
+          .addEventListener("click", () => {
+            CalendarMonth++;
+            if (CalendarMonth > 11) {
+              CalendarMonth = 0;
+              CalendarYear++;
+            }
+            RenderCalendar();
+          });
+        await LoadScheduleList();
+      }
+
+      async function LoadScheduleList() {
+        try {
+          const Response = await CallApi(
+            `/GetScheduleList.php?WorkId=${encodeURIComponent(
+              sessionStorage.getItem("WorkId")
+            )}`,
+            "GET"
+          );
+          if (Response.Success) {
+            ScheduleList = Response.Data || [];
+            RenderCalendar();
+          } else {
+            await ShowErrorDialog(
+              Response.Message || "スケジュール一覧の取得に失敗しました"
+            );
+          }
+        } catch (Error) {
+          console.error(Error);
+          await ShowErrorDialog(
+            "スケジュール一覧の取得中にエラーが発生しました"
+          );
+        }
+      }
+
+      function RenderCalendar() {
+        const Grid = document.getElementById("CalendarGrid");
+        const Title = document.getElementById("CalendarTitle");
+        const RecordCountArea = document.getElementById("RecordCountArea");
+        if (!Grid) return;
+        Title.textContent = `${CalendarYear}年${CalendarMonth + 1}月`;
+        RecordCountArea.innerHTML = "";
+        RecordCountArea.appendChild(CreateRecordCount(ScheduleList.length));
+        Grid.innerHTML = "";
+        const DayNames = ["日", "月", "火", "水", "木", "金", "土"];
+        DayNames.forEach((Name, Idx) => {
+          const DayHeader = document.createElement("div");
+          DayHeader.className = "CalendarDayHeader";
+          if (Idx === 0) DayHeader.classList.add("Sunday");
+          if (Idx === 6) DayHeader.classList.add("Saturday");
+          DayHeader.textContent = Name;
+          Grid.appendChild(DayHeader);
+        });
+        const FirstDay = new Date(CalendarYear, CalendarMonth, 1);
+        const LastDay = new Date(CalendarYear, CalendarMonth + 1, 0);
+        const StartDayOfWeek = FirstDay.getDay();
+        const DaysInMonth = LastDay.getDate();
+        const Today = new Date();
+        const TodayStr = `${Today.getFullYear()}-${String(
+          Today.getMonth() + 1
+        ).padStart(2, "0")}-${String(Today.getDate()).padStart(2, "0")}`;
+        const PrevMonthLastDay = new Date(
+          CalendarYear,
+          CalendarMonth,
+          0
+        ).getDate();
+        for (let I = StartDayOfWeek - 1; I >= 0; I--) {
+          Grid.appendChild(
+            CreateDayCell(PrevMonthLastDay - I, true, StartDayOfWeek - 1 - I)
+          );
+        }
+        for (let Day = 1; Day <= DaysInMonth; Day++) {
+          const DateStr = `${CalendarYear}-${String(CalendarMonth + 1).padStart(
+            2,
+            "0"
+          )}-${String(Day).padStart(2, "0")}`;
+          const DayOfWeek = new Date(CalendarYear, CalendarMonth, Day).getDay();
+          Grid.appendChild(
+            CreateDayCell(Day, false, DayOfWeek, DateStr, DateStr === TodayStr)
+          );
+        }
+        const TotalCells = StartDayOfWeek + DaysInMonth;
+        const RemainingCells = (7 - (TotalCells % 7)) % 7;
+        for (let I = 1; I <= RemainingCells; I++) {
+          Grid.appendChild(CreateDayCell(I, true, (TotalCells + I - 1) % 7));
+        }
+      }
+
+      function CreateDayCell(
+        Day,
+        IsOtherMonth,
+        DayOfWeek,
+        DateStr = null,
+        IsToday = false
+      ) {
+        const DayCell = document.createElement("div");
+        DayCell.className = "CalendarDay";
+        if (IsOtherMonth) DayCell.classList.add("OtherMonth");
+        if (IsToday) DayCell.classList.add("Today");
+        if (DayOfWeek === 0) DayCell.classList.add("Sunday");
+        if (DayOfWeek === 6) DayCell.classList.add("Saturday");
+        const DayNumber = document.createElement("div");
+        DayNumber.className = "CalendarDayNumber";
+        DayNumber.textContent = Day;
+        DayCell.appendChild(DayNumber);
+        if (DateStr && !IsOtherMonth) {
+          const DayEvents = GetEventsForDate(DateStr);
+          DayEvents.slice(0, 2).forEach((Event) => {
+            const EventEl = document.createElement("div");
+            EventEl.className = "CalendarEvent";
+            EventEl.style.backgroundColor = Event.color || "#3498db";
+            EventEl.textContent = Event.title;
+            EventEl.title = Event.title;
+            EventEl.addEventListener("click", (E) => {
+              E.stopPropagation();
+              OpenScheduleModal(Event);
+            });
+            DayCell.appendChild(EventEl);
+          });
+          if (DayEvents.length > 2) {
+            const MoreEl = document.createElement("div");
+            MoreEl.className = "CalendarMoreEvents";
+            MoreEl.textContent = `+${DayEvents.length - 2}件`;
+            DayCell.appendChild(MoreEl);
+          }
+          if (CanEdit()) {
+            DayCell.addEventListener("click", () =>
+              OpenScheduleModal(null, DateStr)
+            );
+          }
+        }
+        return DayCell;
+      }
+
+      function GetEventsForDate(DateStr) {
+        return ScheduleList.filter((Item) => {
+          const Start = Item.startdate || "";
+          const End = Item.enddate || Start;
+          return Start && DateStr >= Start && DateStr <= (End || Start);
+        });
+      }
+
+      function OpenScheduleModal(Event = null, DefaultDate = null) {
+        const CanEditFlg = CanEdit();
+        const IsNew = Event === null;
+        const Modal = document.createElement("div");
+        Modal.className = "ScheduleModal";
+        Modal.innerHTML = `
+        <div class="ScheduleModalContent">
+          <div class="ScheduleModalHeader"><h3>${
+            IsNew ? "スケジュール追加" : "スケジュール編集"
+          }</h3><button class="ScheduleModalClose" id="ScheduleModalClose">&times;</button></div>
+          <div class="FormGroup"><input type="text" class="InputForm" id="ModalScheduleTitle" placeholder="タイトル" maxlength="255" value="${
+            Event?.title || ""
+          }" ${!CanEditFlg ? "disabled" : ""}></div>
+          <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleStartDate" placeholder="開始日" value="${
+            Event?.startdate || DefaultDate || ""
+          }" readonly ${!CanEditFlg ? "disabled" : ""}>${
+          CanEditFlg
+            ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="ModalStartDateBtn"><i class="fas fa-calendar"></i></button>`
+            : ""
+        }</div>
+          <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleEndDate" placeholder="終了日" value="${
+            Event?.enddate || ""
+          }" readonly ${!CanEditFlg ? "disabled" : ""}>${
+          CanEditFlg
+            ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="ModalEndDateBtn"><i class="fas fa-calendar"></i></button>`
+            : ""
+        }</div>
+          ${
+            CanEditFlg
+              ? `<label style="font-size:12px;color:#666;margin-bottom:5px;display:block;">カラー</label><div class="ColorPicker" id="ColorPicker">${ScheduleColors.map(
+                  (C) =>
+                    `<div class="ColorOption ${
+                      (Event?.color || ScheduleColors[0]) === C
+                        ? "Selected"
+                        : ""
+                    }" data-color="${C}" style="background-color:${C};"></div>`
+                ).join("")}</div>`
+              : ""
+          }
+          <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleDescription" placeholder="説明" value="${
+            TruncateText(Event?.description, 30) || ""
+          }" disabled><button class="ButtonClass SecondaryButton ButtonSmall" id="ModalDescriptionBtn"><i class="fas fa-edit"></i></button></div>
+          <input type="hidden" id="ModalScheduleDescriptionHidden" value="${
+            Event?.description || ""
+          }">
+          <input type="hidden" id="ModalScheduleColor" value="${
+            Event?.color || ScheduleColors[0]
+          }">
+          <input type="hidden" id="ModalScheduleId" value="${
+            Event?.scheduleid || ""
+          }">
+          ${
+            CanEditFlg
+              ? `<div class="ButtonGroup" style="margin-top:20px;"><button class="ButtonClass SaveButton" id="ModalSaveBtn"><i class="fas fa-save"></i> 保存</button>${
+                  !IsNew
+                    ? `<button class="ButtonClass DeleteButton" id="ModalDeleteBtn"><i class="fas fa-trash"></i> 削除</button>`
+                    : ""
+                }</div>`
+              : ""
+          }
+        </div>`;
+        document.body.appendChild(Modal);
+        const CloseModal = () => Modal.remove();
+        Modal.querySelector("#ScheduleModalClose").addEventListener(
+          "click",
+          CloseModal
+        );
+        Modal.addEventListener("click", (E) => {
+          if (E.target === Modal) CloseModal();
+        });
+        if (CanEditFlg) {
+          const DatePickerInstance = new DatePicker();
+          Modal.querySelector("#ModalStartDateBtn").addEventListener(
+            "click",
+            () => DatePickerInstance.OpenDialog("ModalScheduleStartDate")
+          );
+          Modal.querySelector("#ModalEndDateBtn").addEventListener(
+            "click",
+            () => DatePickerInstance.OpenDialog("ModalScheduleEndDate")
+          );
+          Modal.querySelectorAll(".ColorOption").forEach((Opt) => {
+            Opt.addEventListener("click", () => {
+              Modal.querySelectorAll(".ColorOption").forEach((O) =>
+                O.classList.remove("Selected")
+              );
+              Opt.classList.add("Selected");
+              Modal.querySelector("#ModalScheduleColor").value =
+                Opt.dataset.color;
+            });
+          });
+          Modal.querySelector("#ModalSaveBtn").addEventListener(
+            "click",
+            async () => {
+              const Title = Modal.querySelector(
+                "#ModalScheduleTitle"
+              ).value.trim();
+              if (!Title) {
+                await ShowErrorDialog("タイトルを入力してください");
+                return;
+              }
+              try {
+                const Response = await CallApi("/SaveSchedule.php", "POST", {
+                  ScheduleId:
+                    Modal.querySelector("#ModalScheduleId").value || null,
+                  WorkId: sessionStorage.getItem("WorkId"),
+                  Title: Title,
+                  StartDate: Modal.querySelector(
+                    "#ModalScheduleStartDate"
+                  ).value.trim(),
+                  EndDate: Modal.querySelector(
+                    "#ModalScheduleEndDate"
+                  ).value.trim(),
+                  Color: Modal.querySelector("#ModalScheduleColor").value,
+                  Description: Modal.querySelector(
+                    "#ModalScheduleDescriptionHidden"
+                  ).value,
+                  UserId: sessionStorage.getItem("UserId"),
+                });
+                if (Response.Success) {
+                  CloseModal();
+                  await ShowInfoDialog(
+                    "保存完了",
+                    "スケジュールを保存しました"
+                  );
+                  await LoadScheduleList();
+                } else {
+                  await ShowErrorDialog(
+                    Response.Message || "保存に失敗しました"
+                  );
+                }
+              } catch (Error) {
+                await ShowErrorDialog("保存中にエラーが発生しました");
+              }
+            }
+          );
+          if (!IsNew) {
+            Modal.querySelector("#ModalDeleteBtn").addEventListener(
+              "click",
+              async () => {
+                if (
+                  !(await ShowConfirmDialog("このスケジュールを削除しますか？"))
+                )
+                  return;
+                try {
+                  const Response = await CallApi(
+                    "/DeleteSchedule.php",
+                    "POST",
+                    {
+                      ScheduleId: Modal.querySelector("#ModalScheduleId").value,
+                      WorkId: sessionStorage.getItem("WorkId"),
+                      UserId: sessionStorage.getItem("UserId"),
+                    }
+                  );
+                  if (Response.Success) {
+                    CloseModal();
+                    await ShowInfoDialog(
+                      "削除完了",
+                      "スケジュールを削除しました"
+                    );
+                    await LoadScheduleList();
+                  } else {
+                    await ShowErrorDialog(
+                      Response.Message || "削除に失敗しました"
+                    );
+                  }
+                } catch (Error) {
+                  await ShowErrorDialog("削除中にエラーが発生しました");
+                }
+              }
+            );
+          }
+        }
+        Modal.querySelector("#ModalDescriptionBtn").addEventListener(
+          "click",
+          async () => {
+            const Result = await ShowInputAreaDialog(
+              Modal.querySelector("#ModalScheduleDescriptionHidden").value,
+              !CanEditFlg
+            );
+            if (Result !== null && CanEditFlg) {
+              Modal.querySelector("#ModalScheduleDescriptionHidden").value =
+                Result;
+              Modal.querySelector("#ModalScheduleDescription").value =
+                TruncateText(Result, 30);
+            }
+          }
+        );
+      }
+
+      function ShowParticipants() {
+        ShowPlaceholder("参加者一覧", "user-friends");
+      }
+
+      function ShowUpdateHistory() {
+        ShowPlaceholder("更新履歴", "history");
+      }
+
+      /**
+       * プレースホルダー画面を表示
+       * @param {string} Title タイトル
+       * @param {string} Icon アイコン
+       */
+      function ShowPlaceholder(Title, Icon) {
+        const ContentArea = document.getElementById("ContentArea");
+        ContentArea.innerHTML = `
+        ${CreateContentHeader(Title, Icon)}
+        <div style="text-align: center; padding: 50px; color: #999;">
+          <i class="fas fa-${Icon}" style="font-size: 60px; margin-bottom: 20px;"></i>
+          <p>この機能は準備中です</p>
+        </div>
+      `;
+      }
+    </script>
+  </body>
+</html>
