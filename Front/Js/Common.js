@@ -564,5 +564,14 @@ function InitializePage() {
   }
 }
 
+function EscapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+}
+
 /** DOMContentLoaded時に初期化 */
 document.addEventListener('DOMContentLoaded', InitializePage)

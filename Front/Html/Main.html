@@ -9,57 +9,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="../Css/Common.css" />
-    <style>
-      /**
-     * メイン画面固有スタイル
-     */
-      .ContentArea {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 25px;
-        min-height: calc(100vh - 80px);
-      }
-
-      .WelcomeMessage {
-        font-size: 16px;
-        color: #7f8c8d;
-        margin-bottom: 5px;
-      }
-
-      .UserIdDisplay {
-        font-weight: 600;
-        color: #2c3e50;
-      }
-
-      .ActionButtons {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-      }
-
-      .ProjectTable {
-        margin-top: 20px;
-      }
-
-      .FeedbackDetailArea {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
-
-      .FeedbackDetailArea .FormGroup {
-        margin-bottom: 0;
-      }
-
-      @media screen and (max-width: 768px) {
-        .FeedbackDetailArea {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
   </head>
   <body>
     <!-- メニュートグルボタン（モバイル用） -->
@@ -101,7 +50,7 @@
       </nav>
 
       <!-- メインコンテンツ -->
-      <main class="MainContent">
+      <main class="MainContentWrapper">
         <div class="ContentArea" id="ContentArea">
           <!-- 動的にコンテンツが挿入される -->
         </div>

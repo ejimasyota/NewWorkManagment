@@ -1,18 +1,14 @@
-/**
- * Common.css
- * 共通スタイルシート
- * レスポンシブ対応・フォーム・ボタン・テーブル等の共通スタイルを定義
- */
-
 /* ==========================================================================
- * リセット・基本設定
+ * 共通設定
  * ========================================================================== */
+/* 1. 画面全体 */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* 2. HTML・BODY */
 html,
 body {
   height: 100%;
@@ -23,30 +19,108 @@ body {
 }
 
 /* ==========================================================================
- * レイアウト
+ * ログイン画面
  * ========================================================================== */
-.PageContainer {
-  display: flex;
-  min-height: 100vh;
-}
-
-.MainContent {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.CenterContainer {
+/* 1. ログイン画面コンテナ */
+.LoginContainer {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+/* 2. ログインフォームカード */
+.LoginCard {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* 3. ログインタイトル */
+.LoginTitle {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+/* 4. ログインサブタイトル */
+.LoginSubtitle {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+/* 5. ログインフォーム */
+.LoginForm .FormGroup {
+  margin-bottom: 20px;
+}
+
+/* 6. ログイン入力フォーム */
+.LoginForm .InputForm {
+  padding: 14px 15px;
+  font-size: 15px;
+}
+
+/* 7. ログインフォームボタン */
+.LoginForm .ButtonClass {
+  padding: 14px 24px;
+  font-size: 16px;
+}
+
+/* 8. ログインフォームボタンコンテナ */
+.LoginButtonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+/* 9. ログインアイコン */
+.LoginIcon {
+  font-size: 50px;
+  color: #667eea;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 10.ログイン画面レスポンシブ対応 */
+@media screen and (max-width: 480px) {
+  .LoginCard {
+    padding: 30px 20px;
+  }
+  .LoginTitle {
+    font-size: 24px;
+  }
+}
+
+/* ==========================================================================
+ * レイアウト
+ * ========================================================================== */
+/* 1. ページコンテナ */
+.PageContainer {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* 2. メインコンテンツラッパー */
+.MainContentWrapper {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 /* ==========================================================================
  * サイドバー
  * ========================================================================== */
+/* 1. サイドバー */
 .Sidebar {
   width: 250px;
   background-color: #2c3e50;
@@ -56,22 +130,26 @@ body {
   transition: width 0.3s ease;
 }
 
+/* 2. サイドバーヘッダー */
 .SidebarHeader {
   padding: 20px;
   text-align: center;
   border-bottom: 1px solid #34495e;
 }
 
+/* 3. サイドバーヘッダーのタイトル */
 .SidebarHeader h1 {
   font-size: 18px;
   font-weight: 600;
 }
 
+/* 4. サイドバーメニュー */
 .SidebarMenu {
   flex: 1;
   padding: 10px 0;
 }
 
+/* 5. サイドバーメニューボタン */
 .SidebarItem {
   display: flex;
   align-items: center;
@@ -85,24 +163,75 @@ body {
   text-align: left;
   font-size: 14px;
 }
-
 .SidebarItem:hover {
   background-color: #34495e;
 }
-
 .SidebarItem.Active {
   background-color: #3498db;
 }
 
+/* 6. サイドバーメニューボタンアイコン */
 .SidebarItem i {
   margin-right: 10px;
   width: 20px;
   text-align: center;
 }
 
+/* 7. サイドバーフッター */
 .SidebarFooter {
   padding: 15px 20px;
   border-top: 1px solid #34495e;
+}
+
+/* ==========================================================================
+ * メイン画面
+ * ========================================================================== */
+/* 1. メインコンテンツ表示エリア */
+.ContentArea {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  min-height: calc(100vh - 80px);
+}
+
+.WelcomeMessage {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+}
+
+.UserIdDisplay {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.ActionButtons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.ProjectTable {
+  margin-top: 20px;
+}
+
+.FeedbackDetailArea {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.FeedbackDetailArea .FormGroup {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .FeedbackDetailArea {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ==========================================================================
@@ -351,6 +480,51 @@ body {
 
 .ButtonFull {
   width: 100%;
+}
+
+/* ==========================================================================
+ * タブ
+ * ========================================================================== */
+.TabContainer {
+  margin-bottom: 20px;
+}
+
+.TabHeader {
+  display: flex;
+  border-bottom: 2px solid #3498db;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.TabButton {
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+}
+
+.TabButton:hover {
+  color: #3498db;
+  background-color: #f8f9fa;
+}
+
+.TabButton.Active {
+  color: #3498db;
+  border-bottom-color: #3498db;
+  font-weight: 600;
+}
+
+.TabContent {
+  display: none;
+}
+
+.TabContent.Active {
+  display: block;
 }
 
 /* ==========================================================================
@@ -744,7 +918,7 @@ body {
     left: 0;
   }
 
-  .MainContent {
+  .MainContentWrapper {
     padding: 15px;
   }
 

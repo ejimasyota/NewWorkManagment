@@ -38,6 +38,7 @@ try {
         FROM UpdateHistory h
         WHERE h.workId = :workId
         ORDER BY h.registDate DESC
+        LIMIT 200
     ";
 
     $Stmt = $Pdo->prepare($Sql);

@@ -13,14 +13,6 @@
       /**
      * 作品管理画面固有スタイル
      */
-      .ContentArea {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 25px;
-        min-height: calc(100vh - 80px);
-      }
-
       .WorkTitle {
         font-size: 18px;
         color: #2c3e50;
@@ -50,49 +42,6 @@
         height: 1px;
         background-color: #34495e;
         margin: 10px 15px;
-      }
-
-      /* タブUI */
-      .TabContainer {
-        margin-bottom: 20px;
-      }
-
-      .TabHeader {
-        display: flex;
-        border-bottom: 2px solid #3498db;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-      }
-
-      .TabButton {
-        padding: 12px 20px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        font-size: 14px;
-        color: #666;
-        border-bottom: 3px solid transparent;
-        margin-bottom: -2px;
-        transition: all 0.2s ease;
-      }
-
-      .TabButton:hover {
-        color: #3498db;
-        background-color: #f8f9fa;
-      }
-
-      .TabButton.Active {
-        color: #3498db;
-        border-bottom-color: #3498db;
-        font-weight: 600;
-      }
-
-      .TabContent {
-        display: none;
-      }
-
-      .TabContent.Active {
-        display: block;
       }
 
       .FormRow {
@@ -696,7 +645,7 @@
       </nav>
 
       <!-- メインコンテンツ -->
-      <main class="MainContent">
+      <main class="MainContentWrapper">
         <div class="ContentArea" id="ContentArea">
           <!-- 動的にコンテンツが挿入される -->
         </div>
@@ -706,6 +655,8 @@
     <script src="../Js/Common.js"></script>
     <script src="../Js/Dialog.js"></script>
     <script>
+      // ページネーション用の1ページあたり件数（デフォルト値）
+      const PAGE_SIZE = 15
       /**
        * WorkManagement.js
        * 作品管理画面の処理
@@ -1928,29 +1879,30 @@
         document.getElementById(
           'RecordCountArea',
         ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
-        const Start = (CurrentPage - 1) * PAGE_SIZE
-        const PageData = OrganizationList.slice(Start, Start + PAGE_SIZE)
-        const TableHtml = `
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = OrganizationList.slice(Start, End)
+        let TableHtml = `
           <table class="DataTable">
             <thead><tr><th>組織名</th><th>拠点</th><th>人数</th><th>設立日</th></tr></thead>
             <tbody>
-              ${
-                PageData.length
-                  ? PageData.map(
-                      (O) => `
-                <tr data-id="${O.OrgId}">
-                  <td>${EscapeHtml(O.OrgName)}</td>
-                  <td>${EscapeHtml(O.BuildName || '')}</td>
-                  <td>${EscapeHtml(O.PeopleNum || '')}</td>
-                  <td>${FormatDisplayDate(O.FoundedDate)}</td>
-                </tr>
-              `,
-                    ).join('')
-                  : '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
-              }
-            </tbody>
-          </table>
         `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (O) => `
+              <tr data-id="${O.OrgId}">
+                <td>${EscapeHtml(O.OrgName)}</td>
+                <td>${EscapeHtml(O.BuildName || '')}</td>
+                <td>${EscapeHtml(O.PeopleNum || '')}</td>
+                <td>${FormatDisplayDate(O.FoundedDate)}</td>
+              </tr>
+            `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
         document.getElementById('OrgTableArea').innerHTML = TableHtml
         document
           .querySelectorAll('#OrgTableArea tbody tr[data-id]')
@@ -1959,10 +1911,14 @@
               SelectOrganization(Row.dataset.id),
             )
           })
-        RenderPagination(TotalCount, CurrentPage, (Page) => {
-          CurrentPage = Page
-          RenderOrganizationTable()
-        })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderOrganizationTable()
+          }),
+        )
       }
 
       function SelectOrganization(OrgId) {
@@ -2224,38 +2180,43 @@
         document.getElementById(
           'RecordCountArea',
         ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
-        const Start = (CurrentPage - 1) * PAGE_SIZE
-        const PageData = TeamList.slice(Start, Start + PAGE_SIZE)
-        const TableHtml = `
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = TeamList.slice(Start, End)
+        let TableHtml = `
           <table class="DataTable">
             <thead><tr><th>チーム名</th><th>所属組織</th><th>説明</th></tr></thead>
             <tbody>
-              ${
-                PageData.length
-                  ? PageData.map(
-                      (T) => `
-                <tr data-id="${T.TeamId}">
-                  <td>${EscapeHtml(T.TeamName)}</td>
-                  <td>${EscapeHtml(T.OrgName || '')}</td>
-                  <td>${EscapeHtml(TruncateText(T.Description || '', 30))}</td>
-                </tr>
-              `,
-                    ).join('')
-                  : '<tr><td colspan="3" class="NoData">データがありません</td></tr>'
-              }
-            </tbody>
-          </table>
         `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (T) => `
+              <tr data-id="${T.TeamId}">
+                <td>${EscapeHtml(T.TeamName)}</td>
+                <td>${EscapeHtml(T.OrgName || '')}</td>
+                <td>${EscapeHtml(TruncateText(T.Description || '', 30))}</td>
+              </tr>
+            `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="3" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
         document.getElementById('TeamTableArea').innerHTML = TableHtml
         document
           .querySelectorAll('#TeamTableArea tbody tr[data-id]')
           .forEach((Row) => {
             Row.addEventListener('dblclick', () => SelectTeam(Row.dataset.id))
           })
-        RenderPagination(TotalCount, CurrentPage, (Page) => {
-          CurrentPage = Page
-          RenderTeamTable()
-        })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderTeamTable()
+          }),
+        )
       }
 
       function SelectTeam(TeamId) {
@@ -2487,39 +2448,44 @@
         document.getElementById(
           'RecordCountArea',
         ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
-        const Start = (CurrentPage - 1) * PAGE_SIZE
-        const PageData = ClassList.slice(Start, Start + PAGE_SIZE)
-        const TableHtml = `
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = ClassList.slice(Start, End)
+        let TableHtml = `
           <table class="DataTable">
             <thead><tr><th>階級名</th><th>所属組織</th><th>序列</th><th>説明</th></tr></thead>
             <tbody>
-              ${
-                PageData.length
-                  ? PageData.map(
-                      (C) => `
-                <tr data-id="${C.ClassId}">
-                  <td>${EscapeHtml(C.ClassName)}</td>
-                  <td>${EscapeHtml(C.OrgName || '共通')}</td>
-                  <td>${C.RankOrder !== null ? C.RankOrder : ''}</td>
-                  <td>${EscapeHtml(TruncateText(C.Description || '', 30))}</td>
-                </tr>
-              `,
-                    ).join('')
-                  : '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
-              }
-            </tbody>
-          </table>
         `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (C) => `
+              <tr data-id="${C.ClassId}">
+                <td>${EscapeHtml(C.ClassName)}</td>
+                <td>${EscapeHtml(C.OrgName || '共通')}</td>
+                <td>${C.RankOrder !== null ? C.RankOrder : ''}</td>
+                <td>${EscapeHtml(TruncateText(C.Description || '', 30))}</td>
+              </tr>
+            `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
         document.getElementById('ClassTableArea').innerHTML = TableHtml
         document
           .querySelectorAll('#ClassTableArea tbody tr[data-id]')
           .forEach((Row) => {
             Row.addEventListener('dblclick', () => SelectClass(Row.dataset.id))
           })
-        RenderPagination(TotalCount, CurrentPage, (Page) => {
-          CurrentPage = Page
-          RenderClassTable()
-        })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderClassTable()
+          }),
+        )
       }
 
       function SelectClass(ClassId) {
@@ -2653,34 +2619,39 @@
         document.getElementById(
           'RecordCountArea',
         ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
-        const Start = (CurrentPage - 1) * PAGE_SIZE
-        const PageData = UpdateHistoryList.slice(Start, Start + PAGE_SIZE)
-        const TableHtml = `
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = UpdateHistoryList.slice(Start, End)
+        let TableHtml = `
           <table class="DataTable">
             <thead><tr><th>更新日時</th><th>機能名</th><th>操作</th><th>更新者</th></tr></thead>
             <tbody>
-              ${
-                PageData.length
-                  ? PageData.map(
-                      (H) => `
-                <tr>
-                  <td>${FormatDisplayDateTime(H.RegistDate)}</td>
-                  <td>${EscapeHtml(H.FunctionName || '')}</td>
-                  <td>${EscapeHtml(H.Operation || '')}</td>
-                  <td>${EscapeHtml(H.RegistUser || '')}</td>
-                </tr>
-              `,
-                    ).join('')
-                  : '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
-              }
-            </tbody>
-          </table>
         `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (H) => `
+              <tr>
+                <td>${FormatDisplayDateTime(H.RegistDate)}</td>
+                <td>${EscapeHtml(H.FunctionName || '')}</td>
+                <td>${EscapeHtml(H.Operation || '')}</td>
+                <td>${EscapeHtml(H.RegistUser || '')}</td>
+              </tr>
+            `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
         document.getElementById('HistoryTableArea').innerHTML = TableHtml
-        RenderPagination(TotalCount, CurrentPage, (Page) => {
-          CurrentPage = Page
-          RenderUpdateHistoryTable()
-        })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderUpdateHistoryTable()
+          }),
+        )
       }
 
       /**
