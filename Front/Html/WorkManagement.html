@@ -539,7 +539,7 @@
         color: #333;
       }
 
-      .ColorPicker {
+      .ScheduleColorPicker {
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
@@ -1754,24 +1754,950 @@
         }
       }
 
-      function ShowOrganizationSetting() {
-        ShowPlaceholder('組織設定', 'building')
+      /* ==========================================================================
+       * 組織設定画面 (3.5 OrganizationInfo)
+       * ========================================================================== */
+      let OrganizationList = []
+      let BuildListForOrg = []
+      let SelectedOrgId = null
+
+      async function ShowOrganizationSetting() {
+        CurrentPage = 1
+        SelectedOrgId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('組織設定', 'building')}
+          <div class="FormRow">
+            <div class="FormGroup Flex1">
+              <input type="text" class="InputForm" id="OrgName" placeholder="組織名" maxlength="255" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+            </div>
+            <div class="FormGroup Flex1">
+              <select class="SelectForm" id="OrgBaseBuild" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+                <option value="">拠点建物を選択</option>
+              </select>
+            </div>
+          </div>
+          <div class="FormRow">
+            <div class="FormGroup Flex1 InputWithButton">
+              <input type="text" class="InputForm" id="OrgFoundedDate" placeholder="設立日" readonly ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+              ${
+                CanEditFlg
+                  ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="OrgFoundedDateBtn"><i class="fas fa-calendar"></i></button>`
+                  : ''
+              }
+            </div>
+            <div class="FormGroup Flex1">
+              <input type="text" class="InputForm" id="OrgPeopleNum" placeholder="人数" maxlength="50" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+            </div>
+          </div>
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="OrgPurpose" placeholder="目的" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="OrgPurposeBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="OrgPurposeHidden">
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="OrgActivity" placeholder="活動内容" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="OrgActivityBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="OrgActivityHidden">
+          ${
+            CanEditFlg
+              ? `
+          <div class="FormGroup">
+            <div class="ImageUploadArea" id="OrgImageArea">
+              <div class="ImageBox" id="OrgImageBox">
+                <span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>
+              </div>
+              <input type="file" id="OrgImageInput" accept="image/*" style="display:none;">
+            </div>
+          </div>
+          <div class="ButtonGroup">
+            <button class="ButtonClass ClearButton" id="OrgClearButton"><i class="fas fa-sync"></i> クリア</button>
+            <button class="ButtonClass SaveButton" id="OrgSaveButton"><i class="fas fa-save"></i> 保存</button>
+            <button class="ButtonClass DeleteButton Hidden" id="OrgDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+          </div>
+          `
+              : ''
+          }
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="OrgTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('OrgFoundedDateBtn')
+            .addEventListener('click', async () => {
+              const Picker = new DatePicker()
+              await Picker.openDialog('OrgFoundedDate')
+            })
+          document
+            .getElementById('OrgPurposeBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog('OrgPurpose', 'OrgPurposeHidden', CanEditFlg),
+            )
+          document
+            .getElementById('OrgActivityBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'OrgActivity',
+                'OrgActivityHidden',
+                CanEditFlg,
+              ),
+            )
+          document
+            .getElementById('OrgImageBox')
+            .addEventListener('click', () =>
+              document.getElementById('OrgImageInput').click(),
+            )
+          document
+            .getElementById('OrgImageInput')
+            .addEventListener('change', (E) => PreviewImage(E, 'OrgImageBox'))
+          document
+            .getElementById('OrgClearButton')
+            .addEventListener('click', ClearOrgForm)
+          document
+            .getElementById('OrgSaveButton')
+            .addEventListener('click', SaveOrganization)
+          document
+            .getElementById('OrgDeleteButton')
+            .addEventListener('click', DeleteOrganization)
+        } else {
+          document
+            .getElementById('OrgPurposeBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog('OrgPurpose', 'OrgPurposeHidden', false),
+            )
+          document
+            .getElementById('OrgActivityBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog('OrgActivity', 'OrgActivityHidden', false),
+            )
+        }
+
+        await LoadOrganizationList()
       }
 
-      function ShowTeamSetting() {
-        ShowPlaceholder('チーム設定', 'users')
+      async function LoadOrganizationList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetOrganizationList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            OrganizationList = Response.Data.OrganizationList || []
+            BuildListForOrg = Response.Data.BuildList || []
+            UpdateBuildSelect()
+            RenderOrganizationTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '組織一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('組織一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function UpdateBuildSelect() {
+        const Select = document.getElementById('OrgBaseBuild')
+        if (!Select) return
+        Select.innerHTML =
+          '<option value="">拠点建物を選択</option>' +
+          BuildListForOrg.map(
+            (B) => `<option value="${B.BuildId}">${B.BuildName}</option>`,
+          ).join('')
+      }
+
+      function RenderOrganizationTable() {
+        const TotalCount = OrganizationList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * PAGE_SIZE
+        const PageData = OrganizationList.slice(Start, Start + PAGE_SIZE)
+        const TableHtml = `
+          <table class="DataTable">
+            <thead><tr><th>組織名</th><th>拠点</th><th>人数</th><th>設立日</th></tr></thead>
+            <tbody>
+              ${
+                PageData.length
+                  ? PageData.map(
+                      (O) => `
+                <tr data-id="${O.OrgId}">
+                  <td>${EscapeHtml(O.OrgName)}</td>
+                  <td>${EscapeHtml(O.BuildName || '')}</td>
+                  <td>${EscapeHtml(O.PeopleNum || '')}</td>
+                  <td>${FormatDisplayDate(O.FoundedDate)}</td>
+                </tr>
+              `,
+                    ).join('')
+                  : '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+              }
+            </tbody>
+          </table>
+        `
+        document.getElementById('OrgTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#OrgTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () =>
+              SelectOrganization(Row.dataset.id),
+            )
+          })
+        RenderPagination(TotalCount, CurrentPage, (Page) => {
+          CurrentPage = Page
+          RenderOrganizationTable()
+        })
+      }
+
+      function SelectOrganization(OrgId) {
+        const Item = OrganizationList.find((O) => O.OrgId == OrgId)
+        if (!Item) return
+        SelectedOrgId = OrgId
+        document.getElementById('OrgName').value = Item.OrgName || ''
+        document.getElementById('OrgBaseBuild').value = Item.BaseBuildId || ''
+        document.getElementById('OrgFoundedDate').value = Item.FoundedDate || ''
+        document.getElementById('OrgPeopleNum').value = Item.PeopleNum || ''
+        document.getElementById('OrgPurpose').value = TruncateText(
+          Item.Purpose || '',
+          30,
+        )
+        document.getElementById('OrgPurposeHidden').value = Item.Purpose || ''
+        document.getElementById('OrgActivity').value = TruncateText(
+          Item.Activity || '',
+          30,
+        )
+        document.getElementById('OrgActivityHidden').value = Item.Activity || ''
+        if (Item.ImgPath) {
+          document.getElementById(
+            'OrgImageBox',
+          ).innerHTML = `<img src="${API_BASE_URL}${Item.ImgPath}" alt="組織画像">`
+        }
+        const DeleteBtn = document.getElementById('OrgDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearOrgForm() {
+        SelectedOrgId = null
+        document.getElementById('OrgName').value = ''
+        document.getElementById('OrgBaseBuild').value = ''
+        document.getElementById('OrgFoundedDate').value = ''
+        document.getElementById('OrgPeopleNum').value = ''
+        document.getElementById('OrgPurpose').value = ''
+        document.getElementById('OrgPurposeHidden').value = ''
+        document.getElementById('OrgActivity').value = ''
+        document.getElementById('OrgActivityHidden').value = ''
+        document.getElementById('OrgImageBox').innerHTML =
+          '<span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>'
+        document.getElementById('OrgImageInput').value = ''
+        const DeleteBtn = document.getElementById('OrgDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveOrganization() {
+        const OrgName = document.getElementById('OrgName').value.trim()
+        if (!OrgName) {
+          await ShowErrorDialog('組織名を入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const FormData = new window.FormData()
+          if (SelectedOrgId) FormData.append('OrgId', SelectedOrgId)
+          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
+          FormData.append('OrgName', OrgName)
+          FormData.append(
+            'FoundedDate',
+            document.getElementById('OrgFoundedDate').value,
+          )
+          FormData.append(
+            'PeopleNum',
+            document.getElementById('OrgPeopleNum').value,
+          )
+          FormData.append(
+            'Purpose',
+            document.getElementById('OrgPurposeHidden').value,
+          )
+          FormData.append(
+            'Activity',
+            document.getElementById('OrgActivityHidden').value,
+          )
+          FormData.append(
+            'BaseBuildId',
+            document.getElementById('OrgBaseBuild').value,
+          )
+          FormData.append('UserId', sessionStorage.getItem('UserId'))
+          const ImageFile = document.getElementById('OrgImageInput').files[0]
+          if (ImageFile) FormData.append('Image', ImageFile)
+          const Response = await fetch(`${API_BASE_URL}/SaveOrganization.php`, {
+            method: 'POST',
+            body: FormData,
+          })
+          const Result = await Response.json()
+          HideSpinner()
+          if (Result.Success) {
+            await ShowInfoDialog('保存完了', Result.Data.Message)
+            ClearOrgForm()
+            await LoadOrganizationList()
+          } else {
+            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteOrganization() {
+        if (!SelectedOrgId) return
+        if (!(await ShowConfirmDialog('この組織を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteOrganization.php', 'POST', {
+            OrgId: SelectedOrgId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '組織を削除しました')
+            ClearOrgForm()
+            await LoadOrganizationList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
+      }
+
+      /* ==========================================================================
+       * チーム設定画面 (3.7 TeamInfo)
+       * ========================================================================== */
+      let TeamList = []
+      let OrgListForTeam = []
+      let SelectedTeamId = null
+
+      async function ShowTeamSetting() {
+        CurrentPage = 1
+        SelectedTeamId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('チーム設定', 'users')}
+          <div class="FormRow">
+            <div class="FormGroup Flex1">
+              <input type="text" class="InputForm" id="TeamName" placeholder="チーム名" maxlength="150" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+            </div>
+            <div class="FormGroup Flex1">
+              <select class="SelectForm" id="TeamOrgId" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+                <option value="">所属組織を選択</option>
+              </select>
+            </div>
+          </div>
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="TeamDescription" placeholder="説明" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="TeamDescriptionBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="TeamDescriptionHidden">
+          ${
+            CanEditFlg
+              ? `
+          <div class="FormGroup">
+            <div class="ImageUploadArea" id="TeamImageArea">
+              <div class="ImageBox" id="TeamImageBox">
+                <span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>
+              </div>
+              <input type="file" id="TeamImageInput" accept="image/*" style="display:none;">
+            </div>
+          </div>
+          <div class="ButtonGroup">
+            <button class="ButtonClass ClearButton" id="TeamClearButton"><i class="fas fa-sync"></i> クリア</button>
+            <button class="ButtonClass SaveButton" id="TeamSaveButton"><i class="fas fa-save"></i> 保存</button>
+            <button class="ButtonClass DeleteButton Hidden" id="TeamDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+          </div>
+          `
+              : ''
+          }
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="TeamTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('TeamDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'TeamDescription',
+                'TeamDescriptionHidden',
+                CanEditFlg,
+              ),
+            )
+          document
+            .getElementById('TeamImageBox')
+            .addEventListener('click', () =>
+              document.getElementById('TeamImageInput').click(),
+            )
+          document
+            .getElementById('TeamImageInput')
+            .addEventListener('change', (E) => PreviewImage(E, 'TeamImageBox'))
+          document
+            .getElementById('TeamClearButton')
+            .addEventListener('click', ClearTeamForm)
+          document
+            .getElementById('TeamSaveButton')
+            .addEventListener('click', SaveTeam)
+          document
+            .getElementById('TeamDeleteButton')
+            .addEventListener('click', DeleteTeam)
+        } else {
+          document
+            .getElementById('TeamDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'TeamDescription',
+                'TeamDescriptionHidden',
+                false,
+              ),
+            )
+        }
+
+        await LoadTeamList()
+      }
+
+      async function LoadTeamList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetTeamList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            TeamList = Response.Data.TeamList || []
+            OrgListForTeam = Response.Data.OrganizationList || []
+            UpdateTeamOrgSelect()
+            RenderTeamTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || 'チーム一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('チーム一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function UpdateTeamOrgSelect() {
+        const Select = document.getElementById('TeamOrgId')
+        if (!Select) return
+        Select.innerHTML =
+          '<option value="">所属組織を選択</option>' +
+          OrgListForTeam.map(
+            (O) => `<option value="${O.OrgId}">${O.OrgName}</option>`,
+          ).join('')
+      }
+
+      function RenderTeamTable() {
+        const TotalCount = TeamList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * PAGE_SIZE
+        const PageData = TeamList.slice(Start, Start + PAGE_SIZE)
+        const TableHtml = `
+          <table class="DataTable">
+            <thead><tr><th>チーム名</th><th>所属組織</th><th>説明</th></tr></thead>
+            <tbody>
+              ${
+                PageData.length
+                  ? PageData.map(
+                      (T) => `
+                <tr data-id="${T.TeamId}">
+                  <td>${EscapeHtml(T.TeamName)}</td>
+                  <td>${EscapeHtml(T.OrgName || '')}</td>
+                  <td>${EscapeHtml(TruncateText(T.Description || '', 30))}</td>
+                </tr>
+              `,
+                    ).join('')
+                  : '<tr><td colspan="3" class="NoData">データがありません</td></tr>'
+              }
+            </tbody>
+          </table>
+        `
+        document.getElementById('TeamTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#TeamTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectTeam(Row.dataset.id))
+          })
+        RenderPagination(TotalCount, CurrentPage, (Page) => {
+          CurrentPage = Page
+          RenderTeamTable()
+        })
+      }
+
+      function SelectTeam(TeamId) {
+        const Item = TeamList.find((T) => T.TeamId == TeamId)
+        if (!Item) return
+        SelectedTeamId = TeamId
+        document.getElementById('TeamName').value = Item.TeamName || ''
+        document.getElementById('TeamOrgId').value = Item.OrgId || ''
+        document.getElementById('TeamDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('TeamDescriptionHidden').value =
+          Item.Description || ''
+        if (Item.ImgPath) {
+          document.getElementById(
+            'TeamImageBox',
+          ).innerHTML = `<img src="${API_BASE_URL}${Item.ImgPath}" alt="チーム画像">`
+        }
+        const DeleteBtn = document.getElementById('TeamDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearTeamForm() {
+        SelectedTeamId = null
+        document.getElementById('TeamName').value = ''
+        document.getElementById('TeamOrgId').value = ''
+        document.getElementById('TeamDescription').value = ''
+        document.getElementById('TeamDescriptionHidden').value = ''
+        document.getElementById('TeamImageBox').innerHTML =
+          '<span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>'
+        document.getElementById('TeamImageInput').value = ''
+        const DeleteBtn = document.getElementById('TeamDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveTeam() {
+        const TeamName = document.getElementById('TeamName').value.trim()
+        if (!TeamName) {
+          await ShowErrorDialog('チーム名を入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const FormData = new window.FormData()
+          if (SelectedTeamId) FormData.append('TeamId', SelectedTeamId)
+          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
+          FormData.append('TeamName', TeamName)
+          FormData.append('OrgId', document.getElementById('TeamOrgId').value)
+          FormData.append(
+            'Description',
+            document.getElementById('TeamDescriptionHidden').value,
+          )
+          FormData.append('UserId', sessionStorage.getItem('UserId'))
+          const ImageFile = document.getElementById('TeamImageInput').files[0]
+          if (ImageFile) FormData.append('Image', ImageFile)
+          const Response = await fetch(`${API_BASE_URL}/SaveTeam.php`, {
+            method: 'POST',
+            body: FormData,
+          })
+          const Result = await Response.json()
+          HideSpinner()
+          if (Result.Success) {
+            await ShowInfoDialog('保存完了', Result.Data.Message)
+            ClearTeamForm()
+            await LoadTeamList()
+          } else {
+            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteTeam() {
+        if (!SelectedTeamId) return
+        if (!(await ShowConfirmDialog('このチームを削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteTeam.php', 'POST', {
+            TeamId: SelectedTeamId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', 'チームを削除しました')
+            ClearTeamForm()
+            await LoadTeamList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       function ShowRaceSetting() {
         ShowPlaceholder('種族設定', 'dna')
       }
 
-      function ShowClassSetting() {
-        ShowPlaceholder('階級設定', 'medal')
+      /* ==========================================================================
+       * 階級設定画面 (3.6 ClassInfo)
+       * ========================================================================== */
+      let ClassList = []
+      let OrgListForClass = []
+      let SelectedClassId = null
+
+      async function ShowClassSetting() {
+        CurrentPage = 1
+        SelectedClassId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('階級設定', 'medal')}
+          <div class="FormRow">
+            <div class="FormGroup Flex1">
+              <input type="text" class="InputForm" id="ClassName" placeholder="階級名" maxlength="150" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+            </div>
+            <div class="FormGroup Flex1">
+              <select class="SelectForm" id="ClassOrgId" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+                <option value="">組織を選択（共通階級の場合は未選択）</option>
+              </select>
+            </div>
+          </div>
+          <div class="FormRow">
+            <div class="FormGroup Flex1">
+              <input type="number" class="InputForm" id="ClassRankOrder" placeholder="序列（数字が小さいほど上位）" min="0" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+            </div>
+          </div>
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="ClassDescription" placeholder="説明" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="ClassDescriptionBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="ClassDescriptionHidden">
+          ${
+            CanEditFlg
+              ? `
+          <div class="ButtonGroup">
+            <button class="ButtonClass ClearButton" id="ClassClearButton"><i class="fas fa-sync"></i> クリア</button>
+            <button class="ButtonClass SaveButton" id="ClassSaveButton"><i class="fas fa-save"></i> 保存</button>
+            <button class="ButtonClass DeleteButton Hidden" id="ClassDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+          </div>
+          `
+              : ''
+          }
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="ClassTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('ClassDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'ClassDescription',
+                'ClassDescriptionHidden',
+                CanEditFlg,
+              ),
+            )
+          document
+            .getElementById('ClassClearButton')
+            .addEventListener('click', ClearClassForm)
+          document
+            .getElementById('ClassSaveButton')
+            .addEventListener('click', SaveClass)
+          document
+            .getElementById('ClassDeleteButton')
+            .addEventListener('click', DeleteClass)
+        } else {
+          document
+            .getElementById('ClassDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'ClassDescription',
+                'ClassDescriptionHidden',
+                false,
+              ),
+            )
+        }
+
+        await LoadClassList()
+      }
+
+      async function LoadClassList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetClassList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            ClassList = Response.Data.ClassList || []
+            OrgListForClass = Response.Data.OrganizationList || []
+            UpdateClassOrgSelect()
+            RenderClassTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '階級一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('階級一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function UpdateClassOrgSelect() {
+        const Select = document.getElementById('ClassOrgId')
+        if (!Select) return
+        Select.innerHTML =
+          '<option value="">組織を選択（共通階級の場合は未選択）</option>' +
+          OrgListForClass.map(
+            (O) => `<option value="${O.OrgId}">${O.OrgName}</option>`,
+          ).join('')
+      }
+
+      function RenderClassTable() {
+        const TotalCount = ClassList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * PAGE_SIZE
+        const PageData = ClassList.slice(Start, Start + PAGE_SIZE)
+        const TableHtml = `
+          <table class="DataTable">
+            <thead><tr><th>階級名</th><th>所属組織</th><th>序列</th><th>説明</th></tr></thead>
+            <tbody>
+              ${
+                PageData.length
+                  ? PageData.map(
+                      (C) => `
+                <tr data-id="${C.ClassId}">
+                  <td>${EscapeHtml(C.ClassName)}</td>
+                  <td>${EscapeHtml(C.OrgName || '共通')}</td>
+                  <td>${C.RankOrder !== null ? C.RankOrder : ''}</td>
+                  <td>${EscapeHtml(TruncateText(C.Description || '', 30))}</td>
+                </tr>
+              `,
+                    ).join('')
+                  : '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+              }
+            </tbody>
+          </table>
+        `
+        document.getElementById('ClassTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#ClassTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectClass(Row.dataset.id))
+          })
+        RenderPagination(TotalCount, CurrentPage, (Page) => {
+          CurrentPage = Page
+          RenderClassTable()
+        })
+      }
+
+      function SelectClass(ClassId) {
+        const Item = ClassList.find((C) => C.ClassId == ClassId)
+        if (!Item) return
+        SelectedClassId = ClassId
+        document.getElementById('ClassName').value = Item.ClassName || ''
+        document.getElementById('ClassOrgId').value = Item.OrgId || ''
+        document.getElementById('ClassRankOrder').value =
+          Item.RankOrder !== null ? Item.RankOrder : ''
+        document.getElementById('ClassDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('ClassDescriptionHidden').value =
+          Item.Description || ''
+        const DeleteBtn = document.getElementById('ClassDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearClassForm() {
+        SelectedClassId = null
+        document.getElementById('ClassName').value = ''
+        document.getElementById('ClassOrgId').value = ''
+        document.getElementById('ClassRankOrder').value = ''
+        document.getElementById('ClassDescription').value = ''
+        document.getElementById('ClassDescriptionHidden').value = ''
+        const DeleteBtn = document.getElementById('ClassDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveClass() {
+        const ClassName = document.getElementById('ClassName').value.trim()
+        if (!ClassName) {
+          await ShowErrorDialog('階級名を入力してください')
+          return
+        }
+        try {
+          const RankOrderVal = document.getElementById('ClassRankOrder').value
+          const Response = await CallApi('/SaveClass.php', 'POST', {
+            ClassId: SelectedClassId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            OrgId: document.getElementById('ClassOrgId').value || null,
+            ClassName: ClassName,
+            RankOrder: RankOrderVal !== '' ? parseInt(RankOrderVal) : null,
+            Description: document.getElementById('ClassDescriptionHidden')
+              .value,
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', Response.Data.Message)
+            ClearClassForm()
+            await LoadClassList()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteClass() {
+        if (!SelectedClassId) return
+        if (!(await ShowConfirmDialog('この階級を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteClass.php', 'POST', {
+            ClassId: SelectedClassId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '階級を削除しました')
+            ClearClassForm()
+            await LoadClassList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       function ShowCalendarSetting() {
         ShowPlaceholder('元号設定', 'calendar-alt')
+      }
+
+      /* ==========================================================================
+       * 更新履歴一覧画面 (2.3 UpdateHistory)
+       * ========================================================================== */
+      let UpdateHistoryList = []
+
+      async function ShowUpdateHistory() {
+        CurrentPage = 1
+        const ContentArea = document.getElementById('ContentArea')
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('更新履歴', 'history')}
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="HistoryTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        await LoadUpdateHistoryList()
+      }
+
+      async function LoadUpdateHistoryList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetUpdateHistoryList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            UpdateHistoryList = Response.Data.HistoryList || []
+            RenderUpdateHistoryTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '更新履歴の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('更新履歴の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderUpdateHistoryTable() {
+        const TotalCount = UpdateHistoryList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * PAGE_SIZE
+        const PageData = UpdateHistoryList.slice(Start, Start + PAGE_SIZE)
+        const TableHtml = `
+          <table class="DataTable">
+            <thead><tr><th>更新日時</th><th>機能名</th><th>操作</th><th>更新者</th></tr></thead>
+            <tbody>
+              ${
+                PageData.length
+                  ? PageData.map(
+                      (H) => `
+                <tr>
+                  <td>${FormatDisplayDateTime(H.RegistDate)}</td>
+                  <td>${EscapeHtml(H.FunctionName || '')}</td>
+                  <td>${EscapeHtml(H.Operation || '')}</td>
+                  <td>${EscapeHtml(H.RegistUser || '')}</td>
+                </tr>
+              `,
+                    ).join('')
+                  : '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+              }
+            </tbody>
+          </table>
+        `
+        document.getElementById('HistoryTableArea').innerHTML = TableHtml
+        RenderPagination(TotalCount, CurrentPage, (Page) => {
+          CurrentPage = Page
+          RenderUpdateHistoryTable()
+        })
+      }
+
+      /**
+       * 日時をフォーマットして表示用に変換
+       * @param {string} DateStr 日時文字列
+       * @returns {string} フォーマット済み日時
+       */
+      function FormatDisplayDateTime(DateStr) {
+        if (!DateStr) return ''
+        const D = new Date(DateStr)
+        if (isNaN(D.getTime())) return DateStr
+        const Y = D.getFullYear()
+        const M = String(D.getMonth() + 1).padStart(2, '0')
+        const Day = String(D.getDate()).padStart(2, '0')
+        const H = String(D.getHours()).padStart(2, '0')
+        const Min = String(D.getMinutes()).padStart(2, '0')
+        return `${Y}年${M}月${Day}日 ${H}:${Min}`
       }
 
       /* ==========================================================================
@@ -3775,7 +4701,7 @@
         }</div>
           ${
             CanEditFlg
-              ? `<label style="font-size:12px;color:#666;margin-bottom:5px;display:block;">カラー</label><div class="ColorPicker" id="ColorPicker">${ScheduleColors.map(
+              ? `<label style="font-size:12px;color:#666;margin-bottom:5px;display:block;">カラー</label><div class="ScheduleColorPicker" id="ColorPicker">${ScheduleColors.map(
                   (C) =>
                     `<div class="ColorOption ${
                       (Event?.color || ScheduleColors[0]) === C
@@ -3934,10 +4860,6 @@
 
       function ShowParticipants() {
         ShowPlaceholder('参加者一覧', 'user-friends')
-      }
-
-      function ShowUpdateHistory() {
-        ShowPlaceholder('更新履歴', 'history')
       }
 
       /**
