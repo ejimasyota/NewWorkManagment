@@ -1496,7 +1496,7 @@
           Tbody.innerHTML =
             '<tr><td colspan="6" style="text-align:center;color:#999;">データがありません</td></tr>'
         } else {
-          PageData.forEach((Item, Idx) => {
+          PageData.forEach((Item, Index) => {
             const Row = document.createElement('tr')
             Row.style.cursor = 'pointer'
             Row.innerHTML = `<td title="${Item.CharaName}">${TruncateText(
@@ -1508,7 +1508,7 @@
               Item.OrgName || '-'
             }</td><td>${FormatTimestamp(Item.RegistDate)}</td>`
             Row.addEventListener('dblclick', () =>
-              SelectCharacter(StartIndex + Idx),
+              SelectCharacter(StartIndex + Index),
             )
             Tbody.appendChild(Row)
           })
@@ -2631,7 +2631,7 @@
           TableHtml += PageData.map(
             (H) => `
               <tr>
-                <td>${FormatDisplayDateTime(H.RegistDate)}</td>
+                <td>${FormatDateTimeWithWeekday(H.RegistDate)}</td>
                 <td>${EscapeHtml(H.FunctionName || '')}</td>
                 <td>${EscapeHtml(H.Operation || '')}</td>
                 <td>${EscapeHtml(H.RegistUser || '')}</td>
@@ -2654,32 +2654,28 @@
         )
       }
 
-      /**
-       * 日時をフォーマットして表示用に変換
-       * @param {string} DateStr 日時文字列
-       * @returns {string} フォーマット済み日時
-       */
-      function FormatDisplayDateTime(DateStr) {
-        if (!DateStr) return ''
-        const D = new Date(DateStr)
-        if (isNaN(D.getTime())) return DateStr
-        const Y = D.getFullYear()
-        const M = String(D.getMonth() + 1).padStart(2, '0')
-        const Day = String(D.getDate()).padStart(2, '0')
-        const H = String(D.getHours()).padStart(2, '0')
-        const Min = String(D.getMinutes()).padStart(2, '0')
-        return `${Y}年${M}月${Day}日 ${H}:${Min}`
-      }
-
       /* ==========================================================================
-       * 年表設定 (6.1 TimelineInfo)
+       * 年表設定
        * ========================================================================== */
+      /**
+       * 年表設定画面の表示処理
+       */
       async function ShowTimelineSetting() {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 年表一覧表示ページ
         CurrentPage = 1
+        // 2. 行ID
         SelectedTimelineId = null
+        // 3. コンテンツ表示エリア要素
         const ContentArea = document.getElementById('ContentArea')
+        // 4. 編集権限FLG
         const CanEditFlg = CanEdit()
 
+        /* ---------------------------------------------
+         *  2. 入力フォーム作成
+         * --------------------------------------------- */
         ContentArea.innerHTML = `
         ${CreateContentHeader('年表設定', 'stream')}
         <div class="FormGroup">
@@ -2728,28 +2724,41 @@
         <div id="PaginationArea"></div>
       `
 
+        /* ---------------------------------------------
+         *  3. 編集権限がある場合
+         * --------------------------------------------- */
         if (CanEditFlg) {
+          /* 1. 定義 */
+          // 1. デートピッカーインスタンス
           const DatePickerInstance = new DatePicker()
+
+          /* 2.イベント登録 */
+          // 1. 発生時期ボタンクリックイベント
           document
             .getElementById('TimelineEventDateBtn')
             .addEventListener('click', () =>
               DatePickerInstance.OpenDialog('TimelineEventDate'),
             )
+          // 2. 終了時期ボタンクリックイベント
           document
             .getElementById('TimelineEndDateBtn')
             .addEventListener('click', () =>
               DatePickerInstance.OpenDialog('TimelineEndDate'),
             )
+          // 3. クリアボタンクリックイベント
           document
             .getElementById('TimelineClearButton')
             .addEventListener('click', ClearTimelineForm)
+          // 4. 保存ボタンクリックイベント
           document
             .getElementById('TimelineSaveButton')
             .addEventListener('click', SaveTimeline)
+          // 5. 削除ボタンクリックイベント
           document
             .getElementById('TimelineDeleteButton')
             .addEventListener('click', DeleteTimeline)
         }
+        // 4. 内容ボタンクリックイベント
         document
           .getElementById('TimelineContentBtn')
           .addEventListener('click', async () => {
@@ -2765,73 +2774,149 @@
               )
             }
           })
+        /* ---------------------------------------------
+         *  4. 年表一覧取得処理
+         * --------------------------------------------- */
         await LoadTimelineList()
       }
 
+      /**
+       * 年表一覧取得処理
+       */
       async function LoadTimelineList() {
+        /* ---------------------------------------------
+         *  1. API通信処理
+         * --------------------------------------------- */
         try {
+          /* 1. 定義 */
+          // 1. 作品ID
           const WorkId = sessionStorage.getItem('WorkId')
-          const Response = await CallApi(
-            `/GetTimelineList.php?WorkId=${encodeURIComponent(WorkId)}`,
-            'GET',
-          )
+          // 2. ユーザーID
+          const UserId = sessionStorage.getItem('UserId')
+
+          /* 2. API呼び出し */
+          const Response = await CallApi('/GetTimelineList.php', 'POST', {
+            // 1. 作品ID
+            WorkId: WorkId,
+            // 2. ユーザーID
+            UserId: UserId,
+          })
+
+          /* 3. 取得成功 */
           if (Response.Success) {
-            TimelineList = Response.Data || []
+            // 1. 取得結果を保持
+            TimelineList = Response.Data.TimelineList || []
+            // 2. 年表一覧表示
             RenderTimelineTable()
           } else {
+            /* 4. 取得失敗 */
+            // 1. エラーダイアログ表示
             await ShowErrorDialog(
               Response.Message || '年表一覧の取得に失敗しました',
             )
           }
         } catch (Error) {
-          console.error(Error)
+          /* ---------------------------------------------
+           *  2. 例外処理
+           * --------------------------------------------- */
+          // 1. エラーダイアログ表示
           await ShowErrorDialog('年表一覧の取得中にエラーが発生しました')
+          // 2. デバッグログ
+          console.error(Error)
         }
       }
+
+      /**
+       * 年表一覧表示処理
+       */
       function RenderTimelineTable() {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 年表一覧表示エリア要素取得
         const TableArea = document.getElementById('TimelineTableArea')
+        // 2. 件数表示エリア要素取得
         const RecordCountArea = document.getElementById('RecordCountArea')
+        // 3. ページネーション表示エリア要素取得
         const PaginationArea = document.getElementById('PaginationArea')
+        // 4. 件数初期化
         RecordCountArea.innerHTML = ''
+        // 5. 件数要素を作成して追加
         RecordCountArea.appendChild(CreateRecordCount(TimelineList.length))
+        // 6. テーブル要素作成
         const Table = document.createElement('table')
+        // 7. クラス設定
         Table.className = 'DataTable'
+        // 8. ヘッダー作成
         const Thead = document.createElement('thead')
+        // 9. ヘッダー内容定義
         Thead.innerHTML = `<tr><th>タイトル</th><th>発生時期</th><th>終了時期</th><th>内容</th></tr>`
+        // 10.ヘッダーをテーブルに追加
         Table.appendChild(Thead)
+        // 11.テーブルボディ作成
         const Tbody = document.createElement('tbody')
+        // 12.ページング開始インデックスを定義
         const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE
+        // 13.ページング終了インデックスを定義
         const EndIndex = Math.min(
           StartIndex + RECORDS_PER_PAGE,
           TimelineList.length,
         )
+        // 14.ページング用データを取得
         const PageData = TimelineList.slice(StartIndex, EndIndex)
+
+        /* ---------------------------------------------
+         *  2. 件数が0件の場合
+         * --------------------------------------------- */
         if (PageData.length === 0) {
+          // 1. テーブルボディ内容定義
           Tbody.innerHTML =
             '<tr><td colspan="4" style="text-align:center;color:#999;">データがありません</td></tr>'
         } else {
-          PageData.forEach((Item, Idx) => {
+          /* ---------------------------------------------
+           *  3. 件数が1件以上の場合
+           * --------------------------------------------- */
+          PageData.forEach((Item, Index) => {
+            /* 1. 行作成 */
+            // 1. 行作成
             const Row = document.createElement('tr')
+            // 2. カーソル設定
             Row.style.cursor = 'pointer'
-            Row.dataset.index = StartIndex + Idx
-            Row.innerHTML = `<td title="${Item.Title}">${TruncateText(
-              Item.Title,
+            // 3. データ属性設定
+            Row.dataset.index = StartIndex + Index
+
+            /* 2. 行内容設定 */
+            Row.innerHTML = `<td title="${Item.title}">${TruncateText(
+              Item.title,
               20,
-            )}</td><td>${FormatDate(Item.EventDate)}</td><td>${
-              FormatDate(Item.EndDate) || '-'
-            }</td><td title="${Item.Content || ''}">${
-              TruncateText(Item.Content, 20) || '-'
+            )}</td><td>${FormatDate(Item.eventDate)}</td><td>${
+              FormatDate(Item.endDate) || '-'
+            }</td><td title="${Item.content || ''}">${
+              TruncateText(Item.content, 20) || '-'
             }</td>`
+
+            /* 行ダブルクリックイベント定義 */
             Row.addEventListener('dblclick', () =>
-              SelectTimeline(StartIndex + Idx),
+              // 1. 年表選択処理呼び出し
+              SelectTimeline(StartIndex + Index),
             )
+            /* 3. 行をテーブルボディに追加 */
             Tbody.appendChild(Row)
           })
         }
+
+        /* ---------------------------------------------
+         *  4. DOM構築
+         * --------------------------------------------- */
+        // 1. テーブルボディをテーブルに追加
         Table.appendChild(Tbody)
+        // 2. 年表一覧表示エリアを初期化
         TableArea.innerHTML = ''
+          // 3. テーブルを年表一覧表示エリアに追加
         TableArea.appendChild(Table)
+        // 4. ページネーション表示エリアを初期化
         PaginationArea.innerHTML = ''
+        // 5. ページネーション要素を作成して追加
         PaginationArea.appendChild(
           CreatePagination(TimelineList.length, CurrentPage, (Page) => {
             CurrentPage = Page
@@ -2842,17 +2927,17 @@
 
       function SelectTimeline(Index) {
         const Item = TimelineList[Index]
-        SelectedTimelineId = Item.TimeId
-        document.getElementById('TimelineTitle').value = Item.Title
+        SelectedTimelineId = Item.timeId
+        document.getElementById('TimelineTitle').value = Item.title
         document.getElementById('TimelineEventDate').value =
-          Item.EventDate || ''
-        document.getElementById('TimelineEndDate').value = Item.EndDate || ''
+          Item.eventDate || ''
+        document.getElementById('TimelineEndDate').value = Item.endDate || ''
         document.getElementById('TimelineContent').value = TruncateText(
-          Item.Content,
+          Item.content,
           30,
         )
         document.getElementById('TimelineContentHidden').value =
-          Item.Content || ''
+          Item.content || ''
         const DeleteBtn = document.getElementById('TimelineDeleteButton')
         if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
       }
@@ -3663,11 +3748,11 @@
           return
         }
         ListArea.innerHTML = StoryList.map(
-          (Item, Idx) => `
+          (Item, Index) => `
           <div class="StoryItem" data-storyid="${
             Item.StoryId
-          }" data-index="${Idx}" ${CanEditFlg ? 'draggable="true"' : ''}>
-            <div class="StoryNumber">${Idx + 1}</div>
+          }" data-index="${Index}" ${CanEditFlg ? 'draggable="true"' : ''}>
+            <div class="StoryNumber">${Index + 1}</div>
             <div class="StoryContent">
               <div class="StoryNarrator">${
                 Item.Narrator ? `語り手: ${Item.Narrator}` : 'ナレーション'
@@ -3728,8 +3813,8 @@
         const ToIndex = parseInt(DropItem.dataset.index)
         const MovedItem = StoryList.splice(FromIndex, 1)[0]
         StoryList.splice(ToIndex, 0, MovedItem)
-        StoryList.forEach((Item, Idx) => {
-          Item.IndexNum = Idx + 1
+        StoryList.forEach((Item, Index) => {
+          Item.IndexNum = Index + 1
         })
         RenderStoryList()
         await SaveStoryOrder()
@@ -4014,11 +4099,11 @@
           return
         }
         ListArea.innerHTML = PlotList.map(
-          (Item, Idx) => `
+          (Item, Index) => `
           <div class="StoryItem" data-plotid="${
             Item.PlotId
-          }" data-index="${Idx}" ${CanEditFlg ? 'draggable="true"' : ''}>
-            <div class="StoryNumber">${Idx + 1}</div>
+          }" data-index="${Index}" ${CanEditFlg ? 'draggable="true"' : ''}>
+            <div class="StoryNumber">${Index + 1}</div>
             <div class="StoryContent">
               <span class="PlotBadge ${
                 PlotStructureClasses[Item.StructureType] || ''
@@ -4074,8 +4159,8 @@
         const ToIndex = parseInt(DropItem.dataset.index)
         const MovedItem = PlotList.splice(FromIndex, 1)[0]
         PlotList.splice(ToIndex, 0, MovedItem)
-        PlotList.forEach((Item, Idx) => {
-          Item.IndexNum = Idx + 1
+        PlotList.forEach((Item, Index) => {
+          Item.IndexNum = Index + 1
         })
         RenderPlotList()
         await SavePlotOrder()
@@ -4348,7 +4433,7 @@
           Tbody.innerHTML =
             '<tr><td colspan="4" style="text-align:center;color:#999;">データがありません</td></tr>'
         } else {
-          PageData.forEach((Item, Idx) => {
+          PageData.forEach((Item, Index) => {
             const Row = document.createElement('tr')
             Row.style.cursor = 'pointer'
             Row.innerHTML = `<td>${
@@ -4360,7 +4445,7 @@
               25,
             )}</td><td>${FormatTimestamp(Item.RegistDate)}</td>`
             Row.addEventListener('dblclick', () =>
-              SelectReview(StartIndex + Idx),
+              SelectReview(StartIndex + Index),
             )
             Tbody.appendChild(Row)
           })
@@ -4546,11 +4631,11 @@
         RecordCountArea.appendChild(CreateRecordCount(ScheduleList.length))
         Grid.innerHTML = ''
         const DayNames = ['日', '月', '火', '水', '木', '金', '土']
-        DayNames.forEach((Name, Idx) => {
+        DayNames.forEach((Name, Index) => {
           const DayHeader = document.createElement('div')
           DayHeader.className = 'CalendarDayHeader'
-          if (Idx === 0) DayHeader.classList.add('Sunday')
-          if (Idx === 6) DayHeader.classList.add('Saturday')
+          if (Index === 0) DayHeader.classList.add('Sunday')
+          if (Index === 6) DayHeader.classList.add('Saturday')
           DayHeader.textContent = Name
           Grid.appendChild(DayHeader)
         })

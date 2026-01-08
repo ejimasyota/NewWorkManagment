@@ -6,7 +6,7 @@ const API_BASE_URL = '/Back/Api'
 // 2. 1ページあたりの表示件数
 const RECORDS_PER_PAGE = 15
 // 3. セッションタイムアウト時間
-const SESSION_TIMEOUT = 60 * 1 * 1000
+const SESSION_TIMEOUT = 60 * 60 * 1000
 
 /**
  * UUIDの生成を行う関数
@@ -119,6 +119,23 @@ function FormatDateTimeWithWeekday(dateTimeStr) {
   const ms = date.getMilliseconds()
 
   return `${year}年${month}月${day}日 (${weekday})${hour}時${minute}分${second}.${ms}秒`
+}
+
+/**
+ * 日時をフォーマットして表示用に変換
+ * @param {string} DateStr 日時文字列
+ * @returns {string} フォーマット済み日時
+ */
+function FormatDisplayDateTime(DateStr) {
+  if (!DateStr) return ''
+  const D = new Date(DateStr)
+  if (isNaN(D.getTime())) return DateStr
+  const Y = D.getFullYear()
+  const M = String(D.getMonth() + 1).padStart(2, '0')
+  const Day = String(D.getDate()).padStart(2, '0')
+  const H = String(D.getHours()).padStart(2, '0')
+  const Min = String(D.getMinutes()).padStart(2, '0')
+  return `${Y}年${M}月${Day}日 ${H}:${Min}`
 }
 
 /* ==========================================================================

@@ -18,7 +18,7 @@ function SaveTimeline(): void
 
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $TimeId = $Input['TimeId'] ?? null;
         $WorkId = $Input['WorkId'] ?? '';
         $CaleId = $Input['CaleId'] ?? null;
@@ -34,17 +34,17 @@ function SaveTimeline(): void
 
         /** 入力チェック */
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
         if (empty($EventDate)) {
-            SendError('発生時期を入力してください');
+            Response::Error('発生時期を入力してください');
             return;
         }
 
         if (empty($Title)) {
-            SendError('タイトルを入力してください');
+            Response::Error('タイトルを入力してください');
             return;
         }
 
@@ -152,7 +152,7 @@ function SaveTimeline(): void
 
         Logger::Info($FunctionName, $Operation . '処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'TimeId' => $NewTimeId,
             'Message' => '年表を' . $Operation . 'しました'
         ]);
@@ -160,7 +160,7 @@ function SaveTimeline(): void
     } catch (Exception $E) {
         Database::Rollback();
         Logger::Error($FunctionName, '保存処理エラー', $UserId, $E->getMessage());
-        SendError('年表の保存に失敗しました');
+        Response::Error('年表の保存に失敗しました');
     }
 }
 
