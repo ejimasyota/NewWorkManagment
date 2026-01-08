@@ -18,7 +18,7 @@ function GetTimelineList(): void
 
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $WorkId = $Input['WorkId'] ?? '';
         $UserId = $Input['UserId'] ?? '';
 
@@ -26,7 +26,7 @@ function GetTimelineList(): void
 
         /** 入力チェック */
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
@@ -85,7 +85,7 @@ function GetTimelineList(): void
 
         Logger::Info($FunctionName, '一覧取得処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'TimelineList' => $TimelineList,
             'CalendarList' => $CalendarList,
             'StageList' => $StageList,
@@ -94,7 +94,7 @@ function GetTimelineList(): void
 
     } catch (Exception $E) {
         Logger::Error($FunctionName, '一覧取得処理エラー', $UserId, $E->getMessage());
-        SendError('年表一覧の取得に失敗しました');
+        Response::Error('年表一覧の取得に失敗しました');
     }
 }
 

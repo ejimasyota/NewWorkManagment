@@ -13,12 +13,17 @@ require_once __DIR__ . '/../Common/Response.php';
  */
 function DeleteReview(): void
 {
+    // POSTメソッドのみ許可
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::Error('不正なリクエストです', 405);
+        return;
+    }
     $FunctionName = '作品レビュー';
     $UserId = '';
 
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $ReviewId = $Input['ReviewId'] ?? null;
         $WorkId = $Input['WorkId'] ?? '';
         $UserId = $Input['UserId'] ?? '';
@@ -27,12 +32,12 @@ function DeleteReview(): void
 
         /** 入力チェック */
         if (empty($ReviewId)) {
-            SendError('レビューIDが指定されていません');
+            Response::Error('レビューIDが指定されていません');
             return;
         }
 
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
@@ -52,7 +57,7 @@ function DeleteReview(): void
 
         if ($DeletedCount === 0) {
             Database::Rollback();
-            SendError('削除対象の作品レビューが見つかりません');
+            Response::Error('削除対象の作品レビューが見つかりません');
             return;
         }
 
@@ -90,14 +95,14 @@ function DeleteReview(): void
 
         Logger::Info($FunctionName, '削除処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'Message' => '作品レビューを削除しました'
         ]);
 
     } catch (Exception $E) {
         Database::Rollback();
         Logger::Error($FunctionName, '削除処理エラー', $UserId, $E->getMessage());
-        SendError('作品レビューの削除に失敗しました');
+        Response::Error('作品レビューの削除に失敗しました');
     }
 }
 

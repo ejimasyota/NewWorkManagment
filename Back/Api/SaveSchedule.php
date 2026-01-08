@@ -13,12 +13,17 @@ require_once __DIR__ . '/../Common/Response.php';
  */
 function SaveSchedule(): void
 {
+    // POSTメソッドのみ許可
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::Error('不正なリクエストです', 405);
+        return;
+    }
     $FunctionName = 'スケジュール設定';
     $UserId = '';
 
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $ScheduleId = $Input['ScheduleId'] ?? null;
         $WorkId = $Input['WorkId'] ?? '';
         $Title = $Input['Title'] ?? '';
@@ -33,12 +38,12 @@ function SaveSchedule(): void
 
         /** 入力チェック */
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
         if (empty($Title)) {
-            SendError('タイトルを入力してください');
+            Response::Error('タイトルを入力してください');
             return;
         }
 
@@ -143,7 +148,7 @@ function SaveSchedule(): void
 
         Logger::Info($FunctionName, $Operation . '処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'ScheduleId' => $NewScheduleId,
             'Message' => 'スケジュールを' . $Operation . 'しました'
         ]);
@@ -151,7 +156,7 @@ function SaveSchedule(): void
     } catch (Exception $E) {
         Database::Rollback();
         Logger::Error($FunctionName, '保存処理エラー', $UserId, $E->getMessage());
-        SendError('スケジュールの保存に失敗しました');
+        Response::Error('スケジュールの保存に失敗しました');
     }
 }
 

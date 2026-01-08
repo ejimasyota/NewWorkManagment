@@ -13,12 +13,17 @@ require_once __DIR__ . '/../Common/Response.php';
  */
 function SaveReview(): void
 {
+    // POSTメソッドのみ許可
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::Error('不正なリクエストです', 405);
+        return;
+    }
     $FunctionName = '作品レビュー';
     $UserId = '';
 
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $ReviewId = $Input['ReviewId'] ?? null;
         $WorkId = $Input['WorkId'] ?? '';
         $ReviewerName = $Input['ReviewerName'] ?? null;
@@ -31,17 +36,17 @@ function SaveReview(): void
 
         /** 入力チェック */
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
         if (empty($ReviewContent)) {
-            SendError('レビュー内容を入力してください');
+            Response::Error('レビュー内容を入力してください');
             return;
         }
 
         if (empty($Evaluation) || $Evaluation < 1 || $Evaluation > 4) {
-            SendError('評価を選択してください');
+            Response::Error('評価を選択してください');
             return;
         }
 
@@ -137,7 +142,7 @@ function SaveReview(): void
 
         Logger::Info($FunctionName, $Operation . '処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'ReviewId' => $NewReviewId,
             'Message' => '作品レビューを' . $Operation . 'しました'
         ]);
@@ -145,7 +150,7 @@ function SaveReview(): void
     } catch (Exception $E) {
         Database::Rollback();
         Logger::Error($FunctionName, '保存処理エラー', $UserId, $E->getMessage());
-        SendError('作品レビューの保存に失敗しました');
+        Response::Error('作品レビューの保存に失敗しました');
     }
 }
 

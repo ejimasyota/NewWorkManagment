@@ -1,0 +1,115 @@
+<?php
+/**
+ * UpdateStoryOrder.php
+ * ストーリー順序更新API（ドラッグ&ドロップ対応）
+ */
+
+require_once __DIR__ . '/../Common/Database.php';
+require_once __DIR__ . '/../Common/Logger.php';
+require_once __DIR__ . '/../Common/Response.php';
+
+$FunctionName = 'ストーリー作成';
+$UserId = '';
+
+try {
+    /** リクエストデータを取得 */
+    $Input = Response::GetJsonInput();
+    $WorkId = $Input['WorkId'] ?? '';
+    $OrderList = $Input['OrderList'] ?? [];
+    $UserId = $Input['UserId'] ?? '';
+
+    Logger::Info($FunctionName, '順序更新処理開始', $UserId);
+
+    /** 入力チェック */
+    if (empty($WorkId)) {
+        Response::Error('作品IDが指定されていません');
+    }
+
+    if (empty($OrderList) || !is_array($OrderList)) {
+        Response::Error('順序情報が指定されていません');
+    }
+
+    /** DB接続 */
+    $Pdo = Database::GetConnection();
+    Database::BeginTransaction();
+
+
+        /** 1. 一時的なindexNum（負数）で全件更新し、ユニーク制約違反を回避 */
+        $TempUpdateSql = "
+            UPDATE StoryInfo SET
+                indexNum = :tempIndexNum,
+                updateDate = CURRENT_TIMESTAMP(3),
+                updateUser = :updateUser
+            WHERE storyId = :storyId AND workId = :workId
+        ";
+        $TempUpdateStmt = $Pdo->prepare($TempUpdateSql);
+        foreach ($OrderList as $Order) {
+            $TempUpdateStmt->execute([
+                ':storyId' => $Order['StoryId'],
+                ':workId' => $WorkId,
+                ':tempIndexNum' => -1 * $Order['IndexNum'],
+                ':updateUser' => $UserId
+            ]);
+        }
+
+        /** 2. 正しいindexNumで再度全件更新 */
+        $UpdateSql = "
+            UPDATE StoryInfo SET
+                indexNum = :indexNum,
+                updateDate = CURRENT_TIMESTAMP(3),
+                updateUser = :updateUser
+            WHERE storyId = :storyId AND workId = :workId
+        ";
+        $UpdateStmt = $Pdo->prepare($UpdateSql);
+        foreach ($OrderList as $Order) {
+            $UpdateStmt->execute([
+                ':storyId' => $Order['StoryId'],
+                ':workId' => $WorkId,
+                ':indexNum' => $Order['IndexNum'],
+                ':updateUser' => $UserId
+            ]);
+        }
+
+    /** 作品情報の更新年月日を更新 */
+    $UpdateWorkSql = "
+        UPDATE WorkInfo SET
+            updateDate = CURRENT_TIMESTAMP(3),
+            updateUser = :updateUser
+        WHERE workId = :workId
+    ";
+    $UpdateWorkStmt = $Pdo->prepare($UpdateWorkSql);
+    $UpdateWorkStmt->execute([
+        ':workId' => $WorkId,
+        ':updateUser' => $UserId
+    ]);
+
+    /** 更新履歴を登録 */
+    $HistorySql = "
+        INSERT INTO UpdateHistory (
+            workId, functionName, operation, registDate, updateDate, registUser, updateUser
+        ) VALUES (
+            :workId, :functionName, :operation, CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), :registUser, :updateUser
+        )
+    ";
+    $HistoryStmt = $Pdo->prepare($HistorySql);
+    $HistoryStmt->execute([
+        ':workId' => $WorkId,
+        ':functionName' => $FunctionName,
+        ':operation' => '順序更新',
+        ':registUser' => $UserId,
+        ':updateUser' => $UserId
+    ]);
+
+    Database::Commit();
+
+    Logger::Info($FunctionName, '順序更新処理終了', $UserId);
+
+    Response::Success([
+        'Message' => 'ストーリーの順序を更新しました'
+    ]);
+
+} catch (Exception $E) {
+    Database::Rollback();
+    Logger::Error($FunctionName, '順序更新処理エラー', $UserId, $E->getMessage());
+    Response::Error('ストーリーの順序更新に失敗しました');
+}

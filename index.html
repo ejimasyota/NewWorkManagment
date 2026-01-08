@@ -1,240 +1,270 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ログイン | 作品管理システム</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="Front/Css/Common.css">
-  <style>
-    /**
-     * ログイン画面固有スタイル
-     */
-    .LoginContainer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 20px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ログイン | 作品管理システム</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="Front/Css/Common.css" />
+  </head>
+  <body>
+    <div class="LoginContainer">
+      <div class="LoginCard">
+        <div class="LoginIcon">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <h1 class="LoginTitle">作品管理システム</h1>
+        <p class="LoginSubtitle">アカウントにログインしてください</p>
 
-    .LoginCard {
-      background-color: #fff;
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      padding: 40px;
-      width: 100%;
-      max-width: 400px;
-    }
+        <form class="LoginForm" id="LoginForm" onsubmit="return false;">
+          <div class="FormGroup">
+            <input
+              type="text"
+              class="InputForm"
+              id="UserId"
+              placeholder="ユーザーID（12桁）"
+              maxlength="12"
+              autocomplete="username"
+            />
+          </div>
 
-    .LoginTitle {
-      font-size: 28px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 10px;
-      color: #2c3e50;
-    }
+          <div class="FormGroup">
+            <input
+              type="password"
+              class="InputForm"
+              id="Password"
+              placeholder="パスワード（12桁）"
+              maxlength="12"
+              autocomplete="current-password"
+            />
+          </div>
 
-    .LoginSubtitle {
-      text-align: center;
-      color: #7f8c8d;
-      margin-bottom: 30px;
-      font-size: 14px;
-    }
-
-    .LoginForm .FormGroup {
-      margin-bottom: 20px;
-    }
-
-    .LoginForm .InputForm {
-      padding: 14px 15px;
-      font-size: 15px;
-    }
-
-    .LoginForm .ButtonClass {
-      padding: 14px 24px;
-      font-size: 16px;
-    }
-
-    .LoginButtonGroup {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 25px;
-    }
-
-    .LoginIcon {
-      font-size: 50px;
-      color: #667eea;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    @media screen and (max-width: 480px) {
-      .LoginCard {
-        padding: 30px 20px;
-      }
-      .LoginTitle {
-        font-size: 24px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="LoginContainer">
-    <div class="LoginCard">
-      <div class="LoginIcon">
-        <i class="fas fa-book-open"></i>
+          <div class="LoginButtonGroup">
+            <button
+              type="submit"
+              class="ButtonClass PrimaryButton ButtonFull"
+              id="LoginButton"
+            >
+              <i class="fas fa-sign-in-alt"></i> ログイン
+            </button>
+            <button
+              type="button"
+              class="ButtonClass SecondaryButton ButtonFull"
+              id="RegisterButton"
+            >
+              <i class="fas fa-user-plus"></i> 会員登録
+            </button>
+          </div>
+        </form>
       </div>
-      <h1 class="LoginTitle">作品管理システム</h1>
-      <p class="LoginSubtitle">アカウントにログインしてください</p>
-
-      <form class="LoginForm" id="LoginForm" onsubmit="return false;">
-        <div class="FormGroup">
-          <input
-            type="text"
-            class="InputForm"
-            id="UserId"
-            placeholder="ユーザーID（12桁）"
-            maxlength="12"
-            autocomplete="username"
-          >
-        </div>
-
-        <div class="FormGroup">
-          <input
-            type="password"
-            class="InputForm"
-            id="Password"
-            placeholder="パスワード（12桁）"
-            maxlength="12"
-            autocomplete="current-password"
-          >
-        </div>
-
-        <div class="LoginButtonGroup">
-          <button type="submit" class="ButtonClass PrimaryButton ButtonFull" id="LoginButton">
-            <i class="fas fa-sign-in-alt"></i> ログイン
-          </button>
-          <button type="button" class="ButtonClass SecondaryButton ButtonFull" id="RegisterButton">
-            <i class="fas fa-user-plus"></i> 会員登録
-          </button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <script src="Front/Js/Common.js"></script>
-  <script src="Front/Js/Dialog.js"></script>
-  <script>
-    /**
-     * Login.js
-     * ログイン画面の処理
-     */
+    <script src="Front/Js/Common.js"></script>
+    <script src="Front/Js/Dialog.js"></script>
+    <script>
+      /**
+       * 画面ロード時
+       */
+      document.addEventListener('DOMContentLoaded', function () {
+        // 1 .ログイン画面の初期化処理呼び出し
+        InitializeLoginPage()
+      })
 
-    /**
-     * ページ読み込み時の初期化処理
-     */
-    document.addEventListener("DOMContentLoaded", function() {
-      InitializeLoginPage();
-    });
+      /**
+       * ログイン画面の初期化
+       */
+      function InitializeLoginPage() {
+        /* ==========================================================
+         * ログインボタンのクリックイベント定義
+         * ========================================================== */
+        document
+          .getElementById('LoginButton')
+          .addEventListener('click', HandleLogin)
 
-    /**
-     * ログイン画面の初期化
-     */
-    function InitializeLoginPage() {
-      /** ログインボタンのイベント設定 */
-      document.getElementById("LoginButton").addEventListener("click", HandleLogin);
+        /* ==========================================================
+         * 会員登録ボタンのクリックイベント定義
+         * ========================================================== */
+        document
+          .getElementById('RegisterButton')
+          .addEventListener('click', function () {
+            window.location.href = 'Front/Html/Registration.html'
+          })
 
-      /** 会員登録ボタンのイベント設定 */
-      document.getElementById("RegisterButton").addEventListener("click", function() {
-        window.location.href = "Front/Html/Registration.html";
-      });
+        /* ==========================================================
+         * Enterキーのクリックイベント定義
+         * ========================================================== */
+        document
+          .getElementById('LoginForm')
+          .addEventListener('keypress', function (Event) {
+            /* ---------------------------------------------
+             *  1. Enterキー押下時の処理
+             * --------------------------------------------- */
+            if (Event.key === 'Enter') {
+              // 1. ログイン処理呼び出し
+              HandleLogin()
+            }
+          })
+      }
 
-      /** Enterキーでログイン */
-      document.getElementById("LoginForm").addEventListener("keypress", function(E) {
-        if (E.key === "Enter") {
-          HandleLogin();
+      /**
+       * ログイン処理
+       */
+      async function HandleLogin() {
+        /* ==========================================================
+         * 定義
+         * ========================================================== */
+        // 1. ユーザーID
+        const UserId = document.getElementById('UserId').value.trim()
+        // 2. パスワード
+        const Password = document.getElementById('Password').value.trim()
+
+        /* ==========================================================
+         * 入力値チェック
+         * ========================================================== */
+        /* ---------------------------------------------
+         *  1. ユーザーID入力チェック
+         * --------------------------------------------- */
+        if (!IsRequired(UserId)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog('ユーザーIDを入力してください')
+          // 2. フォーカス設定
+          document.getElementById('UserId').focus()
+          // 3. 処理終了
+          return
         }
-      });
-    }
 
-    /**
-     * ログイン処理
-     */
-    async function HandleLogin() {
-      const UserId = document.getElementById("UserId").value.trim();
-      const Password = document.getElementById("Password").value.trim();
+        /* ---------------------------------------------
+         *  2. パスワード入力チェック
+         * --------------------------------------------- */
+        if (!IsRequired(Password)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog('パスワードを入力してください')
+          // 2. フォーカス設定
+          document.getElementById('Password').focus()
+          // 3. 処理終了
+          return
+        }
 
-      /** 入力チェック */
-      if (!IsRequired(UserId)) {
-        await ShowErrorDialog("ユーザーIDを入力してください");
-        document.getElementById("UserId").focus();
-        return;
-      }
+        /* ---------------------------------------------
+         *  3. ユーザーID桁数チェック
+         * --------------------------------------------- */
+        if (!CheckLength(UserId, 12)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog('ユーザーIDは12桁で入力してください')
+          // 2. フォーカス設定
+          document.getElementById('UserId').focus()
+          // 3. 処理終了
+          return
+        }
+        /* ---------------------------------------------
+         *  4. パスワード桁数チェック
+         * --------------------------------------------- */
+        if (!CheckLength(Password, 12)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog('パスワードは12桁で入力してください')
+          // 2. フォーカス設定
+          document.getElementById('Password').focus()
+          // 3. 処理終了
+          return
+        }
 
-      if (!IsRequired(Password)) {
-        await ShowErrorDialog("パスワードを入力してください");
-        document.getElementById("Password").focus();
-        return;
-      }
+        /* ---------------------------------------------
+         *  5. ユーザーID形式チェック
+         * --------------------------------------------- */
+        if (!ValidateUserId(UserId)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog(
+            'ユーザーIDには大文字・記号・数値を含めてください',
+          )
+          // 2. フォーカス設定
+          document.getElementById('UserId').focus()
+          // 3. 処理終了
+          return
+        }
 
-      /** 桁数チェック */
-      if (!CheckLength(UserId, 12)) {
-        await ShowErrorDialog("ユーザーIDは12桁で入力してください");
-        document.getElementById("UserId").focus();
-        return;
-      }
+        /* ---------------------------------------------
+         *  6. ユーザーIDとパスワードの同一チェック
+         * --------------------------------------------- */
+        if (UserId === Password) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog(
+            'パスワードはユーザーIDと異なる値を設定してください',
+          )
+          // 2. フォーカス設定
+          document.getElementById('Password').focus()
+          // 3. 処理終了
+          return
+        }
 
-      if (!CheckLength(Password, 12)) {
-        await ShowErrorDialog("パスワードは12桁で入力してください");
-        document.getElementById("Password").focus();
-        return;
-      }
+        /* ==========================================================
+         * API呼び出し
+         * ========================================================== */
+        try {
+          /* ---------------------------------------------
+           *  1. 事前処理
+           * --------------------------------------------- */
+          // 1. スピナー表示
+          ShowSpinner()
 
-      /** 形式チェック */
-      if (!ValidateUserId(UserId)) {
-        await ShowErrorDialog("ユーザーIDには大文字・記号・数値を含めてください");
-        document.getElementById("UserId").focus();
-        return;
-      }
+          /* ---------------------------------------------
+           *  2. ユーザーID入力チェック
+           * --------------------------------------------- */
+          const Response = await CallApi('/Login.php', 'POST', {
+            // 1. ユーザーID
+            UserId: UserId,
+            // 2. パスワード
+            Password: Password,
+          })
 
-      if (UserId === Password) {
-        await ShowErrorDialog("パスワードはユーザーIDと異なる値を設定してください");
-        document.getElementById("Password").focus();
-        return;
-      }
+          /* ---------------------------------------------
+           *  3. ログイン成功
+           * --------------------------------------------- */
+          if (Response.Success) {
+            /* 1. 事前処理 */
+            // 1. ユーザーIDをセッションに保持
+            sessionStorage.setItem('UserId', UserId)
+            // 2. 遷移前パス取得
+            const LastPath = sessionStorage.getItem('LastPath')
 
-      /** API呼び出し */
-      try {
-        const Response = await CallApi("/Login.php", "POST", {
-          UserId: UserId,
-          Password: Password
-        });
+            /* 2. 管理者によるログインであった場合 */
+            if (Response.Data.IsAdmin) {
+              // 1. 管理者状態をセッションに保持
+              sessionStorage.setItem('AuthFlg', 'true')
+            }
 
-        if (Response.Success) {
-          /** ログイン成功：セッション情報を保存してメイン画面へ遷移 */
-          sessionStorage.setItem("UserId", UserId);
-          if (Response.Data.IsAdmin) {
-            sessionStorage.setItem("AuthFlg", "true");
-          }
-
-          /** 以前のパスがあればそこへ遷移 */
-          const LastPath = sessionStorage.getItem("LastPath");
-          if (LastPath && LastPath !== "/index.html") {
-            sessionStorage.removeItem("LastPath");
-            window.location.href = LastPath;
+            /* 3. セッションに遷移前パスが存在する場合(セッションタイムアウトによるログアウト時) */
+            if (LastPath && LastPath !== '/index.html') {
+              // 1. セッションの遷移前パスを削除
+              sessionStorage.removeItem('LastPath')
+              // 2. 遷移前パスへリダイレクト
+              window.location.href = LastPath
+            } else {
+              /* 4. セッションに遷移前パスが存在しない場合 */
+              // 1. メイン画面へリダイレクト
+              window.location.href = 'Front/Html/Main.html'
+            }
           } else {
-            window.location.href = "Front/Html/Main.html";
+            /* ---------------------------------------------
+             *  4. ログイン失敗
+             * --------------------------------------------- */
+            // 1. エラーダイアログ表示
+            await ShowErrorDialog(Response.Message || 'ログインに失敗しました')
           }
-        } else {
-          await ShowErrorDialog(Response.Message || "ログインに失敗しました");
+        } catch (Error) {
+          /* ==========================================================
+           * 例外処理
+           * ========================================================== */
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog(
+            Error.message || 'ログイン処理中にエラーが発生しました',
+          )
+          // 2. デバッグログ出力
+          console.error(Error)
         }
-      } catch (Error) {
-        await ShowErrorDialog(Error.message || "ログイン処理中にエラーが発生しました");
       }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
