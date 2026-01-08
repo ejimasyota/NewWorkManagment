@@ -52,6 +52,324 @@
         margin: 10px 15px;
       }
 
+      /* タブUI */
+      .TabContainer {
+        margin-bottom: 20px;
+      }
+
+      .TabHeader {
+        display: flex;
+        border-bottom: 2px solid #3498db;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .TabButton {
+        padding: 12px 20px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 14px;
+        color: #666;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s ease;
+      }
+
+      .TabButton:hover {
+        color: #3498db;
+        background-color: #f8f9fa;
+      }
+
+      .TabButton.Active {
+        color: #3498db;
+        border-bottom-color: #3498db;
+        font-weight: 600;
+      }
+
+      .TabContent {
+        display: none;
+      }
+
+      .TabContent.Active {
+        display: block;
+      }
+
+      .FormRow {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+
+      .FormRow .FormGroup {
+        flex: 1;
+        min-width: 200px;
+        margin-bottom: 0;
+      }
+
+      .FormLabel {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      /* 相関図スタイル */
+      .RelationContainer {
+        display: flex;
+        gap: 20px;
+        height: calc(100vh - 200px);
+        min-height: 500px;
+      }
+
+      .RelationSidebar {
+        width: 200px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        overflow-y: auto;
+      }
+
+      .RelationSidebarTitle {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #2c3e50;
+      }
+
+      .CharacterListItem {
+        padding: 8px 12px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        cursor: grab;
+        font-size: 12px;
+        transition: all 0.2s ease;
+      }
+
+      .CharacterListItem:hover {
+        background: #e3f2fd;
+        border-color: #3498db;
+      }
+
+      .CharacterListItem.dragging {
+        opacity: 0.5;
+      }
+
+      .RelationCanvas {
+        flex: 1;
+        background: #fff;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .RelationCanvasSvg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .RelationCanvasSvg line,
+      .RelationCanvasSvg path {
+        pointer-events: stroke;
+        cursor: pointer;
+      }
+
+      .RelationObject {
+        position: absolute;
+        background: #fff;
+        border: 2px solid #3498db;
+        border-radius: 8px;
+        padding: 10px;
+        cursor: move;
+        min-width: 80px;
+        text-align: center;
+        font-size: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+      }
+
+      .RelationObject.selected {
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+      }
+
+      .RelationObject img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 5px;
+      }
+
+      .RelationGroupBox {
+        position: absolute;
+        border: 2px dashed #9b59b6;
+        border-radius: 12px;
+        padding: 10px;
+        background: rgba(155, 89, 182, 0.05);
+        z-index: 1;
+      }
+
+      .RelationGroupLabel {
+        position: absolute;
+        top: -12px;
+        left: 10px;
+        background: #9b59b6;
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+
+      .TrashZone {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 60px;
+        height: 60px;
+        background: #f8f9fa;
+        border: 2px dashed #e74c3c;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #e74c3c;
+        font-size: 24px;
+        transition: all 0.2s ease;
+        z-index: 100;
+      }
+
+      .TrashZone.active {
+        background: #fee;
+        border-style: solid;
+        transform: scale(1.1);
+      }
+
+      /* ストーリー・プロット用スタイル */
+      .StoryList {
+        margin-top: 20px;
+      }
+
+      .StoryItem {
+        display: flex;
+        align-items: flex-start;
+        padding: 15px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        cursor: grab;
+        transition: all 0.2s ease;
+      }
+
+      .StoryItem:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .StoryItem.dragging {
+        opacity: 0.5;
+        transform: rotate(2deg);
+      }
+
+      .StoryItem.drag-over {
+        border-color: #3498db;
+        background: #e3f2fd;
+      }
+
+      .StoryNumber {
+        width: 30px;
+        height: 30px;
+        background: #3498db;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        font-size: 12px;
+        margin-right: 15px;
+        flex-shrink: 0;
+      }
+
+      .StoryContent {
+        flex: 1;
+      }
+
+      .StoryNarrator {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      .StoryText {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .PlotBadge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 10px;
+      }
+
+      .PlotBadge.ki {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+
+      .PlotBadge.sho {
+        background: #e8f5e9;
+        color: #388e3c;
+      }
+
+      .PlotBadge.ten {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+
+      .PlotBadge.ketsu {
+        background: #fce4ec;
+        color: #c2185b;
+      }
+
+      /* 関係性タイプ選択 */
+      .RelationTypeSelector {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+
+      .RelationTypeOption {
+        padding: 8px 16px;
+        border: 2px solid #ddd;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s ease;
+      }
+
+      .RelationTypeOption:hover {
+        border-color: #3498db;
+      }
+
+      .RelationTypeOption.selected {
+        border-color: currentColor;
+        background: currentColor;
+        color: #fff;
+      }
+
       /* カレンダーUI */
       .CalendarContainer {
         margin-top: 20px;
@@ -835,10 +1153,410 @@
       }
 
       /* ==========================================================================
-       * プレースホルダー関数（各画面の実装）
+       * キャラ設定画面 (4.1 CharacterInfo)
        * ========================================================================== */
-      function ShowCharacterSetting() {
-        ShowPlaceholder('キャラ設定', 'user')
+      let CharacterList = []
+      let SelectedCharacterId = null
+      let CharacterOrganizationList = []
+      let CharacterTeamList = []
+      let CharacterRaceList = []
+      let CharacterClassList = []
+
+      async function ShowCharacterSetting() {
+        CurrentPage = 1
+        SelectedCharacterId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('キャラ設定', 'user')}
+          <div class="TabContainer">
+            <div class="TabHeader">
+              <button class="TabButton Active" data-tab="basic">基本情報</button>
+              <button class="TabButton" data-tab="affiliation">所属情報</button>
+              <button class="TabButton" data-tab="detail">詳細情報</button>
+              <button class="TabButton" data-tab="image">画像</button>
+            </div>
+
+            <!-- 基本情報タブ -->
+            <div class="TabContent Active" id="TabBasic">
+              <div class="FormRow">
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaName" placeholder="キャラ名" maxlength="255" ${!CanEditFlg ? 'disabled' : ''}>
+                </div>
+                <div class="FormGroup">
+                  <select class="SelectForm" id="CharaGender" ${!CanEditFlg ? 'disabled' : ''}>${PullDownList('Gender')}</select>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup InputWithButton">
+                  <input type="text" class="InputForm" id="CharaBirthDate" placeholder="生年月日" readonly ${!CanEditFlg ? 'disabled' : ''}>
+                  ${CanEditFlg ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBirthDateBtn"><i class="fas fa-calendar"></i></button>` : ''}
+                </div>
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaAge" placeholder="年齢" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaHeight" placeholder="身長" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
+                </div>
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaWeight" placeholder="体重" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
+                </div>
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaBloodType" placeholder="血液型" maxlength="10" ${!CanEditFlg ? 'disabled' : ''}>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaFirstPerson" placeholder="一人称" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
+                </div>
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaSecondPerson" placeholder="二人称" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="CharaRoleInfo" placeholder="役割" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaRoleInfoBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="CharaRoleInfoHidden">
+            </div>
+
+            <!-- 所属情報タブ -->
+            <div class="TabContent" id="TabAffiliation">
+              <div class="FormRow">
+                <div class="FormGroup">
+                  <select class="SelectForm" id="CharaRace" ${!CanEditFlg ? 'disabled' : ''}>
+                    <option value="">種族を選択</option>
+                  </select>
+                </div>
+                <div class="FormGroup">
+                  <select class="SelectForm" id="CharaOrganization" ${!CanEditFlg ? 'disabled' : ''}>
+                    <option value="">組織を選択</option>
+                  </select>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup">
+                  <select class="SelectForm" id="CharaTeam" ${!CanEditFlg ? 'disabled' : ''}>
+                    <option value="">チームを選択</option>
+                  </select>
+                </div>
+                <div class="FormGroup">
+                  <select class="SelectForm" id="CharaClass" ${!CanEditFlg ? 'disabled' : ''}>
+                    <option value="">階級を選択</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 詳細情報タブ -->
+            <div class="TabContent" id="TabDetail">
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="CharaPersonality" placeholder="性格" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaPersonalityBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="CharaPersonalityHidden">
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="CharaBiography" placeholder="生い立ち・経歴" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBiographyBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="CharaBiographyHidden">
+            </div>
+
+            <!-- 画像タブ -->
+            <div class="TabContent" id="TabImage">
+              <div class="ImageBox" id="CharaImageBox">
+                <div class="ImageBoxPlaceholder">
+                  <i class="fas fa-user"></i>
+                  <div>クリックで画像選択</div>
+                </div>
+              </div>
+              <input type="file" id="CharaImageInput" accept="image/*" style="display:none;">
+              <input type="hidden" id="CharaImagePath">
+            </div>
+          </div>
+
+          ${CanEditFlg ? `
+          <div class="ButtonGroup">
+            <button class="ButtonClass ClearButton" id="CharaClearButton"><i class="fas fa-sync"></i> クリア</button>
+            <button class="ButtonClass SaveButton" id="CharaSaveButton"><i class="fas fa-save"></i> 保存</button>
+            <button class="ButtonClass DeleteButton Hidden" id="CharaDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+          </div>
+          ` : ''}
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="CharacterTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        SetupCharacterTabEvents()
+        await LoadCharacterMasterData()
+        SetupCharacterFormEvents(CanEditFlg)
+        await LoadCharacterList()
+      }
+
+      function SetupCharacterTabEvents() {
+        document.querySelectorAll('.TabButton').forEach((Btn) => {
+          Btn.addEventListener('click', function () {
+            document.querySelectorAll('.TabButton').forEach((B) => B.classList.remove('Active'))
+            document.querySelectorAll('.TabContent').forEach((C) => C.classList.remove('Active'))
+            this.classList.add('Active')
+            const TabId = this.dataset.tab
+            const TabMap = { basic: 'TabBasic', affiliation: 'TabAffiliation', detail: 'TabDetail', image: 'TabImage' }
+            document.getElementById(TabMap[TabId]).classList.add('Active')
+          })
+        })
+      }
+
+      async function LoadCharacterMasterData() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const [OrgRes, TeamRes, RaceRes, ClassRes] = await Promise.all([
+            CallApi(`/GetOrganizationList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
+            CallApi(`/GetTeamList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
+            CallApi(`/GetRaceList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
+            CallApi(`/GetClassList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
+          ])
+          CharacterOrganizationList = OrgRes.Success ? OrgRes.Data || [] : []
+          CharacterTeamList = TeamRes.Success ? TeamRes.Data || [] : []
+          CharacterRaceList = RaceRes.Success ? RaceRes.Data || [] : []
+          CharacterClassList = ClassRes.Success ? ClassRes.Data || [] : []
+          PopulateCharacterSelects()
+        } catch (Error) {
+          console.error('マスタデータ取得エラー:', Error)
+        }
+      }
+
+      function PopulateCharacterSelects() {
+        const OrgSelect = document.getElementById('CharaOrganization')
+        const TeamSelect = document.getElementById('CharaTeam')
+        const RaceSelect = document.getElementById('CharaRace')
+        const ClassSelect = document.getElementById('CharaClass')
+        OrgSelect.innerHTML = '<option value="">組織を選択</option>' + CharacterOrganizationList.map((I) => `<option value="${I.OrgId}">${I.OrgName}</option>`).join('')
+        TeamSelect.innerHTML = '<option value="">チームを選択</option>' + CharacterTeamList.map((I) => `<option value="${I.TeamId}">${I.TeamName}</option>`).join('')
+        RaceSelect.innerHTML = '<option value="">種族を選択</option>' + CharacterRaceList.map((I) => `<option value="${I.RaceId}">${I.RaceName}</option>`).join('')
+        ClassSelect.innerHTML = '<option value="">階級を選択</option>' + CharacterClassList.map((I) => `<option value="${I.ClassId}">${I.ClassName}</option>`).join('')
+      }
+
+      function SetupCharacterFormEvents(CanEditFlg) {
+        if (CanEditFlg) {
+          const DatePickerInstance = new DatePicker()
+          document.getElementById('CharaBirthDateBtn')?.addEventListener('click', () => DatePickerInstance.OpenDialog('CharaBirthDate'))
+          document.getElementById('CharaClearButton').addEventListener('click', ClearCharacterForm)
+          document.getElementById('CharaSaveButton').addEventListener('click', SaveCharacter)
+          document.getElementById('CharaDeleteButton').addEventListener('click', DeleteCharacter)
+          document.getElementById('CharaImageBox').addEventListener('click', () => document.getElementById('CharaImageInput').click())
+          document.getElementById('CharaImageInput').addEventListener('change', HandleCharacterImageChange)
+        }
+        document.getElementById('CharaRoleInfoBtn').addEventListener('click', async () => {
+          const Result = await ShowInputAreaDialog(document.getElementById('CharaRoleInfoHidden').value, !CanEditFlg)
+          if (Result !== null && CanEditFlg) {
+            document.getElementById('CharaRoleInfoHidden').value = Result
+            document.getElementById('CharaRoleInfo').value = TruncateText(Result, 30)
+          }
+        })
+        document.getElementById('CharaPersonalityBtn').addEventListener('click', async () => {
+          const Result = await ShowInputAreaDialog(document.getElementById('CharaPersonalityHidden').value, !CanEditFlg)
+          if (Result !== null && CanEditFlg) {
+            document.getElementById('CharaPersonalityHidden').value = Result
+            document.getElementById('CharaPersonality').value = TruncateText(Result, 30)
+          }
+        })
+        document.getElementById('CharaBiographyBtn').addEventListener('click', async () => {
+          const Result = await ShowInputAreaDialog(document.getElementById('CharaBiographyHidden').value, !CanEditFlg)
+          if (Result !== null && CanEditFlg) {
+            document.getElementById('CharaBiographyHidden').value = Result
+            document.getElementById('CharaBiography').value = TruncateText(Result, 30)
+          }
+        })
+      }
+
+      function HandleCharacterImageChange(E) {
+        const File = E.target.files[0]
+        if (!File) return
+        const Reader = new FileReader()
+        Reader.onload = function (Ev) {
+          const ImageBox = document.getElementById('CharaImageBox')
+          ImageBox.innerHTML = `<img src="${Ev.target.result}" alt="キャラ画像">`
+          ImageBox.addEventListener('click', async () => {
+            const Deleted = await ShowImageDialog(Ev.target.result, CanEdit())
+            if (Deleted) {
+              ImageBox.innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
+              document.getElementById('CharaImagePath').value = ''
+              document.getElementById('CharaImageInput').value = ''
+            }
+          })
+        }
+        Reader.readAsDataURL(File)
+      }
+
+      async function LoadCharacterList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(`/GetCharacterList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET')
+          if (Response.Success) {
+            CharacterList = Response.Data || []
+            RenderCharacterTable()
+          } else {
+            await ShowErrorDialog(Response.Message || 'キャラ一覧の取得に失敗しました')
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('キャラ一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderCharacterTable() {
+        const TableArea = document.getElementById('CharacterTableArea')
+        const RecordCountArea = document.getElementById('RecordCountArea')
+        const PaginationArea = document.getElementById('PaginationArea')
+        RecordCountArea.innerHTML = ''
+        RecordCountArea.appendChild(CreateRecordCount(CharacterList.length))
+        const Table = document.createElement('table')
+        Table.className = 'DataTable'
+        const Thead = document.createElement('thead')
+        Thead.innerHTML = `<tr><th>キャラ名</th><th>性別</th><th>年齢</th><th>種族</th><th>組織</th><th>登録日</th></tr>`
+        Table.appendChild(Thead)
+        const Tbody = document.createElement('tbody')
+        const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const EndIndex = Math.min(StartIndex + RECORDS_PER_PAGE, CharacterList.length)
+        const PageData = CharacterList.slice(StartIndex, EndIndex)
+        if (PageData.length === 0) {
+          Tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;">データがありません</td></tr>'
+        } else {
+          PageData.forEach((Item, Idx) => {
+            const Row = document.createElement('tr')
+            Row.style.cursor = 'pointer'
+            Row.innerHTML = `<td title="${Item.CharaName}">${TruncateText(Item.CharaName, 15)}</td><td>${GetKeyInfo('Gender', Item.Gender)}</td><td>${Item.Age || '-'}</td><td>${Item.RaceName || '-'}</td><td>${Item.OrgName || '-'}</td><td>${FormatTimestamp(Item.RegistDate)}</td>`
+            Row.addEventListener('dblclick', () => SelectCharacter(StartIndex + Idx))
+            Tbody.appendChild(Row)
+          })
+        }
+        Table.appendChild(Tbody)
+        TableArea.innerHTML = ''
+        TableArea.appendChild(Table)
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(CreatePagination(CharacterList.length, CurrentPage, (Page) => { CurrentPage = Page; RenderCharacterTable() }))
+      }
+
+      function SelectCharacter(Index) {
+        const Item = CharacterList[Index]
+        SelectedCharacterId = Item.CharaId
+        document.getElementById('CharaName').value = Item.CharaName || ''
+        document.getElementById('CharaGender').value = Item.Gender || 0
+        document.getElementById('CharaBirthDate').value = Item.BirthDate || ''
+        document.getElementById('CharaAge').value = Item.Age || ''
+        document.getElementById('CharaHeight').value = Item.Height || ''
+        document.getElementById('CharaWeight').value = Item.Weight || ''
+        document.getElementById('CharaBloodType').value = Item.BloodType || ''
+        document.getElementById('CharaFirstPerson').value = Item.FirstPerson || ''
+        document.getElementById('CharaSecondPerson').value = Item.SecondPerson || ''
+        document.getElementById('CharaRoleInfo').value = TruncateText(Item.RoleInfo, 30)
+        document.getElementById('CharaRoleInfoHidden').value = Item.RoleInfo || ''
+        document.getElementById('CharaRace').value = Item.RaceId || ''
+        document.getElementById('CharaOrganization').value = Item.OrgId || ''
+        document.getElementById('CharaTeam').value = Item.TeamId || ''
+        document.getElementById('CharaClass').value = Item.ClassId || ''
+        document.getElementById('CharaPersonality').value = TruncateText(Item.Personality, 30)
+        document.getElementById('CharaPersonalityHidden').value = Item.Personality || ''
+        document.getElementById('CharaBiography').value = TruncateText(Item.Biography, 30)
+        document.getElementById('CharaBiographyHidden').value = Item.Biography || ''
+        if (Item.ImgPath) {
+          const ImageBox = document.getElementById('CharaImageBox')
+          ImageBox.innerHTML = `<img src="${Item.ImgPath}" alt="キャラ画像">`
+          document.getElementById('CharaImagePath').value = Item.ImgPath
+        }
+        const DeleteBtn = document.getElementById('CharaDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearCharacterForm() {
+        SelectedCharacterId = null
+        document.getElementById('CharaName').value = ''
+        document.getElementById('CharaGender').value = 0
+        document.getElementById('CharaBirthDate').value = ''
+        document.getElementById('CharaAge').value = ''
+        document.getElementById('CharaHeight').value = ''
+        document.getElementById('CharaWeight').value = ''
+        document.getElementById('CharaBloodType').value = ''
+        document.getElementById('CharaFirstPerson').value = ''
+        document.getElementById('CharaSecondPerson').value = ''
+        document.getElementById('CharaRoleInfo').value = ''
+        document.getElementById('CharaRoleInfoHidden').value = ''
+        document.getElementById('CharaRace').value = ''
+        document.getElementById('CharaOrganization').value = ''
+        document.getElementById('CharaTeam').value = ''
+        document.getElementById('CharaClass').value = ''
+        document.getElementById('CharaPersonality').value = ''
+        document.getElementById('CharaPersonalityHidden').value = ''
+        document.getElementById('CharaBiography').value = ''
+        document.getElementById('CharaBiographyHidden').value = ''
+        document.getElementById('CharaImageBox').innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
+        document.getElementById('CharaImagePath').value = ''
+        document.getElementById('CharaImageInput').value = ''
+        const DeleteBtn = document.getElementById('CharaDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveCharacter() {
+        const CharaName = document.getElementById('CharaName').value.trim()
+        if (!CharaName) { await ShowErrorDialog('キャラ名を入力してください'); return }
+        try {
+          const FormData = new window.FormData()
+          FormData.append('CharaId', SelectedCharacterId || '')
+          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
+          FormData.append('CharaName', CharaName)
+          FormData.append('Gender', document.getElementById('CharaGender').value)
+          FormData.append('BirthDate', document.getElementById('CharaBirthDate').value)
+          FormData.append('Age', document.getElementById('CharaAge').value)
+          FormData.append('Height', document.getElementById('CharaHeight').value)
+          FormData.append('Weight', document.getElementById('CharaWeight').value)
+          FormData.append('BloodType', document.getElementById('CharaBloodType').value)
+          FormData.append('FirstPerson', document.getElementById('CharaFirstPerson').value)
+          FormData.append('SecondPerson', document.getElementById('CharaSecondPerson').value)
+          FormData.append('RoleInfo', document.getElementById('CharaRoleInfoHidden').value)
+          FormData.append('RaceId', document.getElementById('CharaRace').value)
+          FormData.append('OrgId', document.getElementById('CharaOrganization').value)
+          FormData.append('TeamId', document.getElementById('CharaTeam').value)
+          FormData.append('ClassId', document.getElementById('CharaClass').value)
+          FormData.append('Personality', document.getElementById('CharaPersonalityHidden').value)
+          FormData.append('Biography', document.getElementById('CharaBiographyHidden').value)
+          FormData.append('UserId', sessionStorage.getItem('UserId'))
+          const ImageInput = document.getElementById('CharaImageInput')
+          if (ImageInput.files[0]) FormData.append('Image', ImageInput.files[0])
+          ShowSpinner()
+          const Response = await fetch(`${API_BASE_URL}/SaveCharacter.php`, { method: 'POST', body: FormData })
+          const Result = await Response.json()
+          HideSpinner()
+          if (Result.Success) {
+            await ShowInfoDialog('保存完了', 'キャラ情報を保存しました')
+            ClearCharacterForm()
+            await LoadCharacterList()
+          } else {
+            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteCharacter() {
+        if (!SelectedCharacterId) return
+        if (!(await ShowConfirmDialog('このキャラを削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteCharacter.php', 'POST', { CharaId: SelectedCharacterId, UserId: sessionStorage.getItem('UserId') })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', 'キャラを削除しました')
+            ClearCharacterForm()
+            await LoadCharacterList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       function ShowOrganizationSetting() {
@@ -1137,16 +1855,842 @@
         ShowPlaceholder('セリフ設定', 'comment')
       }
 
-      function ShowRelationDiagram() {
-        ShowPlaceholder('相関図作成', 'project-diagram')
+      /* ==========================================================================
+       * 相関図作成画面 (5.1, 5.2 RelationObjectInfo, RelationInfo)
+       * ========================================================================== */
+      let RelationObjects = []
+      let RelationLines = []
+      let RelationCharaList = []
+      let SelectedRelationObject = null
+      let IsDraggingObject = false
+      let DragStartX = 0
+      let DragStartY = 0
+      let IsDrawingLine = false
+      let LineStartObjId = null
+      let CurrentLineType = 1
+      let CurrentRelationType = '好意'
+      let CurrentRelationColor = '#e74c3c'
+      const RelationTypes = [
+        { name: '好意', color: '#e74c3c' },
+        { name: '敵意', color: '#2c3e50' },
+        { name: '疑心', color: '#9b59b6' },
+        { name: '友情', color: '#3498db' },
+        { name: '家族', color: '#27ae60' },
+        { name: 'ライバル', color: '#f39c12' },
+      ]
+
+      async function ShowRelationDiagram() {
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('相関図作成', 'project-diagram')}
+          ${CanEditFlg ? `
+          <div class="ButtonGroup MarginBottom20">
+            <button class="ButtonClass PrimaryButton" id="RelationSaveBtn"><i class="fas fa-save"></i> 保存</button>
+            <button class="ButtonClass SecondaryButton" id="RelationAddGroupBtn"><i class="fas fa-object-group"></i> グループ追加</button>
+            <select class="SelectForm" id="RelationLineTypeSelect" style="width:auto;">
+              <option value="1">矢印線（感情）</option>
+              <option value="2">直線（関係）</option>
+            </select>
+          </div>
+          <div class="RelationTypeSelector" id="RelationTypeSelector">
+            ${RelationTypes.map((T, I) => `<div class="RelationTypeOption ${I === 0 ? 'selected' : ''}" data-type="${T.name}" data-color="${T.color}" style="color:${T.color};border-color:${T.color};">${T.name}</div>`).join('')}
+          </div>
+          ` : ''}
+          <div class="RelationContainer">
+            <div class="RelationSidebar" id="RelationSidebar">
+              <div class="RelationSidebarTitle"><i class="fas fa-users"></i> キャラクター</div>
+              <div id="RelationCharaList"></div>
+            </div>
+            <div class="RelationCanvas" id="RelationCanvas">
+              <svg class="RelationCanvasSvg" id="RelationSvg"></svg>
+              ${CanEditFlg ? `<div class="TrashZone" id="TrashZone"><i class="fas fa-trash"></i></div>` : ''}
+            </div>
+          </div>
+        `
+        await LoadRelationCharaList()
+        await LoadRelationData()
+        if (CanEditFlg) SetupRelationEvents()
       }
 
-      function ShowStoryCreation() {
-        ShowPlaceholder('ストーリー作成', 'book')
+      async function LoadRelationCharaList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(`/GetCharacterList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET')
+          if (Response.Success) {
+            RelationCharaList = Response.Data || []
+            RenderRelationCharaList()
+          }
+        } catch (Error) { console.error(Error) }
       }
 
-      function ShowPlotCreation() {
-        ShowPlaceholder('プロット作成', 'sitemap')
+      function RenderRelationCharaList() {
+        const Container = document.getElementById('RelationCharaList')
+        if (!Container) return
+        Container.innerHTML = RelationCharaList.map((C) => `<div class="CharacterListItem" draggable="true" data-charaid="${C.CharaId}" data-charaname="${C.CharaName}">${C.CharaName}</div>`).join('')
+        if (CanEdit()) {
+          Container.querySelectorAll('.CharacterListItem').forEach((Item) => {
+            Item.addEventListener('dragstart', HandleCharaDragStart)
+            Item.addEventListener('dragend', HandleCharaDragEnd)
+          })
+        }
+      }
+
+      function HandleCharaDragStart(E) {
+        E.dataTransfer.setData('text/plain', JSON.stringify({ charaId: E.target.dataset.charaid, charaName: E.target.dataset.charaname }))
+        E.target.classList.add('dragging')
+      }
+
+      function HandleCharaDragEnd(E) { E.target.classList.remove('dragging') }
+
+      async function LoadRelationData() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const [ObjRes, LineRes] = await Promise.all([
+            CallApi(`/GetRelationObjects.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
+            CallApi(`/GetRelationLines.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
+          ])
+          RelationObjects = ObjRes.Success ? ObjRes.Data || [] : []
+          RelationLines = LineRes.Success ? LineRes.Data || [] : []
+          RenderRelationCanvas()
+        } catch (Error) { console.error(Error) }
+      }
+
+      function RenderRelationCanvas() {
+        const Canvas = document.getElementById('RelationCanvas')
+        const Svg = document.getElementById('RelationSvg')
+        if (!Canvas || !Svg) return
+        Canvas.querySelectorAll('.RelationObject, .RelationGroupBox').forEach((E) => E.remove())
+        Svg.innerHTML = ''
+        RelationObjects.forEach((Obj) => {
+          if (Obj.ObjType === 2) {
+            const GroupBox = document.createElement('div')
+            GroupBox.className = 'RelationGroupBox'
+            GroupBox.dataset.objid = Obj.ObjId
+            GroupBox.style.left = Obj.PosX + 'px'
+            GroupBox.style.top = Obj.PosY + 'px'
+            GroupBox.style.width = (Obj.Width || 150) + 'px'
+            GroupBox.style.height = (Obj.Height || 100) + 'px'
+            if (Obj.BgColor) GroupBox.style.borderColor = Obj.BgColor
+            if (Obj.Label) GroupBox.innerHTML = `<div class="RelationGroupLabel" style="background:${Obj.BgColor || '#9b59b6'}">${Obj.Label}</div>`
+            Canvas.insertBefore(GroupBox, Svg)
+          } else {
+            const CharaObj = document.createElement('div')
+            CharaObj.className = 'RelationObject'
+            CharaObj.dataset.objid = Obj.ObjId
+            CharaObj.dataset.charaid = Obj.TargetId
+            CharaObj.style.left = Obj.PosX + 'px'
+            CharaObj.style.top = Obj.PosY + 'px'
+            const Chara = RelationCharaList.find((C) => C.CharaId === Obj.TargetId)
+            CharaObj.innerHTML = `${Chara?.ImgPath ? `<img src="${Chara.ImgPath}" alt="">` : ''}<div>${Chara?.CharaName || Obj.Label || '不明'}</div>`
+            Canvas.appendChild(CharaObj)
+          }
+        })
+        RelationLines.forEach((Line) => {
+          const SourceObj = RelationObjects.find((O) => O.ObjId == Line.SourceObjId)
+          const TargetObj = RelationObjects.find((O) => O.ObjId == Line.TargetObjId)
+          if (!SourceObj || !TargetObj) return
+          const X1 = SourceObj.PosX + 50, Y1 = SourceObj.PosY + 40
+          const X2 = TargetObj.PosX + 50, Y2 = TargetObj.PosY + 40
+          if (Line.LineType === 1) {
+            const Path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+            const Dx = X2 - X1, Dy = Y2 - Y1, Len = Math.sqrt(Dx * Dx + Dy * Dy)
+            const UnitX = Dx / Len, UnitY = Dy / Len
+            const ArrowLen = 10, ArrowX = X2 - UnitX * 15, ArrowY = Y2 - UnitY * 15
+            const LeftX = ArrowX - UnitY * ArrowLen - UnitX * ArrowLen
+            const LeftY = ArrowY + UnitX * ArrowLen - UnitY * ArrowLen
+            const RightX = ArrowX + UnitY * ArrowLen - UnitX * ArrowLen
+            const RightY = ArrowY - UnitX * ArrowLen - UnitY * ArrowLen
+            Path.setAttribute('d', `M${X1},${Y1} L${X2 - UnitX * 15},${Y2 - UnitY * 15} M${ArrowX},${ArrowY} L${LeftX},${LeftY} M${ArrowX},${ArrowY} L${RightX},${RightY}`)
+            Path.setAttribute('stroke', Line.Color || '#e74c3c')
+            Path.setAttribute('stroke-width', '2')
+            Path.setAttribute('fill', 'none')
+            Path.dataset.relationid = Line.RelationId
+            Svg.appendChild(Path)
+          } else {
+            const LineEl = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+            LineEl.setAttribute('x1', X1)
+            LineEl.setAttribute('y1', Y1)
+            LineEl.setAttribute('x2', X2)
+            LineEl.setAttribute('y2', Y2)
+            LineEl.setAttribute('stroke', Line.Color || '#3498db')
+            LineEl.setAttribute('stroke-width', '2')
+            LineEl.dataset.relationid = Line.RelationId
+            Svg.appendChild(LineEl)
+          }
+          const TextX = (X1 + X2) / 2, TextY = (Y1 + Y2) / 2 - 5
+          const Text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+          Text.setAttribute('x', TextX)
+          Text.setAttribute('y', TextY)
+          Text.setAttribute('fill', Line.Color || '#333')
+          Text.setAttribute('font-size', '10')
+          Text.setAttribute('text-anchor', 'middle')
+          Text.textContent = Line.RelationType || ''
+          Svg.appendChild(Text)
+        })
+        if (CanEdit()) SetupRelationObjectEvents()
+      }
+
+      function SetupRelationEvents() {
+        const Canvas = document.getElementById('RelationCanvas')
+        Canvas.addEventListener('dragover', (E) => E.preventDefault())
+        Canvas.addEventListener('drop', HandleCanvasDrop)
+        document.getElementById('RelationSaveBtn').addEventListener('click', SaveRelationData)
+        document.getElementById('RelationAddGroupBtn').addEventListener('click', AddRelationGroup)
+        document.getElementById('RelationLineTypeSelect').addEventListener('change', (E) => { CurrentLineType = parseInt(E.target.value) })
+        document.querySelectorAll('.RelationTypeOption').forEach((Opt) => {
+          Opt.addEventListener('click', function () {
+            document.querySelectorAll('.RelationTypeOption').forEach((O) => O.classList.remove('selected'))
+            this.classList.add('selected')
+            CurrentRelationType = this.dataset.type
+            CurrentRelationColor = this.dataset.color
+          })
+        })
+      }
+
+      function SetupRelationObjectEvents() {
+        document.querySelectorAll('.RelationObject').forEach((Obj) => {
+          Obj.addEventListener('mousedown', StartDragObject)
+          Obj.addEventListener('dblclick', StartDrawLine)
+        })
+        document.querySelectorAll('.RelationGroupBox').forEach((Obj) => {
+          Obj.addEventListener('mousedown', StartDragObject)
+        })
+      }
+
+      function HandleCanvasDrop(E) {
+        E.preventDefault()
+        const Data = JSON.parse(E.dataTransfer.getData('text/plain') || '{}')
+        if (!Data.charaId) return
+        if (RelationObjects.find((O) => O.TargetId === Data.charaId)) {
+          ShowErrorDialog('このキャラは既に配置されています')
+          return
+        }
+        const Rect = E.target.closest('.RelationCanvas').getBoundingClientRect()
+        const NewObj = {
+          ObjId: 'new_' + Date.now(),
+          ObjType: 1,
+          TargetId: Data.charaId,
+          Label: Data.charaName,
+          PosX: E.clientX - Rect.left - 40,
+          PosY: E.clientY - Rect.top - 30,
+        }
+        RelationObjects.push(NewObj)
+        RenderRelationCanvas()
+      }
+
+      function StartDragObject(E) {
+        if (E.target.closest('.TrashZone')) return
+        SelectedRelationObject = E.target.closest('.RelationObject, .RelationGroupBox')
+        if (!SelectedRelationObject) return
+        IsDraggingObject = true
+        DragStartX = E.clientX - SelectedRelationObject.offsetLeft
+        DragStartY = E.clientY - SelectedRelationObject.offsetTop
+        document.addEventListener('mousemove', DragObject)
+        document.addEventListener('mouseup', EndDragObject)
+        document.querySelectorAll('.RelationObject').forEach((O) => O.classList.remove('selected'))
+        SelectedRelationObject.classList.add('selected')
+      }
+
+      function DragObject(E) {
+        if (!IsDraggingObject || !SelectedRelationObject) return
+        const Canvas = document.getElementById('RelationCanvas')
+        const Rect = Canvas.getBoundingClientRect()
+        let NewX = E.clientX - DragStartX
+        let NewY = E.clientY - DragStartY
+        NewX = Math.max(0, Math.min(NewX, Rect.width - SelectedRelationObject.offsetWidth))
+        NewY = Math.max(0, Math.min(NewY, Rect.height - SelectedRelationObject.offsetHeight))
+        SelectedRelationObject.style.left = NewX + 'px'
+        SelectedRelationObject.style.top = NewY + 'px'
+        const ObjId = SelectedRelationObject.dataset.objid
+        const Obj = RelationObjects.find((O) => O.ObjId == ObjId)
+        if (Obj) { Obj.PosX = NewX; Obj.PosY = NewY }
+        RenderRelationLines()
+        const TrashZone = document.getElementById('TrashZone')
+        if (TrashZone) {
+          const TrashRect = TrashZone.getBoundingClientRect()
+          if (E.clientX >= TrashRect.left && E.clientX <= TrashRect.right && E.clientY >= TrashRect.top && E.clientY <= TrashRect.bottom) {
+            TrashZone.classList.add('active')
+          } else {
+            TrashZone.classList.remove('active')
+          }
+        }
+      }
+
+      function RenderRelationLines() {
+        const Svg = document.getElementById('RelationSvg')
+        if (!Svg) return
+        Svg.innerHTML = ''
+        RelationLines.forEach((Line) => {
+          const SourceObj = RelationObjects.find((O) => O.ObjId == Line.SourceObjId)
+          const TargetObj = RelationObjects.find((O) => O.ObjId == Line.TargetObjId)
+          if (!SourceObj || !TargetObj) return
+          const X1 = SourceObj.PosX + 50, Y1 = SourceObj.PosY + 40
+          const X2 = TargetObj.PosX + 50, Y2 = TargetObj.PosY + 40
+          if (Line.LineType === 1) {
+            const Path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+            const Dx = X2 - X1, Dy = Y2 - Y1, Len = Math.sqrt(Dx * Dx + Dy * Dy) || 1
+            const UnitX = Dx / Len, UnitY = Dy / Len
+            const ArrowLen = 10, ArrowX = X2 - UnitX * 15, ArrowY = Y2 - UnitY * 15
+            const LeftX = ArrowX - UnitY * ArrowLen - UnitX * ArrowLen
+            const LeftY = ArrowY + UnitX * ArrowLen - UnitY * ArrowLen
+            const RightX = ArrowX + UnitY * ArrowLen - UnitX * ArrowLen
+            const RightY = ArrowY - UnitX * ArrowLen - UnitY * ArrowLen
+            Path.setAttribute('d', `M${X1},${Y1} L${X2 - UnitX * 15},${Y2 - UnitY * 15} M${ArrowX},${ArrowY} L${LeftX},${LeftY} M${ArrowX},${ArrowY} L${RightX},${RightY}`)
+            Path.setAttribute('stroke', Line.Color || '#e74c3c')
+            Path.setAttribute('stroke-width', '2')
+            Path.setAttribute('fill', 'none')
+            Svg.appendChild(Path)
+          } else {
+            const LineEl = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+            LineEl.setAttribute('x1', X1); LineEl.setAttribute('y1', Y1)
+            LineEl.setAttribute('x2', X2); LineEl.setAttribute('y2', Y2)
+            LineEl.setAttribute('stroke', Line.Color || '#3498db')
+            LineEl.setAttribute('stroke-width', '2')
+            Svg.appendChild(LineEl)
+          }
+          const TextX = (X1 + X2) / 2, TextY = (Y1 + Y2) / 2 - 5
+          const Text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+          Text.setAttribute('x', TextX); Text.setAttribute('y', TextY)
+          Text.setAttribute('fill', Line.Color || '#333')
+          Text.setAttribute('font-size', '10')
+          Text.setAttribute('text-anchor', 'middle')
+          Text.textContent = Line.RelationType || ''
+          Svg.appendChild(Text)
+        })
+      }
+
+      function EndDragObject(E) {
+        if (!IsDraggingObject) return
+        const TrashZone = document.getElementById('TrashZone')
+        if (TrashZone && TrashZone.classList.contains('active') && SelectedRelationObject) {
+          const ObjId = SelectedRelationObject.dataset.objid
+          RelationObjects = RelationObjects.filter((O) => O.ObjId != ObjId)
+          RelationLines = RelationLines.filter((L) => L.SourceObjId != ObjId && L.TargetObjId != ObjId)
+          RenderRelationCanvas()
+        }
+        IsDraggingObject = false
+        SelectedRelationObject = null
+        document.removeEventListener('mousemove', DragObject)
+        document.removeEventListener('mouseup', EndDragObject)
+        if (TrashZone) TrashZone.classList.remove('active')
+      }
+
+      function StartDrawLine(E) {
+        const Obj = E.target.closest('.RelationObject')
+        if (!Obj) return
+        if (!IsDrawingLine) {
+          IsDrawingLine = true
+          LineStartObjId = Obj.dataset.objid
+          Obj.classList.add('selected')
+          ShowInfoDialog('線の描画', '接続先のキャラをダブルクリックしてください')
+        } else {
+          const EndObjId = Obj.dataset.objid
+          if (LineStartObjId !== EndObjId) {
+            const NewLine = {
+              RelationId: 'new_' + Date.now(),
+              SourceObjId: LineStartObjId,
+              TargetObjId: EndObjId,
+              LineType: CurrentLineType,
+              RelationType: CurrentRelationType,
+              Color: CurrentRelationColor,
+            }
+            RelationLines.push(NewLine)
+            RenderRelationCanvas()
+          }
+          IsDrawingLine = false
+          LineStartObjId = null
+          document.querySelectorAll('.RelationObject').forEach((O) => O.classList.remove('selected'))
+        }
+      }
+
+      async function AddRelationGroup() {
+        const Label = prompt('グループ名を入力してください')
+        if (!Label) return
+        const Color = prompt('カラーコードを入力してください（例: #9b59b6）', '#9b59b6')
+        const NewGroup = {
+          ObjId: 'new_' + Date.now(),
+          ObjType: 2,
+          Label: Label,
+          PosX: 100,
+          PosY: 100,
+          Width: 200,
+          Height: 150,
+          BgColor: Color || '#9b59b6',
+        }
+        RelationObjects.push(NewGroup)
+        RenderRelationCanvas()
+      }
+
+      async function SaveRelationData() {
+        try {
+          const Response = await CallApi('/SaveRelationData.php', 'POST', {
+            WorkId: sessionStorage.getItem('WorkId'),
+            Objects: RelationObjects,
+            Lines: RelationLines,
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', '相関図を保存しました')
+            await LoadRelationData()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      /* ==========================================================================
+       * ストーリー作成画面 (6.2 StoryInfo)
+       * ========================================================================== */
+      let StoryList = []
+      let SelectedStoryId = null
+      let StoryDragItem = null
+
+      async function ShowStoryCreation() {
+        CurrentPage = 1
+        SelectedStoryId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('ストーリー作成', 'book')}
+          ${CanEditFlg ? `
+          <div class="ButtonGroup MarginBottom20">
+            <button class="ButtonClass PrimaryButton" id="StoryAddBtn"><i class="fas fa-plus"></i> 行追加</button>
+            <button class="ButtonClass SuccessButton" id="StoryExportBtn"><i class="fas fa-file-word"></i> Word出力</button>
+          </div>
+          ` : ''}
+          <div id="RecordCountArea"></div>
+          <div class="StoryList" id="StoryListArea"></div>
+          <div id="PaginationArea"></div>
+        `
+        if (CanEditFlg) {
+          document.getElementById('StoryAddBtn').addEventListener('click', () => ShowStoryDialog())
+          document.getElementById('StoryExportBtn').addEventListener('click', ExportStoryToWord)
+        }
+        await LoadStoryList()
+      }
+
+      async function LoadStoryList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(`/GetStoryList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET')
+          if (Response.Success) {
+            StoryList = (Response.Data || []).sort((A, B) => A.IndexNum - B.IndexNum)
+            RenderStoryList()
+          } else {
+            await ShowErrorDialog(Response.Message || 'ストーリー一覧の取得に失敗しました')
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('ストーリー一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderStoryList() {
+        const ListArea = document.getElementById('StoryListArea')
+        const RecordCountArea = document.getElementById('RecordCountArea')
+        if (!ListArea) return
+        RecordCountArea.innerHTML = ''
+        RecordCountArea.appendChild(CreateRecordCount(StoryList.length))
+        const CanEditFlg = CanEdit()
+        if (StoryList.length === 0) {
+          ListArea.innerHTML = '<div style="text-align:center;color:#999;padding:50px;">データがありません</div>'
+          return
+        }
+        ListArea.innerHTML = StoryList.map((Item, Idx) => `
+          <div class="StoryItem" data-storyid="${Item.StoryId}" data-index="${Idx}" ${CanEditFlg ? 'draggable="true"' : ''}>
+            <div class="StoryNumber">${Idx + 1}</div>
+            <div class="StoryContent">
+              <div class="StoryNarrator">${Item.Narrator ? `語り手: ${Item.Narrator}` : 'ナレーション'}</div>
+              <div class="StoryText">${Item.Content || ''}</div>
+            </div>
+          </div>
+        `).join('')
+        if (CanEditFlg) {
+          ListArea.querySelectorAll('.StoryItem').forEach((Item) => {
+            Item.addEventListener('dblclick', () => ShowStoryDialog(Item.dataset.storyid))
+            Item.addEventListener('dragstart', HandleStoryDragStart)
+            Item.addEventListener('dragend', HandleStoryDragEnd)
+            Item.addEventListener('dragover', HandleStoryDragOver)
+            Item.addEventListener('drop', HandleStoryDrop)
+          })
+        }
+      }
+
+      function HandleStoryDragStart(E) {
+        StoryDragItem = E.target.closest('.StoryItem')
+        E.target.classList.add('dragging')
+        E.dataTransfer.effectAllowed = 'move'
+      }
+
+      function HandleStoryDragEnd(E) {
+        E.target.classList.remove('dragging')
+        document.querySelectorAll('.StoryItem').forEach((I) => I.classList.remove('drag-over'))
+        StoryDragItem = null
+      }
+
+      function HandleStoryDragOver(E) {
+        E.preventDefault()
+        const Item = E.target.closest('.StoryItem')
+        if (Item && Item !== StoryDragItem) {
+          document.querySelectorAll('.StoryItem').forEach((I) => I.classList.remove('drag-over'))
+          Item.classList.add('drag-over')
+        }
+      }
+
+      async function HandleStoryDrop(E) {
+        E.preventDefault()
+        const DropItem = E.target.closest('.StoryItem')
+        if (!DropItem || !StoryDragItem || DropItem === StoryDragItem) return
+        const FromIndex = parseInt(StoryDragItem.dataset.index)
+        const ToIndex = parseInt(DropItem.dataset.index)
+        const MovedItem = StoryList.splice(FromIndex, 1)[0]
+        StoryList.splice(ToIndex, 0, MovedItem)
+        StoryList.forEach((Item, Idx) => { Item.IndexNum = Idx + 1 })
+        RenderStoryList()
+        await SaveStoryOrder()
+      }
+
+      async function SaveStoryOrder() {
+        try {
+          const Response = await CallApi('/UpdateStoryOrder.php', 'POST', {
+            WorkId: sessionStorage.getItem('WorkId'),
+            Orders: StoryList.map((Item) => ({ StoryId: Item.StoryId, IndexNum: Item.IndexNum })),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (!Response.Success) await ShowErrorDialog(Response.Message || '並び順の保存に失敗しました')
+        } catch (Error) { console.error(Error) }
+      }
+
+      async function ShowStoryDialog(StoryId = null) {
+        const IsEdit = StoryId !== null
+        const Item = IsEdit ? StoryList.find((S) => S.StoryId == StoryId) : null
+        return new Promise((Resolve) => {
+          const Overlay = document.createElement('div')
+          Overlay.className = 'DialogOverlay'
+          const Dialog = document.createElement('div')
+          Dialog.className = 'DialogContainer DialogMedium'
+          Dialog.innerHTML = `
+            <div class="DialogTitle">${IsEdit ? 'ストーリー編集' : 'ストーリー追加'}</div>
+            <div class="DialogContent">
+              <div class="FormGroup">
+                <div class="CheckboxWrapper">
+                  <input type="checkbox" id="StoryNarratorToggle" ${Item?.Narrator ? '' : 'checked'}>
+                  <label>自由入力</label>
+                </div>
+              </div>
+              <div class="FormGroup" id="StoryNarratorSelectGroup">
+                <select class="SelectForm" id="StoryNarratorSelect">
+                  <option value="">語り手を選択</option>
+                  ${RelationCharaList.length ? RelationCharaList.map((C) => `<option value="${C.CharaName}" ${Item?.Narrator === C.CharaName ? 'selected' : ''}>${C.CharaName}</option>`).join('') : CharacterList.map((C) => `<option value="${C.CharaName}" ${Item?.Narrator === C.CharaName ? 'selected' : ''}>${C.CharaName}</option>`).join('')}
+                </select>
+              </div>
+              <div class="FormGroup Hidden" id="StoryNarratorInputGroup">
+                <input type="text" class="InputForm" id="StoryNarratorInput" placeholder="語り手（空白でナレーション）" value="${Item?.Narrator || ''}">
+              </div>
+              <div class="FormGroup">
+                <textarea class="TextAreaForm" id="StoryContentInput" placeholder="内容" style="min-height:150px;">${Item?.Content || ''}</textarea>
+              </div>
+            </div>
+            <div class="DialogButtonArea">
+              <button class="ButtonClass CloseButton" id="StoryDialogClose"><i class="fas fa-times"></i> 閉じる</button>
+              ${IsEdit ? `<button class="ButtonClass DeleteButton" id="StoryDialogDelete"><i class="fas fa-trash"></i> 削除</button>` : ''}
+              <button class="ButtonClass SaveButton" id="StoryDialogSave"><i class="fas fa-save"></i> 保存</button>
+            </div>
+          `
+          document.body.appendChild(Overlay)
+          Overlay.appendChild(Dialog)
+          const Toggle = Dialog.querySelector('#StoryNarratorToggle')
+          const SelectGroup = Dialog.querySelector('#StoryNarratorSelectGroup')
+          const InputGroup = Dialog.querySelector('#StoryNarratorInputGroup')
+          const UpdateToggle = () => {
+            if (Toggle.checked) { SelectGroup.classList.add('Hidden'); InputGroup.classList.remove('Hidden') }
+            else { SelectGroup.classList.remove('Hidden'); InputGroup.classList.add('Hidden') }
+          }
+          UpdateToggle()
+          Toggle.addEventListener('change', UpdateToggle)
+          Dialog.querySelector('#StoryDialogClose').addEventListener('click', () => { Overlay.remove(); Resolve(null) })
+          Dialog.querySelector('#StoryDialogSave').addEventListener('click', async () => {
+            let Narrator = Toggle.checked ? Dialog.querySelector('#StoryNarratorInput').value.trim() : Dialog.querySelector('#StoryNarratorSelect').value
+            let Content = Dialog.querySelector('#StoryContentInput').value.trim()
+            if (!Content) { await ShowErrorDialog('内容を入力してください'); return }
+            if (Narrator) Content = `「${Content.replace(/^「/, '').replace(/」$/, '')}」`
+            try {
+              const Response = await CallApi('/SaveStory.php', 'POST', {
+                StoryId: IsEdit ? StoryId : null,
+                WorkId: sessionStorage.getItem('WorkId'),
+                IndexNum: IsEdit ? Item.IndexNum : StoryList.length + 1,
+                Narrator: Narrator,
+                Content: Content,
+                UserId: sessionStorage.getItem('UserId'),
+              })
+              if (Response.Success) {
+                Overlay.remove()
+                await ShowInfoDialog('保存完了', 'ストーリーを保存しました')
+                await LoadStoryList()
+                Resolve(true)
+              } else { await ShowErrorDialog(Response.Message || '保存に失敗しました') }
+            } catch (Error) { await ShowErrorDialog('保存中にエラーが発生しました') }
+          })
+          if (IsEdit) {
+            Dialog.querySelector('#StoryDialogDelete').addEventListener('click', async () => {
+              if (!(await ShowConfirmDialog('このストーリーを削除しますか？'))) return
+              try {
+                const Response = await CallApi('/DeleteStory.php', 'POST', { StoryId: StoryId, UserId: sessionStorage.getItem('UserId') })
+                if (Response.Success) {
+                  Overlay.remove()
+                  await ShowInfoDialog('削除完了', 'ストーリーを削除しました')
+                  await LoadStoryList()
+                  Resolve(true)
+                } else { await ShowErrorDialog(Response.Message || '削除に失敗しました') }
+              } catch (Error) { await ShowErrorDialog('削除中にエラーが発生しました') }
+            })
+          }
+        })
+      }
+
+      async function ExportStoryToWord() {
+        try {
+          ShowSpinner()
+          const Response = await fetch(`${API_BASE_URL}/ExportStory.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ WorkId: sessionStorage.getItem('WorkId'), UserId: sessionStorage.getItem('UserId') }),
+          })
+          if (!Response.ok) throw new Error('出力に失敗しました')
+          const Blob = await Response.blob()
+          const WorkTitle = WorkInfo?.WorkTitle || '作品'
+          DownloadFile(Blob, `${WorkTitle}_ストーリー.docx`)
+          HideSpinner()
+          await ShowInfoDialog('出力完了', 'Wordファイルをダウンロードしました')
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('出力中にエラーが発生しました')
+        }
+      }
+
+      /* ==========================================================================
+       * プロット作成画面 (6.3 PlotInfo)
+       * ========================================================================== */
+      let PlotList = []
+      let SelectedPlotId = null
+      let PlotDragItem = null
+      const PlotStructureLabels = ['起', '承', '転', '結']
+      const PlotStructureClasses = ['ki', 'sho', 'ten', 'ketsu']
+
+      async function ShowPlotCreation() {
+        CurrentPage = 1
+        SelectedPlotId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('プロット作成', 'sitemap')}
+          ${CanEditFlg ? `
+          <div class="ButtonGroup MarginBottom20">
+            <button class="ButtonClass PrimaryButton" id="PlotAddBtn"><i class="fas fa-plus"></i> 行追加</button>
+            <button class="ButtonClass SuccessButton" id="PlotExportBtn"><i class="fas fa-file-word"></i> Word出力</button>
+          </div>
+          ` : ''}
+          <div id="RecordCountArea"></div>
+          <div class="StoryList" id="PlotListArea"></div>
+          <div id="PaginationArea"></div>
+        `
+        if (CanEditFlg) {
+          document.getElementById('PlotAddBtn').addEventListener('click', () => ShowPlotDialog())
+          document.getElementById('PlotExportBtn').addEventListener('click', ExportPlotToWord)
+        }
+        await LoadPlotList()
+      }
+
+      async function LoadPlotList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(`/GetPlotList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET')
+          if (Response.Success) {
+            PlotList = (Response.Data || []).sort((A, B) => A.IndexNum - B.IndexNum)
+            RenderPlotList()
+          } else {
+            await ShowErrorDialog(Response.Message || 'プロット一覧の取得に失敗しました')
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('プロット一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderPlotList() {
+        const ListArea = document.getElementById('PlotListArea')
+        const RecordCountArea = document.getElementById('RecordCountArea')
+        if (!ListArea) return
+        RecordCountArea.innerHTML = ''
+        RecordCountArea.appendChild(CreateRecordCount(PlotList.length))
+        const CanEditFlg = CanEdit()
+        if (PlotList.length === 0) {
+          ListArea.innerHTML = '<div style="text-align:center;color:#999;padding:50px;">データがありません</div>'
+          return
+        }
+        ListArea.innerHTML = PlotList.map((Item, Idx) => `
+          <div class="StoryItem" data-plotid="${Item.PlotId}" data-index="${Idx}" ${CanEditFlg ? 'draggable="true"' : ''}>
+            <div class="StoryNumber">${Idx + 1}</div>
+            <div class="StoryContent">
+              <span class="PlotBadge ${PlotStructureClasses[Item.StructureType] || ''}">${PlotStructureLabels[Item.StructureType] || '?'}</span>
+              <span class="StoryText">${Item.Content || ''}</span>
+            </div>
+          </div>
+        `).join('')
+        if (CanEditFlg) {
+          ListArea.querySelectorAll('.StoryItem').forEach((Item) => {
+            Item.addEventListener('dblclick', () => ShowPlotDialog(Item.dataset.plotid))
+            Item.addEventListener('dragstart', HandlePlotDragStart)
+            Item.addEventListener('dragend', HandlePlotDragEnd)
+            Item.addEventListener('dragover', HandlePlotDragOver)
+            Item.addEventListener('drop', HandlePlotDrop)
+          })
+        }
+      }
+
+      function HandlePlotDragStart(E) {
+        PlotDragItem = E.target.closest('.StoryItem')
+        E.target.classList.add('dragging')
+        E.dataTransfer.effectAllowed = 'move'
+      }
+
+      function HandlePlotDragEnd(E) {
+        E.target.classList.remove('dragging')
+        document.querySelectorAll('.StoryItem').forEach((I) => I.classList.remove('drag-over'))
+        PlotDragItem = null
+      }
+
+      function HandlePlotDragOver(E) {
+        E.preventDefault()
+        const Item = E.target.closest('.StoryItem')
+        if (Item && Item !== PlotDragItem) {
+          document.querySelectorAll('.StoryItem').forEach((I) => I.classList.remove('drag-over'))
+          Item.classList.add('drag-over')
+        }
+      }
+
+      async function HandlePlotDrop(E) {
+        E.preventDefault()
+        const DropItem = E.target.closest('.StoryItem')
+        if (!DropItem || !PlotDragItem || DropItem === PlotDragItem) return
+        const FromIndex = parseInt(PlotDragItem.dataset.index)
+        const ToIndex = parseInt(DropItem.dataset.index)
+        const MovedItem = PlotList.splice(FromIndex, 1)[0]
+        PlotList.splice(ToIndex, 0, MovedItem)
+        PlotList.forEach((Item, Idx) => { Item.IndexNum = Idx + 1 })
+        RenderPlotList()
+        await SavePlotOrder()
+      }
+
+      async function SavePlotOrder() {
+        try {
+          const Response = await CallApi('/UpdatePlotOrder.php', 'POST', {
+            WorkId: sessionStorage.getItem('WorkId'),
+            Orders: PlotList.map((Item) => ({ PlotId: Item.PlotId, IndexNum: Item.IndexNum })),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (!Response.Success) await ShowErrorDialog(Response.Message || '並び順の保存に失敗しました')
+        } catch (Error) { console.error(Error) }
+      }
+
+      async function ShowPlotDialog(PlotId = null) {
+        const IsEdit = PlotId !== null
+        const Item = IsEdit ? PlotList.find((P) => P.PlotId == PlotId) : null
+        return new Promise((Resolve) => {
+          const Overlay = document.createElement('div')
+          Overlay.className = 'DialogOverlay'
+          const Dialog = document.createElement('div')
+          Dialog.className = 'DialogContainer DialogMedium'
+          Dialog.innerHTML = `
+            <div class="DialogTitle">${IsEdit ? 'プロット編集' : 'プロット追加'}</div>
+            <div class="DialogContent">
+              <div class="FormGroup">
+                <select class="SelectForm" id="PlotStructureSelect">
+                  ${PlotStructureLabels.map((L, I) => `<option value="${I}" ${Item?.StructureType == I ? 'selected' : ''}>${L}</option>`).join('')}
+                </select>
+              </div>
+              <div class="FormGroup">
+                <textarea class="TextAreaForm" id="PlotContentInput" placeholder="内容" style="min-height:150px;">${Item?.Content || ''}</textarea>
+              </div>
+            </div>
+            <div class="DialogButtonArea">
+              <button class="ButtonClass CloseButton" id="PlotDialogClose"><i class="fas fa-times"></i> 閉じる</button>
+              ${IsEdit ? `<button class="ButtonClass DeleteButton" id="PlotDialogDelete"><i class="fas fa-trash"></i> 削除</button>` : ''}
+              <button class="ButtonClass SaveButton" id="PlotDialogSave"><i class="fas fa-save"></i> 保存</button>
+            </div>
+          `
+          document.body.appendChild(Overlay)
+          Overlay.appendChild(Dialog)
+          Dialog.querySelector('#PlotDialogClose').addEventListener('click', () => { Overlay.remove(); Resolve(null) })
+          Dialog.querySelector('#PlotDialogSave').addEventListener('click', async () => {
+            const StructureType = parseInt(Dialog.querySelector('#PlotStructureSelect').value)
+            const Content = Dialog.querySelector('#PlotContentInput').value.trim()
+            if (!Content) { await ShowErrorDialog('内容を入力してください'); return }
+            if (!IsEdit && !ValidatePlotOrder(StructureType)) {
+              await ShowErrorDialog('起承転結の順序で登録してください')
+              return
+            }
+            try {
+              const Response = await CallApi('/SavePlot.php', 'POST', {
+                PlotId: IsEdit ? PlotId : null,
+                WorkId: sessionStorage.getItem('WorkId'),
+                IndexNum: IsEdit ? Item.IndexNum : PlotList.length + 1,
+                StructureType: StructureType,
+                Content: Content,
+                UserId: sessionStorage.getItem('UserId'),
+              })
+              if (Response.Success) {
+                Overlay.remove()
+                await ShowInfoDialog('保存完了', 'プロットを保存しました')
+                await LoadPlotList()
+                Resolve(true)
+              } else { await ShowErrorDialog(Response.Message || '保存に失敗しました') }
+            } catch (Error) { await ShowErrorDialog('保存中にエラーが発生しました') }
+          })
+          if (IsEdit) {
+            Dialog.querySelector('#PlotDialogDelete').addEventListener('click', async () => {
+              if (!(await ShowConfirmDialog('このプロットを削除しますか？'))) return
+              try {
+                const Response = await CallApi('/DeletePlot.php', 'POST', { PlotId: PlotId, UserId: sessionStorage.getItem('UserId') })
+                if (Response.Success) {
+                  Overlay.remove()
+                  await ShowInfoDialog('削除完了', 'プロットを削除しました')
+                  await LoadPlotList()
+                  Resolve(true)
+                } else { await ShowErrorDialog(Response.Message || '削除に失敗しました') }
+              } catch (Error) { await ShowErrorDialog('削除中にエラーが発生しました') }
+            })
+          }
+        })
+      }
+
+      function ValidatePlotOrder(NewStructureType) {
+        if (PlotList.length === 0) return NewStructureType === 0
+        const LastStructureType = PlotList[PlotList.length - 1].StructureType
+        return NewStructureType >= LastStructureType
+      }
+
+      async function ExportPlotToWord() {
+        try {
+          ShowSpinner()
+          const Response = await fetch(`${API_BASE_URL}/ExportPlot.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ WorkId: sessionStorage.getItem('WorkId'), UserId: sessionStorage.getItem('UserId') }),
+          })
+          if (!Response.ok) throw new Error('出力に失敗しました')
+          const Blob = await Response.blob()
+          const WorkTitle = WorkInfo?.WorkTitle || '作品'
+          DownloadFile(Blob, `${WorkTitle}_プロット.docx`)
+          HideSpinner()
+          await ShowInfoDialog('出力完了', 'Wordファイルをダウンロードしました')
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('出力中にエラーが発生しました')
+        }
       }
 
       function ShowClueMemo() {
