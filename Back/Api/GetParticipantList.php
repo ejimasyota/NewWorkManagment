@@ -26,18 +26,17 @@ try {
     /** DB接続 */
     $Pdo = Database::GetConnection();
 
-    /** 参加者一覧を取得（ユーザー情報と結合） */
+    /** 参加者一覧を取得 */
     $Sql = "
         SELECT
             c.id AS \"Id\",
             c.workId AS \"WorkId\",
             c.userId AS \"UserId\",
             c.isCreator AS \"IsCreator\",
-            w.projectLockFlg AS \"ProjectLockFlg\",
+            c.userLockFlg AS \"UserLockFlg\",
             c.registDate AS \"RegistDate\",
             c.updateDate AS \"UpdateDate\"
         FROM CreaterList c
-        LEFT JOIN WorkInfo w ON c.workId = w.workId
         WHERE c.workId = :workId
         ORDER BY c.isCreator DESC, c.registDate ASC
     ";
@@ -70,8 +69,8 @@ try {
 
     Response::Success([
         'ParticipantList' => $ParticipantList,
-        'TotalCount' => count($ParticipantList),
-        'CanEdit' => $CanEdit
+        'TotalCount'      => count($ParticipantList),
+        'CanEdit'         => $CanEdit
     ]);
 
 } catch (Exception $E) {
