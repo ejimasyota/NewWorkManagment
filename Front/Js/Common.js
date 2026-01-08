@@ -1,24 +1,13 @@
-/**
- * Common.js
- * 共通JavaScript関数
- * ユーティリティ関数・API呼び出し・バリデーション等を定義
- */
-
 /* ==========================================================================
  * 定数定義
  * ========================================================================== */
-/** APIベースURL */
+// 1. APIベースURL
 const API_BASE_URL = '/Back/Api'
-
-/** 1ページあたりの表示件数 */
+// 2. 1ページあたりの表示件数
 const RECORDS_PER_PAGE = 15
+// 3. セッションタイムアウト時間
+const SESSION_TIMEOUT = 60 * 1 * 1000
 
-/** セッションタイムアウト（1時間） */
-const SESSION_TIMEOUT = 60 * 60 * 1000
-
-/* ==========================================================================
- * UUID生成
- * ========================================================================== */
 /**
  * UUIDの生成を行う関数
  * @returns {string} 生成されたUUIDの文字列
@@ -248,7 +237,7 @@ async function CallApi(Endpoint, Method = 'GET', Data = null) {
     const Result = await Response.json()
 
     if (!Response.ok) {
-      throw new Error(Result.message || 'APIエラーが発生しました')
+      throw new Error(Result.Message || 'APIエラーが発生しました')
     }
     return Result
   } catch (Error) {

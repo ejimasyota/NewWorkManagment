@@ -102,6 +102,96 @@ body {
 }
 
 /* ==========================================================================
+ * 会員登録画面
+ * ========================================================================== */
+/* 1. 会員登録画面コンテナ */
+.RegistrationContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+/* 2. 会員登録フォームカード */
+.RegistrationCard {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* 3. 会員登録タイトル */
+.RegistrationTitle {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+/* 4. 会員登録サブタイトル */
+.RegistrationSubtitle {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+/* 5. 会員登録フォーム */
+.RegistrationForm .FormGroup {
+  margin-bottom: 20px;
+}
+
+/* 6. 会員登録入力フォーム */
+.RegistrationForm .InputForm {
+  padding: 14px 15px;
+  font-size: 15px;
+}
+
+/* 7. 会員登録フォームボタン */
+.RegistrationForm .ButtonClass {
+  padding: 14px 24px;
+  font-size: 16px;
+}
+
+/* 8. 会員登録フォームボタンコンテナ */
+.RegistrationButtonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+/* 9. 会員登録アイコン */
+.RegistrationIcon {
+  font-size: 50px;
+  color: #667eea;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 10. 会員登録ヒントテキスト */
+.HintText {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-top: 5px;
+}
+
+/* 11. 会員登録画面レスポンシブ対応 */
+@media screen and (max-width: 480px) {
+  .RegistrationCard {
+    padding: 30px 20px;
+  }
+  .RegistrationTitle {
+    font-size: 24px;
+  }
+}
+
+/* ==========================================================================
  * レイアウト
  * ========================================================================== */
 /* 1. ページコンテナ */
