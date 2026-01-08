@@ -2204,22 +2204,111 @@
         }
       }
 
+      /**
+       * グループ追加ダイアログを表示する
+       * @returns {Promise<void>}
+       */
       async function AddRelationGroup() {
-        const Label = prompt('グループ名を入力してください')
-        if (!Label) return
-        const Color = prompt('カラーコードを入力してください（例: #9b59b6）', '#9b59b6')
+        const Result = await ShowGroupDialog()
+        if (!Result) return
         const NewGroup = {
           ObjId: 'new_' + Date.now(),
           ObjType: 2,
-          Label: Label,
+          Label: Result.Label,
           PosX: 100,
           PosY: 100,
           Width: 200,
           Height: 150,
-          BgColor: Color || '#9b59b6',
+          BgColor: Result.BgColor || '#9b59b6',
         }
         RelationObjects.push(NewGroup)
         RenderRelationCanvas()
+      }
+
+      /**
+       * グループ追加・編集ダイアログを表示する
+       * @param {Object|null} Group 編集対象のグループ（新規の場合はnull）
+       * @returns {Promise<Object|null>} グループ情報またはnull
+       */
+      function ShowGroupDialog(Group = null) {
+        const IsEdit = Group !== null
+        return new Promise((Resolve) => {
+          const Overlay = document.createElement('div')
+          Overlay.className = 'DialogOverlay'
+          const Dialog = document.createElement('div')
+          Dialog.className = 'DialogContainer DialogSmall'
+          Dialog.innerHTML = `
+            <div class="DialogTitle">${IsEdit ? 'グループ編集' : 'グループ追加'}</div>
+            <div class="DialogContent">
+              <div class="FormGroup">
+                <input type="text" class="InputForm" id="GroupLabelInput" placeholder="グループ名" value="${Group?.Label || ''}" maxlength="50">
+              </div>
+              <div class="FormGroup">
+                <label class="FormLabel">背景色</label>
+                <div class="ColorPickerWrapper">
+                  <input type="color" class="ColorPicker" id="GroupColorInput" value="${Group?.BgColor || '#9b59b6'}">
+                  <input type="text" class="InputForm ColorCodeInput" id="GroupColorCodeInput" placeholder="#9b59b6" value="${Group?.BgColor || '#9b59b6'}" maxlength="7">
+                </div>
+              </div>
+            </div>
+            <div class="DialogButtonArea">
+              <button class="ButtonClass CloseButton" id="GroupDialogClose"><i class="fas fa-times"></i> 閉じる</button>
+              <button class="ButtonClass SaveButton" id="GroupDialogSave"><i class="fas fa-check"></i> 決定</button>
+            </div>
+          `
+          document.body.appendChild(Overlay)
+          Overlay.appendChild(Dialog)
+
+          /** カラーピッカーとテキスト入力の同期 */
+          const ColorPicker = Dialog.querySelector('#GroupColorInput')
+          const ColorCode = Dialog.querySelector('#GroupColorCodeInput')
+          ColorPicker.addEventListener('input', () => { ColorCode.value = ColorPicker.value })
+          ColorCode.addEventListener('input', () => {
+            const Val = ColorCode.value
+            if (/^#[0-9A-Fa-f]{6}$/.test(Val)) { ColorPicker.value = Val }
+          })
+
+          /** 閉じるボタン */
+          Dialog.querySelector('#GroupDialogClose').addEventListener('click', () => {
+            Overlay.remove()
+            Resolve(null)
+          })
+
+          /** オーバーレイクリックで閉じる */
+          Overlay.addEventListener('click', (E) => {
+            if (E.target === Overlay) {
+              Overlay.remove()
+              Resolve(null)
+            }
+          })
+
+          /** 決定ボタン */
+          Dialog.querySelector('#GroupDialogSave').addEventListener('click', async () => {
+            const Label = Dialog.querySelector('#GroupLabelInput').value.trim()
+            const BgColor = ColorCode.value.trim()
+            if (!Label) {
+              await ShowErrorDialog('グループ名を入力してください')
+              return
+            }
+            if (BgColor && !/^#[0-9A-Fa-f]{6}$/.test(BgColor)) {
+              await ShowErrorDialog('カラーコードの形式が正しくありません（例: #9b59b6）')
+              return
+            }
+            Overlay.remove()
+            Resolve({ Label: Label, BgColor: BgColor || '#9b59b6' })
+          })
+
+          /** Enterキーで決定 */
+          Dialog.querySelector('#GroupLabelInput').addEventListener('keydown', (E) => {
+            if (E.key === 'Enter') {
+              E.preventDefault()
+              Dialog.querySelector('#GroupDialogSave').click()
+            }
+          })
+
+          /** 初期フォーカス */
+          Dialog.querySelector('#GroupLabelInput').focus()
+        })
       }
 
       async function SaveRelationData() {
