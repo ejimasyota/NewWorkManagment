@@ -15,10 +15,14 @@ function GetReviewList(): void
 {
     $FunctionName = '作品レビュー';
     $UserId = '';
-
+    // POSTメソッドのみ許可
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::Error('不正なリクエストです', 405);
+        return;
+    }
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $WorkId = $Input['WorkId'] ?? '';
         $UserId = $Input['UserId'] ?? '';
 
@@ -26,7 +30,7 @@ function GetReviewList(): void
 
         /** 入力チェック */
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
@@ -56,14 +60,14 @@ function GetReviewList(): void
 
         Logger::Info($FunctionName, '一覧取得処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'ReviewList' => $ReviewList,
             'TotalCount' => count($ReviewList)
         ]);
 
     } catch (Exception $E) {
         Logger::Error($FunctionName, '一覧取得処理エラー', $UserId, $E->getMessage());
-        SendError('作品レビュー一覧の取得に失敗しました');
+        Response::Error('作品レビュー一覧の取得に失敗しました');
     }
 }
 

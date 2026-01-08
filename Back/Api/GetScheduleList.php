@@ -13,12 +13,17 @@ require_once __DIR__ . '/../Common/Response.php';
  */
 function GetScheduleList(): void
 {
+    // POSTメソッドのみ許可
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::Error('不正なリクエストです', 405);
+        return;
+    }
     $FunctionName = 'スケジュール設定';
     $UserId = '';
 
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $WorkId = $Input['WorkId'] ?? '';
         $UserId = $Input['UserId'] ?? '';
 
@@ -26,7 +31,7 @@ function GetScheduleList(): void
 
         /** 入力チェック */
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
@@ -58,14 +63,13 @@ function GetScheduleList(): void
 
         Logger::Info($FunctionName, '一覧取得処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'ScheduleList' => $ScheduleList,
             'TotalCount' => count($ScheduleList)
         ]);
-
-    } catch (Exception $E) {
+    }catch (Exception $E) {
         Logger::Error($FunctionName, '一覧取得処理エラー', $UserId, $E->getMessage());
-        SendError('スケジュール一覧の取得に失敗しました');
+        Response::Error('スケジュール一覧の取得に失敗しました', 500);
     }
 }
 

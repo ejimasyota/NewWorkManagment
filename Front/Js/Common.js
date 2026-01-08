@@ -8,13 +8,13 @@
  * 定数定義
  * ========================================================================== */
 /** APIベースURL */
-const API_BASE_URL = "/Back/Api";
+const API_BASE_URL = '/Back/Api'
 
 /** 1ページあたりの表示件数 */
-const RECORDS_PER_PAGE = 15;
+const RECORDS_PER_PAGE = 15
 
 /** セッションタイムアウト（1時間） */
-const SESSION_TIMEOUT = 60 * 60 * 1000;
+const SESSION_TIMEOUT = 60 * 60 * 1000
 
 /* ==========================================================================
  * UUID生成
@@ -24,11 +24,11 @@ const SESSION_TIMEOUT = 60 * 60 * 1000;
  * @returns {string} 生成されたUUIDの文字列
  */
 function GenerateUUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
 }
 
 /* ==========================================================================
@@ -42,12 +42,12 @@ function GenerateUUID() {
  */
 function TruncateText(Text, MaxLength = 20) {
   if (!Text) {
-    return "";
+    return ''
   }
   if (Text.length > MaxLength) {
-    return Text.slice(0, MaxLength) + "…";
+    return Text.slice(0, MaxLength) + '…'
   }
-  return Text;
+  return Text
 }
 
 /**
@@ -56,10 +56,10 @@ function TruncateText(Text, MaxLength = 20) {
  * @returns {string} カンマ区切りされた文字列
  */
 function FormatNumber(Num) {
-  if (Num === null || Num === undefined || Num === "") {
-    return "";
+  if (Num === null || Num === undefined || Num === '') {
+    return ''
   }
-  return Number(Num).toLocaleString();
+  return Number(Num).toLocaleString()
 }
 
 /**
@@ -69,22 +69,22 @@ function FormatNumber(Num) {
  */
 function FormatDate(DateStr) {
   if (!DateStr) {
-    return "";
+    return ''
   }
-  const Cleaned = DateStr.replace(/[^0-9]/g, "");
+  const Cleaned = DateStr.replace(/[^0-9]/g, '')
   if (Cleaned.length === 8) {
-    const Year = Cleaned.slice(0, 4);
-    const Month = Cleaned.slice(4, 6);
-    const Day = Cleaned.slice(6, 8);
-    return `${Year}年${Month}月${Day}日`;
+    const Year = Cleaned.slice(0, 4)
+    const Month = Cleaned.slice(4, 6)
+    const Day = Cleaned.slice(6, 8)
+    return `${Year}年${Month}月${Day}日`
   } else if (Cleaned.length === 6) {
-    const Year = Cleaned.slice(0, 4);
-    const Month = Cleaned.slice(4, 6);
-    return `${Year}年${Month}月`;
+    const Year = Cleaned.slice(0, 4)
+    const Month = Cleaned.slice(4, 6)
+    return `${Year}年${Month}月`
   } else if (Cleaned.length === 4) {
-    return `${Cleaned}年`;
+    return `${Cleaned}年`
   }
-  return DateStr;
+  return DateStr
 }
 
 /**
@@ -94,16 +94,42 @@ function FormatDate(DateStr) {
  */
 function FormatTimestamp(Timestamp) {
   if (!Timestamp) {
-    return "";
+    return ''
   }
-  const DateInstance = new Date(Timestamp);
+  const DateInstance = new Date(Timestamp)
   if (isNaN(DateInstance.getTime())) {
-    return "";
+    return ''
   }
-  const Year = DateInstance.getFullYear();
-  const Month = String(DateInstance.getMonth() + 1).padStart(2, "0");
-  const Day = String(DateInstance.getDate()).padStart(2, "0");
-  return `${Year}年${Month}月${Day}日`;
+  const Year = DateInstance.getFullYear()
+  const Month = String(DateInstance.getMonth() + 1).padStart(2, '0')
+  const Day = String(DateInstance.getDate()).padStart(2, '0')
+  return `${Year}年${Month}月${Day}日`
+}
+/**
+ * 日時を「yyyy年M月d日 (曜日)H時m分s.ミリ秒秒」形式にフォーマットする関数
+ * @param {string} dateTimeStr 日時文字列（例: "2026-01-07 16:24:23.058"）
+ * @returns {string} フォーマットされた日時文字列
+ */
+function FormatDateTimeWithWeekday(dateTimeStr) {
+  if (!dateTimeStr) return ''
+
+  // "2026-01-07 16:24:23.058" → "2026-01-07T16:24:23.058"
+  const isoStr = dateTimeStr.replace(' ', 'T')
+  const date = new Date(isoStr)
+
+  if (isNaN(date.getTime())) return dateTimeStr
+
+  const weekdays = ['日', '月', '火', '水', '木', '金', '土']
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const weekday = weekdays[date.getDay()]
+  const hour = date.getHours()
+  const minute = date.getMinutes()
+  const second = date.getSeconds()
+  const ms = date.getMilliseconds()
+
+  return `${year}年${month}月${day}日 (${weekday})${hour}時${minute}分${second}.${ms}秒`
 }
 
 /* ==========================================================================
@@ -118,68 +144,68 @@ function PullDownList(Type) {
   const DataMap = {
     /** 作品ジャンル区分 */
     Genre: [
-      { value: 0, label: "未設定" },
-      { value: 1, label: "ホラー" },
-      { value: 2, label: "ファンタジー" },
-      { value: 3, label: "SF" },
-      { value: 4, label: "恋愛" },
-      { value: 5, label: "日常" },
-      { value: 6, label: "アクション" },
-      { value: 7, label: "冒険" },
-      { value: 8, label: "ミステリー" },
-      { value: 9, label: "コメディ" },
-      { value: 10, label: "スポーツ" },
-      { value: 11, label: "歴史" },
-      { value: 12, label: "学園" },
-      { value: 13, label: "その他" },
+      { value: 0, label: '未設定' },
+      { value: 1, label: 'ホラー' },
+      { value: 2, label: 'ファンタジー' },
+      { value: 3, label: 'SF' },
+      { value: 4, label: '恋愛' },
+      { value: 5, label: '日常' },
+      { value: 6, label: 'アクション' },
+      { value: 7, label: '冒険' },
+      { value: 8, label: 'ミステリー' },
+      { value: 9, label: 'コメディ' },
+      { value: 10, label: 'スポーツ' },
+      { value: 11, label: '歴史' },
+      { value: 12, label: '学園' },
+      { value: 13, label: 'その他' },
     ],
     /** レビュー評価区分 */
     Review: [
-      { value: 0, label: "" },
-      { value: 1, label: "◎" },
-      { value: 2, label: "〇" },
-      { value: 3, label: "△" },
-      { value: 4, label: "✕" },
+      { value: 0, label: '' },
+      { value: 1, label: '◎' },
+      { value: 2, label: '〇' },
+      { value: 3, label: '△' },
+      { value: 4, label: '✕' },
     ],
     /** 性別区分 */
     Gender: [
-      { value: 0, label: "未設定" },
-      { value: 1, label: "男性" },
-      { value: 2, label: "女性" },
-      { value: 3, label: "その他" },
+      { value: 0, label: '未設定' },
+      { value: 1, label: '男性' },
+      { value: 2, label: '女性' },
+      { value: 3, label: 'その他' },
     ],
     /** 起承転結区分 */
     PlotStructure: [
-      { value: 0, label: "起" },
-      { value: 1, label: "承" },
-      { value: 2, label: "転" },
-      { value: 3, label: "結" },
+      { value: 0, label: '起' },
+      { value: 1, label: '承' },
+      { value: 2, label: '転' },
+      { value: 3, label: '結' },
     ],
-  };
-
-  const List = DataMap[Type];
-  if (!List) {
-    return "";
   }
 
-  const ZeroIndex = List.findIndex((Item) => Item.value === 0);
-  let Items;
+  const List = DataMap[Type]
+  if (!List) {
+    return ''
+  }
+
+  const ZeroIndex = List.findIndex((Item) => Item.value === 0)
+  let Items
   if (ZeroIndex !== -1) {
     if (ZeroIndex === 0) {
-      Items = List.slice();
+      Items = List.slice()
     } else {
-      Items = [List[ZeroIndex]].concat(List.filter((_, i) => i !== ZeroIndex));
+      Items = [List[ZeroIndex]].concat(List.filter((_, i) => i !== ZeroIndex))
     }
   } else {
-    Items = List.slice();
+    Items = List.slice()
   }
 
   return Items.map((Item, Idx) => {
     if (Idx === 0) {
-      return `<option value="${Item.value}" selected data-placeholder="true">${Item.label}</option>`;
+      return `<option value="${Item.value}" selected data-placeholder="true">${Item.label}</option>`
     }
-    return `<option value="${Item.value}">${Item.label}</option>`;
-  }).join("");
+    return `<option value="${Item.value}">${Item.label}</option>`
+  }).join('')
 }
 
 /**
@@ -189,11 +215,11 @@ function PullDownList(Type) {
  * @returns {string} 取得したCDの値
  */
 function GetKeyInfo(Type, Cd) {
-  const OptionsHtml = PullDownList(Type);
-  const Temp = document.createElement("select");
-  Temp.innerHTML = OptionsHtml;
-  const Option = Array.from(Temp.options).find((Opt) => Opt.value == Cd);
-  return Option ? Option.text : "";
+  const OptionsHtml = PullDownList(Type)
+  const Temp = document.createElement('select')
+  Temp.innerHTML = OptionsHtml
+  const Option = Array.from(Temp.options).find((Opt) => Opt.value == Cd)
+  return Option ? Option.text : ''
 }
 
 /* ==========================================================================
@@ -206,32 +232,30 @@ function GetKeyInfo(Type, Cd) {
  * @param {Object} Data 送信データ
  * @returns {Promise<Object>} APIレスポンス
  */
-async function CallApi(Endpoint, Method = "GET", Data = null) {
-  ShowSpinner();
+async function CallApi(Endpoint, Method = 'GET', Data = null) {
+  ShowSpinner()
   try {
     const Options = {
       method: Method,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-    };
-    if (Data && Method !== "GET") {
-      Options.body = JSON.stringify(Data);
     }
-    console.log("API_BASE_URL:", API_BASE_URL);
-    console.log("Endpoint:", Endpoint);
-    console.log("Options:", Options);
-    const Response = await fetch(`${API_BASE_URL}${Endpoint}`, Options);
-    const Result = await Response.json();
+    if (Data && Method !== 'GET') {
+      Options.body = JSON.stringify(Data)
+    }
+    const Response = await fetch(`${API_BASE_URL}${Endpoint}`, Options)
+    const Result = await Response.json()
+
     if (!Response.ok) {
-      throw new Error(Result.message || "APIエラーが発生しました");
+      throw new Error(Result.message || 'APIエラーが発生しました')
     }
-    return Result;
+    return Result
   } catch (Error) {
-    console.error("API Error:", Error);
-    throw Error;
+    console.error('API Error:', Error)
+    throw Error
   } finally {
-    HideSpinner();
+    HideSpinner()
   }
 }
 
@@ -242,26 +266,26 @@ async function CallApi(Endpoint, Method = "GET", Data = null) {
  * スピナーを表示する関数
  */
 function ShowSpinner() {
-  let Overlay = document.getElementById("SpinnerOverlay");
+  let Overlay = document.getElementById('SpinnerOverlay')
   if (!Overlay) {
-    Overlay = document.createElement("div");
-    Overlay.id = "SpinnerOverlay";
-    Overlay.className = "SpinnerOverlay";
-    const Spinner = document.createElement("div");
-    Spinner.className = "Spinner";
-    Overlay.appendChild(Spinner);
-    document.body.appendChild(Overlay);
+    Overlay = document.createElement('div')
+    Overlay.id = 'SpinnerOverlay'
+    Overlay.className = 'SpinnerOverlay'
+    const Spinner = document.createElement('div')
+    Spinner.className = 'Spinner'
+    Overlay.appendChild(Spinner)
+    document.body.appendChild(Overlay)
   }
-  Overlay.style.display = "flex";
+  Overlay.style.display = 'flex'
 }
 
 /**
  * スピナーを非表示にする関数
  */
 function HideSpinner() {
-  const Overlay = document.getElementById("SpinnerOverlay");
+  const Overlay = document.getElementById('SpinnerOverlay')
   if (Overlay) {
-    Overlay.style.display = "none";
+    Overlay.style.display = 'none'
   }
 }
 
@@ -269,43 +293,43 @@ function HideSpinner() {
  * セッション管理
  * ========================================================================== */
 /** セッションタイマーID */
-let SessionTimerId = null;
+let SessionTimerId = null
 
 /**
  * セッションタイマーをリセットする関数
  */
 function ResetSessionTimer() {
   if (SessionTimerId) {
-    clearTimeout(SessionTimerId);
+    clearTimeout(SessionTimerId)
   }
   SessionTimerId = setTimeout(() => {
-    SessionTimeout();
-  }, SESSION_TIMEOUT);
+    SessionTimeout()
+  }, SESSION_TIMEOUT)
 }
 
 /**
  * セッションタイムアウト処理
  */
 function SessionTimeout() {
-  const CurrentPath = window.location.pathname;
-  sessionStorage.setItem("LastPath", CurrentPath);
+  const CurrentPath = window.location.pathname
+  sessionStorage.setItem('LastPath', CurrentPath)
   ShowInfoDialog(
-    "セッションタイムアウト",
-    "一定時間操作がなかったため、ログアウトしました。"
-  );
+    'セッションタイムアウト',
+    '一定時間操作がなかったため、ログアウトしました。',
+  )
   setTimeout(() => {
-    window.location.href = "/index.html";
-  }, 2000);
+    window.location.href = '/index.html'
+  }, 2000)
 }
 
 /**
  * セッション監視を開始する関数
  */
 function StartSessionMonitor() {
-  document.addEventListener("click", ResetSessionTimer);
-  document.addEventListener("keypress", ResetSessionTimer);
-  document.addEventListener("scroll", ResetSessionTimer);
-  ResetSessionTimer();
+  document.addEventListener('click', ResetSessionTimer)
+  document.addEventListener('keypress', ResetSessionTimer)
+  document.addEventListener('scroll', ResetSessionTimer)
+  ResetSessionTimer()
 }
 
 /* ==========================================================================
@@ -317,12 +341,12 @@ function StartSessionMonitor() {
  * @param {string} Filename 保存名
  */
 function DownloadFile(BlobData, Filename) {
-  const Url = window.URL.createObjectURL(BlobData);
-  const Anchor = document.createElement("a");
-  Anchor.href = Url;
-  Anchor.download = Filename;
-  Anchor.click();
-  window.URL.revokeObjectURL(Url);
+  const Url = window.URL.createObjectURL(BlobData)
+  const Anchor = document.createElement('a')
+  Anchor.href = Url
+  Anchor.download = Filename
+  Anchor.click()
+  window.URL.revokeObjectURL(Url)
 }
 
 /* ==========================================================================
@@ -335,12 +359,12 @@ function DownloadFile(BlobData, Filename) {
  */
 function ValidateUserId(UserId) {
   if (!UserId || UserId.length !== 12) {
-    return false;
+    return false
   }
-  const HasUpperCase = /[A-Z]/.test(UserId);
-  const HasNumber = /[0-9]/.test(UserId);
-  const HasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(UserId);
-  return HasUpperCase && HasNumber && HasSymbol;
+  const HasUpperCase = /[A-Z]/.test(UserId)
+  const HasNumber = /[0-9]/.test(UserId)
+  const HasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(UserId)
+  return HasUpperCase && HasNumber && HasSymbol
 }
 
 /**
@@ -349,7 +373,7 @@ function ValidateUserId(UserId) {
  * @returns {boolean} 入力されているかどうか
  */
 function IsRequired(Value) {
-  return Value !== null && Value !== undefined && Value.trim() !== "";
+  return Value !== null && Value !== undefined && Value.trim() !== ''
 }
 
 /**
@@ -359,7 +383,7 @@ function IsRequired(Value) {
  * @returns {boolean} 桁数が一致するかどうか
  */
 function CheckLength(Value, Length) {
-  return Value && Value.length === Length;
+  return Value && Value.length === Length
 }
 
 /* ==========================================================================
@@ -373,44 +397,44 @@ function CheckLength(Value, Length) {
  * @returns {HTMLElement} ページネーション要素
  */
 function CreatePagination(TotalRecords, CurrentPage, OnPageChange) {
-  const TotalPages = Math.ceil(TotalRecords / RECORDS_PER_PAGE);
-  const Container = document.createElement("div");
-  Container.className = "PaginationContainer";
+  const TotalPages = Math.ceil(TotalRecords / RECORDS_PER_PAGE)
+  const Container = document.createElement('div')
+  Container.className = 'PaginationContainer'
 
   if (TotalPages <= 1) {
-    return Container;
+    return Container
   }
 
   /** 前へボタン */
-  const PrevButton = document.createElement("button");
-  PrevButton.className = "PaginationButton";
-  PrevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
-  PrevButton.disabled = CurrentPage === 1;
-  PrevButton.onclick = () => OnPageChange(CurrentPage - 1);
-  Container.appendChild(PrevButton);
+  const PrevButton = document.createElement('button')
+  PrevButton.className = 'PaginationButton'
+  PrevButton.innerHTML = '<i class="fas fa-chevron-left"></i>'
+  PrevButton.disabled = CurrentPage === 1
+  PrevButton.onclick = () => OnPageChange(CurrentPage - 1)
+  Container.appendChild(PrevButton)
 
   /** ページ番号ボタン */
-  const StartPage = Math.max(1, CurrentPage - 2);
-  const EndPage = Math.min(TotalPages, CurrentPage + 2);
+  const StartPage = Math.max(1, CurrentPage - 2)
+  const EndPage = Math.min(TotalPages, CurrentPage + 2)
 
   for (let i = StartPage; i <= EndPage; i++) {
-    const PageButton = document.createElement("button");
+    const PageButton = document.createElement('button')
     PageButton.className =
-      "PaginationButton" + (i === CurrentPage ? " Active" : "");
-    PageButton.textContent = i;
-    PageButton.onclick = () => OnPageChange(i);
-    Container.appendChild(PageButton);
+      'PaginationButton' + (i === CurrentPage ? ' Active' : '')
+    PageButton.textContent = i
+    PageButton.onclick = () => OnPageChange(i)
+    Container.appendChild(PageButton)
   }
 
   /** 次へボタン */
-  const NextButton = document.createElement("button");
-  NextButton.className = "PaginationButton";
-  NextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-  NextButton.disabled = CurrentPage === TotalPages;
-  NextButton.onclick = () => OnPageChange(CurrentPage + 1);
-  Container.appendChild(NextButton);
+  const NextButton = document.createElement('button')
+  NextButton.className = 'PaginationButton'
+  NextButton.innerHTML = '<i class="fas fa-chevron-right"></i>'
+  NextButton.disabled = CurrentPage === TotalPages
+  NextButton.onclick = () => OnPageChange(CurrentPage + 1)
+  Container.appendChild(NextButton)
 
-  return Container;
+  return Container
 }
 
 /**
@@ -419,10 +443,10 @@ function CreatePagination(TotalRecords, CurrentPage, OnPageChange) {
  * @returns {HTMLElement} 件数表示要素
  */
 function CreateRecordCount(TotalRecords) {
-  const CountDiv = document.createElement("div");
-  CountDiv.className = "RecordCount";
-  CountDiv.textContent = `${FormatNumber(TotalRecords)}件`;
-  return CountDiv;
+  const CountDiv = document.createElement('div')
+  CountDiv.className = 'RecordCount'
+  CountDiv.textContent = `${FormatNumber(TotalRecords)}件`
+  return CountDiv
 }
 
 /* ==========================================================================
@@ -434,15 +458,15 @@ function CreateRecordCount(TotalRecords) {
  * @returns {HTMLElement} 入力要素
  */
 function CreateInput(Options = {}) {
-  const Input = document.createElement("input");
-  Input.type = Options.type || "text";
-  Input.className = "InputForm";
-  if (Options.id) Input.id = Options.id;
-  if (Options.placeholder) Input.placeholder = Options.placeholder;
-  if (Options.maxLength) Input.maxLength = Options.maxLength;
-  if (Options.disabled) Input.disabled = true;
-  if (Options.value) Input.value = Options.value;
-  return Input;
+  const Input = document.createElement('input')
+  Input.type = Options.type || 'text'
+  Input.className = 'InputForm'
+  if (Options.id) Input.id = Options.id
+  if (Options.placeholder) Input.placeholder = Options.placeholder
+  if (Options.maxLength) Input.maxLength = Options.maxLength
+  if (Options.disabled) Input.disabled = true
+  if (Options.value) Input.value = Options.value
+  return Input
 }
 
 /**
@@ -451,14 +475,14 @@ function CreateInput(Options = {}) {
  * @returns {HTMLElement} セレクト要素
  */
 function CreateSelect(Options = {}) {
-  const Select = document.createElement("select");
-  Select.className = "SelectForm";
-  if (Options.id) Select.id = Options.id;
+  const Select = document.createElement('select')
+  Select.className = 'SelectForm'
+  if (Options.id) Select.id = Options.id
   if (Options.pulldownType) {
-    Select.innerHTML = PullDownList(Options.pulldownType);
+    Select.innerHTML = PullDownList(Options.pulldownType)
   }
-  if (Options.disabled) Select.disabled = true;
-  return Select;
+  if (Options.disabled) Select.disabled = true
+  return Select
 }
 
 /**
@@ -467,19 +491,19 @@ function CreateSelect(Options = {}) {
  * @returns {HTMLElement} ボタン要素
  */
 function CreateButton(Options = {}) {
-  const Button = document.createElement("button");
-  Button.className = `ButtonClass ${Options.className || "PrimaryButton"}`;
-  if (Options.id) Button.id = Options.id;
+  const Button = document.createElement('button')
+  Button.className = `ButtonClass ${Options.className || 'PrimaryButton'}`
+  if (Options.id) Button.id = Options.id
   if (Options.icon) {
     Button.innerHTML = `<i class="fas fa-${Options.icon}"></i> ${
-      Options.text || ""
-    }`;
+      Options.text || ''
+    }`
   } else {
-    Button.textContent = Options.text || "";
+    Button.textContent = Options.text || ''
   }
-  if (Options.onClick) Button.onclick = Options.onClick;
-  if (Options.disabled) Button.disabled = true;
-  return Button;
+  if (Options.onClick) Button.onclick = Options.onClick
+  if (Options.disabled) Button.disabled = true
+  return Button
 }
 
 /* ==========================================================================
@@ -492,7 +516,7 @@ function CreateButton(Options = {}) {
  * @returns {boolean} 編集権限があるかどうか
  */
 function HasEditPermission(IsCreator, IsAdmin) {
-  return IsCreator || IsAdmin;
+  return IsCreator || IsAdmin
 }
 
 /**
@@ -502,7 +526,7 @@ function HasEditPermission(IsCreator, IsAdmin) {
  * @returns {boolean} 権限があるかどうか
  */
 function HasAssistantPermission(IsAssistant, IsAdmin) {
-  return IsAssistant || IsAdmin;
+  return IsAssistant || IsAdmin
 }
 
 /* ==========================================================================
@@ -515,11 +539,11 @@ function HasAssistantPermission(IsAssistant, IsAdmin) {
  */
 async function CopyToClipboard(Text) {
   try {
-    await navigator.clipboard.writeText(Text);
-    return true;
+    await navigator.clipboard.writeText(Text)
+    return true
   } catch (Error) {
-    console.error("Clipboard Error:", Error);
-    return false;
+    console.error('Clipboard Error:', Error)
+    return false
   }
 }
 
@@ -532,13 +556,13 @@ async function CopyToClipboard(Text) {
 function InitializePage() {
   /** Font Awesome読み込み確認 */
   if (!document.querySelector('link[href*="font-awesome"]')) {
-    const FontAwesome = document.createElement("link");
-    FontAwesome.rel = "stylesheet";
+    const FontAwesome = document.createElement('link')
+    FontAwesome.rel = 'stylesheet'
     FontAwesome.href =
-      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
-    document.head.appendChild(FontAwesome);
+      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+    document.head.appendChild(FontAwesome)
   }
 }
 
 /** DOMContentLoaded時に初期化 */
-document.addEventListener("DOMContentLoaded", InitializePage);
+document.addEventListener('DOMContentLoaded', InitializePage)

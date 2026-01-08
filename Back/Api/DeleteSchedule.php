@@ -13,12 +13,17 @@ require_once __DIR__ . '/../Common/Response.php';
  */
 function DeleteSchedule(): void
 {
+    // POSTメソッドのみ許可
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        Response::Error('不正なリクエストです', 405);
+        return;
+    }
     $FunctionName = 'スケジュール設定';
     $UserId = '';
 
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $ScheduleId = $Input['ScheduleId'] ?? null;
         $WorkId = $Input['WorkId'] ?? '';
         $UserId = $Input['UserId'] ?? '';
@@ -27,12 +32,12 @@ function DeleteSchedule(): void
 
         /** 入力チェック */
         if (empty($ScheduleId)) {
-            SendError('スケジュールIDが指定されていません');
+            Response::Error('スケジュールIDが指定されていません');
             return;
         }
 
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
@@ -52,7 +57,7 @@ function DeleteSchedule(): void
 
         if ($DeletedCount === 0) {
             Database::Rollback();
-            SendError('削除対象のスケジュールが見つかりません');
+            Response::Error('削除対象のスケジュールが見つかりません');
             return;
         }
 
@@ -90,14 +95,14 @@ function DeleteSchedule(): void
 
         Logger::Info($FunctionName, '削除処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'Message' => 'スケジュールを削除しました'
         ]);
 
     } catch (Exception $E) {
         Database::Rollback();
         Logger::Error($FunctionName, '削除処理エラー', $UserId, $E->getMessage());
-        SendError('スケジュールの削除に失敗しました');
+        Response::Error('スケジュールの削除に失敗しました');
     }
 }
 
