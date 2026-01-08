@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>会員登録 | 作品管理システム</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../Css/Common.css" />
+  </head>
+  <body>
+    <div class="RegistrationContainer">
+      <div class="RegistrationCard">
+        <div class="RegistrationIcon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <h1 class="RegistrationTitle">会員登録</h1>
+        <p class="RegistrationSubtitle">新規アカウントを作成してください</p>
+
+        <form
+          class="RegistrationForm"
+          id="RegistrationForm"
+          onsubmit="return false;"
+        >
+          <div class="FormGroup">
+            <input
+              type="text"
+              class="InputForm"
+              id="UserId"
+              placeholder="ユーザーID（12桁）"
+              maxlength="12"
+              autocomplete="username"
+            />
+            <p class="HintText">大文字・記号・数値を含む12桁</p>
+          </div>
+
+          <div class="FormGroup">
+            <input
+              type="password"
+              class="InputForm"
+              id="Password"
+              placeholder="パスワード（12桁）"
+              maxlength="12"
+              autocomplete="new-password"
+            />
+            <p class="HintText">ユーザーIDと異なる12桁</p>
+          </div>
+
+          <div class="RegistrationButtonGroup">
+            <button
+              type="submit"
+              class="ButtonClass SuccessButton ButtonFull"
+              id="RegisterButton"
+            >
+              <i class="fas fa-check"></i> 登録
+            </button>
+            <button
+              type="button"
+              class="ButtonClass SecondaryButton ButtonFull"
+              id="BackToLoginButton"
+            >
+              <i class="fas fa-arrow-left"></i> ログインへ
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="../Js/Common.js"></script>
+    <script src="../Js/Dialog.js"></script>
+    <script>
+      /**
+       * 画面ロード時
+       */
+      document.addEventListener('DOMContentLoaded', function () {
+        // 1. 会員登録画面の初期化処理呼び出し
+        InitializeRegistrationPage()
+      })
+
+      /**
+       * 会員登録画面の初期化
+       */
+      function InitializeRegistrationPage() {
+        /* ==========================================================
+         * 登録ボタンのクリックイベント定義
+         * ========================================================== */
+        document
+          .getElementById('RegisterButton')
+          .addEventListener('click', HandleRegistration)
+
+        /* ==========================================================
+         * ログインへボタンのクリックイベント定義
+         * ========================================================== */
+        document
+          .getElementById('BackToLoginButton')
+          .addEventListener('click', function () {
+            window.location.href = '/index.html'
+          })
+
+        /* ==========================================================
+         * Enterキーのクリックイベント定義
+         * ========================================================== */
+        document
+          .getElementById('RegistrationForm')
+          .addEventListener('keypress', function (Event) {
+            /* ---------------------------------------------
+             *  1. Enterキー押下時の処理
+             * --------------------------------------------- */
+            if (Event.key === 'Enter') {
+              // 1. 会員登録処理呼び出し
+              HandleRegistration()
+            }
+          })
+      }
+
+      /**
+       * 会員登録処理
+       */
+      async function HandleRegistration() {
+        /* ==========================================================
+         * 定義
+         * ========================================================== */
+        // 1. ユーザーID
+        const UserId = document.getElementById('UserId').value.trim()
+        // 2. パスワード
+        const Password = document.getElementById('Password').value.trim()
+
+        /* ==========================================================
+         * 入力値チェック
+         * ========================================================== */
+        /* ---------------------------------------------
+         *  1. ユーザーID入力チェック
+         * --------------------------------------------- */
+        if (!IsRequired(UserId)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog('ユーザーIDを入力してください')
+          // 2. フォーカス設定
+          document.getElementById('UserId').focus()
+          // 3. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  2. パスワード入力チェック
+         * --------------------------------------------- */
+        if (!IsRequired(Password)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog('パスワードを入力してください')
+          // 2. フォーカス設定
+          document.getElementById('Password').focus()
+          // 3. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  3. ユーザーID桁数チェック
+         * --------------------------------------------- */
+        if (!CheckLength(UserId, 12)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog('ユーザーIDは12桁で入力してください')
+          // 2. フォーカス設定
+          document.getElementById('UserId').focus()
+          // 3. 処理終了
+          return
+        }
+        /* ---------------------------------------------
+         *  4. パスワード桁数チェック
+         * --------------------------------------------- */
+        if (!CheckLength(Password, 12)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog('パスワードは12桁で入力してください')
+          // 2. フォーカス設定
+          document.getElementById('Password').focus()
+          // 3. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  5. ユーザーID形式チェック
+         * --------------------------------------------- */
+        if (!ValidateUserId(UserId)) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog(
+            'ユーザーIDには大文字・記号・数値を含めてください',
+          )
+          // 2. フォーカス設定
+          document.getElementById('UserId').focus()
+          // 3. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  6. ユーザーIDとパスワードの同一チェック
+         * --------------------------------------------- */
+        if (UserId === Password) {
+          // 1. エラーダイアログ表示
+          await ShowErrorDialog(
+            'パスワードはユーザーIDと異なる値を設定してください',
+          )
+          // 2. フォーカス設定
+          document.getElementById('Password').focus()
+          // 3. 処理終了
+          return
+        }
+
+        /* ==========================================================
+         * API呼び出し
+         * ========================================================== */
+        try {
+          /* ---------------------------------------------
+           *  1. 事前処理
+           * --------------------------------------------- */
+          // 1. スピナー表示
+          ShowSpinner()
+
+          /* ---------------------------------------------
+           *  2. ユーザーID入力チェック
+           * --------------------------------------------- */
+          const Response = await CallApi('/Registration.php', 'POST', {
+            // 1. ユーザーID
+            UserId: UserId,
+            // 2. パスワード
+            Password: Password,
+          })
+
+          /* ---------------------------------------------
+           *  3. 会員登録成功
+           * --------------------------------------------- */
+          if (Response.Success) {
+            // 1. 情報ダイアログ表示
+            await ShowInfoDialog(
+              '登録完了',
+              '会員登録が完了しました。ログイン画面へ移動します。',
+            )
+            // 2. ログイン画面へ遷移
+            window.location.href = '/index.html'
+          } else {
+            await ShowErrorDialog(Response.Message || '登録に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog(
+            Error.message || '登録処理中にエラーが発生しました',
+          )
+        }
+      }
+    </script>
+  </body>
+</html>
