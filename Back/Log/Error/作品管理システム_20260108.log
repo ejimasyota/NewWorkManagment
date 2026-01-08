@@ -4,3 +4,15 @@ DETAIL:  Key (workid, indexnum)=(59c2e980-5b77-4cc9-b8ba-b3bae5e1f294, 2) alread
 DETAIL:  Key (workid, indexnum)=(59c2e980-5b77-4cc9-b8ba-b3bae5e1f294, 1) already exists.
 [2026-01-08 12:57:13] ストーリー作成 | 順序更新処理エラー | ユーザーID : Ejimasyot@09 | error : SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique constraint "storyinfo_workid_indexnum_key"
 DETAIL:  Key (workid, indexnum)=(59c2e980-5b77-4cc9-b8ba-b3bae5e1f294, 1) already exists.
+[2026-01-08 18:36:24] 参加者一覧 | 一覧取得処理エラー | ユーザーID : Ejimasyot@09 | error : SQLSTATE[42703]: Undefined column: 7 ERROR:  column c.projectbanflg does not exist
+LINE 7:             c.projectBanFlg AS "ProjectBanFlg",
+                    ^
+[2026-01-08 18:42:53] 参加者一覧 | 一覧取得処理エラー | ユーザーID : Ejimasyot@09 | error : SQLSTATE[42703]: Undefined column: 7 ERROR:  column c.projectbanflg does not exist
+LINE 7:             c.projectBanFlg AS "ProjectBanFlg",
+                    ^
+[2026-01-08 18:46:01] 参加者一覧 | 一覧取得処理エラー | ユーザーID : Ejimasyot@09 | error : SQLSTATE[42703]: Undefined column: 7 ERROR:  column c.projectbanflg does not exist
+LINE 7:             c.projectBanFlg AS "ProjectBanFlg",
+                    ^
+[2026-01-08 18:52:16] 参加者一覧 | 一覧取得処理エラー | ユーザーID : Ejimasyot@09 | error : SQLSTATE[42703]: Undefined column: 7 ERROR:  column c.projectlockflg does not exist
+LINE 7:             c.projectLockFlg AS "ProjectLockFlg",
+                    ^

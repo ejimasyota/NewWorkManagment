@@ -56,9 +56,9 @@ try {
 
     Database::BeginTransaction();
 
-    /** 対象の参加者情報を取得 */
+    /** 対象の参加者情報を取得（isCreator） */
     $CheckSql = "
-        SELECT id, projectBanFlg, isCreator
+        SELECT isCreator
         FROM CreaterList
         WHERE workId = :workId AND userId = :userId
     ";
@@ -77,23 +77,30 @@ try {
         Response::Error('作成者の参加禁止フラグは変更できません');
     }
 
-    /** フラグを反転 */
-    $CurrentFlg = (bool)$TargetInfo['projectbanflg'];
+    /** projectBanFlgはWorkInfoから取得 */
+    $FlgSql = "
+        SELECT projectBanFlg
+        FROM WorkInfo
+        WHERE workId = :workId
+    ";
+    $FlgStmt = $Pdo->prepare($FlgSql);
+    $FlgStmt->execute([':workId' => $WorkId]);
+    $FlgInfo = $FlgStmt->fetch();
+    $CurrentFlg = $FlgInfo ? (bool)$FlgInfo['projectbanflg'] : false;
     $NewFlg = !$CurrentFlg;
 
-    /** 参加禁止フラグを更新 */
+    /** 参加禁止フラグを更新（WorkInfoテーブル） */
     $Sql = "
-        UPDATE CreaterList SET
+        UPDATE WorkInfo SET
             projectBanFlg = :projectBanFlg,
             updateDate = CURRENT_TIMESTAMP(3),
             updateUser = :updateUser
-        WHERE workId = :workId AND userId = :userId
+        WHERE workId = :workId
     ";
     $Stmt = $Pdo->prepare($Sql);
     $Stmt->execute([
         ':projectBanFlg' => $NewFlg,
         ':workId' => $WorkId,
-        ':userId' => $TargetUserId,
         ':updateUser' => $UserId
     ]);
 

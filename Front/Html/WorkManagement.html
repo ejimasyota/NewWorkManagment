@@ -525,6 +525,145 @@
           padding: 1px 2px;
         }
       }
+
+      /* 年表ビジュアル表示スタイル */
+      .TimelineVisual {
+        position: relative;
+        padding: 20px 0;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .TimelineVisual::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, #3498db 0%, #9b59b6 100%);
+        transform: translateX(-50%);
+        border-radius: 2px;
+      }
+
+      .TimelineItem {
+        position: relative;
+        width: 50%;
+        padding: 10px 30px;
+        box-sizing: border-box;
+      }
+
+      .TimelineItem::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        width: 16px;
+        height: 16px;
+        background: #fff;
+        border: 4px solid #3498db;
+        border-radius: 50%;
+        z-index: 1;
+      }
+
+      .TimelineLeft {
+        left: 0;
+        padding-right: 40px;
+        text-align: right;
+      }
+
+      .TimelineLeft::before {
+        right: -8px;
+      }
+
+      .TimelineRight {
+        left: 50%;
+        padding-left: 40px;
+        text-align: left;
+      }
+
+      .TimelineRight::before {
+        left: -8px;
+      }
+
+      .TimelineContent {
+        background: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #3498db;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .TimelineContent:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      .TimelineRight .TimelineContent {
+        border-left: none;
+        border-right: 4px solid #9b59b6;
+      }
+
+      .TimelineDate {
+        font-size: 12px;
+        font-weight: 600;
+        color: #3498db;
+        margin-bottom: 5px;
+      }
+
+      .TimelineRight .TimelineDate {
+        color: #9b59b6;
+      }
+
+      .TimelineTitle {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+      }
+
+      .TimelineDesc {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      /* レスポンシブ対応 */
+      @media screen and (max-width: 768px) {
+        .TimelineVisual::before {
+          left: 20px;
+        }
+
+        .TimelineItem {
+          width: 100%;
+          padding-left: 50px;
+          padding-right: 15px;
+          text-align: left;
+        }
+
+        .TimelineLeft,
+        .TimelineRight {
+          left: 0;
+        }
+
+        .TimelineLeft::before,
+        .TimelineRight::before {
+          left: 12px;
+          right: auto;
+        }
+
+        .TimelineContent,
+        .TimelineRight .TimelineContent {
+          border-left: 4px solid #3498db;
+          border-right: none;
+        }
+
+        .TimelineRight .TimelineDate {
+          color: #3498db;
+        }
+      }
     </style>
   </head>
   <body>
@@ -2568,8 +2707,263 @@
         }
       }
 
-      function ShowCalendarSetting() {
-        ShowPlaceholder('元号設定', 'calendar-alt')
+      /* ==========================================================================
+       * 元号設定画面 (3.2 CalendarInfo)
+       * ========================================================================== */
+      let CalendarList = []
+      let SelectedCalendarId = null
+
+      async function ShowCalendarSetting() {
+        CurrentPage = 1
+        SelectedCalendarId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('元号設定', 'calendar-alt')}
+          <div class="FormRow">
+            <div class="FormGroup Flex1">
+              <input type="text" class="InputForm" id="CalendarEraName" placeholder="元号名" maxlength="100" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+            </div>
+          </div>
+          <div class="FormRow">
+            <div class="FormGroup InputWithButton Flex1">
+              <input type="text" class="InputForm" id="CalendarStartYear" placeholder="開始年" readonly ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+              ${
+                CanEditFlg
+                  ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarStartYearBtn"><i class="fas fa-calendar"></i></button>`
+                  : ''
+              }
+            </div>
+            <div class="FormGroup InputWithButton Flex1">
+              <input type="text" class="InputForm" id="CalendarEndYear" placeholder="終了年" readonly ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+              ${
+                CanEditFlg
+                  ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarEndYearBtn"><i class="fas fa-calendar"></i></button>`
+                  : ''
+              }
+            </div>
+          </div>
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="CalendarDescription" placeholder="概要" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarDescriptionBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="CalendarDescriptionHidden">
+          ${
+            CanEditFlg
+              ? `
+          <div class="ButtonGroup">
+            <button class="ButtonClass ClearButton" id="CalendarClearButton"><i class="fas fa-sync"></i> クリア</button>
+            <button class="ButtonClass SaveButton" id="CalendarSaveButton"><i class="fas fa-save"></i> 保存</button>
+            <button class="ButtonClass DeleteButton Hidden" id="CalendarDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+          </div>
+          `
+              : ''
+          }
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="CalendarTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        /** イベント設定 */
+        if (CanEditFlg) {
+          const DatePickerInstance = new DatePicker()
+          document
+            .getElementById('CalendarStartYearBtn')
+            .addEventListener('click', () =>
+              DatePickerInstance.openDialog('CalendarStartYear'),
+            )
+          document
+            .getElementById('CalendarEndYearBtn')
+            .addEventListener('click', () =>
+              DatePickerInstance.openDialog('CalendarEndYear'),
+            )
+          document
+            .getElementById('CalendarDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'CalendarDescription',
+                'CalendarDescriptionHidden',
+                CanEditFlg,
+              ),
+            )
+          document
+            .getElementById('CalendarClearButton')
+            .addEventListener('click', ClearCalendarForm)
+          document
+            .getElementById('CalendarSaveButton')
+            .addEventListener('click', SaveCalendar)
+          document
+            .getElementById('CalendarDeleteButton')
+            .addEventListener('click', DeleteCalendar)
+        } else {
+          document
+            .getElementById('CalendarDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'CalendarDescription',
+                'CalendarDescriptionHidden',
+                false,
+              ),
+            )
+        }
+
+        await LoadCalendarList()
+      }
+
+      async function LoadCalendarList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetCalendarList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            CalendarList = Response.Data.CalendarList || []
+            RenderCalendarTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '元号一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('元号一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderCalendarTable() {
+        const TotalCount = CalendarList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = CalendarList.slice(Start, End)
+        let TableHtml = `
+          <table class="DataTable">
+            <thead><tr><th>元号名</th><th>開始年</th><th>終了年</th><th>概要</th></tr></thead>
+            <tbody>
+        `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (C) => `
+              <tr data-id="${C.CaleId}">
+                <td>${EscapeHtml(C.EraName || '')}</td>
+                <td>${FormatDate(C.StartYear)}</td>
+                <td>${FormatDate(C.EndYear)}</td>
+                <td>${TruncateText(EscapeHtml(C.Description || ''), 30)}</td>
+              </tr>
+            `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('CalendarTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#CalendarTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () =>
+              SelectCalendar(Row.dataset.id),
+            )
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderCalendarTable()
+          }),
+        )
+      }
+
+      function SelectCalendar(CaleId) {
+        const Item = CalendarList.find((C) => C.CaleId == CaleId)
+        if (!Item) return
+        SelectedCalendarId = CaleId
+        document.getElementById('CalendarEraName').value = Item.EraName || ''
+        document.getElementById('CalendarStartYear').value =
+          Item.StartYear || ''
+        document.getElementById('CalendarEndYear').value = Item.EndYear || ''
+        document.getElementById('CalendarDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('CalendarDescriptionHidden').value =
+          Item.Description || ''
+        const DeleteBtn = document.getElementById('CalendarDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearCalendarForm() {
+        SelectedCalendarId = null
+        document.getElementById('CalendarEraName').value = ''
+        document.getElementById('CalendarStartYear').value = ''
+        document.getElementById('CalendarEndYear').value = ''
+        document.getElementById('CalendarDescription').value = ''
+        document.getElementById('CalendarDescriptionHidden').value = ''
+        const DeleteBtn = document.getElementById('CalendarDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveCalendar() {
+        const EraName = document.getElementById('CalendarEraName').value.trim()
+        if (!EraName) {
+          await ShowErrorDialog('元号名を入力してください')
+          return
+        }
+        try {
+          const Response = await CallApi('/SaveCalendar.php', 'POST', {
+            CaleId: SelectedCalendarId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            EraName: EraName,
+            StartYear: document.getElementById('CalendarStartYear').value,
+            EndYear: document.getElementById('CalendarEndYear').value,
+            Description: document.getElementById('CalendarDescriptionHidden')
+              .value,
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', '元号を保存しました')
+            ClearCalendarForm()
+            await LoadCalendarList()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteCalendar() {
+        if (!SelectedCalendarId) return
+        if (!(await ShowConfirmDialog('この元号を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteCalendar.php', 'POST', {
+            CaleId: SelectedCalendarId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '元号を削除しました')
+            ClearCalendarForm()
+            await LoadCalendarList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       /* ==========================================================================
@@ -2668,6 +3062,8 @@
         CurrentPage = 1
         // 2. 行ID
         SelectedTimelineId = null
+        // 3. 年表表示モードリセット
+        IsTimelineVisualMode = false
         // 3. コンテンツ表示エリア要素
         const ContentArea = document.getElementById('ContentArea')
         // 4. 編集権限FLG
@@ -2712,6 +3108,7 @@
           CanEditFlg
             ? `
         <div class="ButtonGroup">
+          <button class="ButtonClass SecondaryButton" id="TimelineViewBtn"><i class="fas fa-stream"></i> 年表表示</button>
           <button class="ButtonClass ClearButton" id="TimelineClearButton"><i class="fas fa-sync"></i> クリア</button>
           <button class="ButtonClass SaveButton" id="TimelineSaveButton"><i class="fas fa-save"></i> 保存</button>
           <button class="ButtonClass DeleteButton Hidden" id="TimelineDeleteButton"><i class="fas fa-trash"></i> 削除</button>
@@ -2719,8 +3116,9 @@
         `
             : ''
         }
-        <div id="RecordCountArea" class="MarginTop20"></div>
+        <div id="RecordCountArea" class="MarginTop10"></div>
         <div class="TableContainer" id="TimelineTableArea"></div>
+        <div id="TimelineVisualArea" style="display:none;"></div>
         <div id="PaginationArea"></div>
       `
 
@@ -2774,10 +3172,105 @@
               )
             }
           })
+
         /* ---------------------------------------------
-         *  4. 年表一覧取得処理
+         *  4. 年表表示ボタンイベント
+         * --------------------------------------------- */
+        document
+          .getElementById('TimelineViewBtn')
+          .addEventListener('click', ToggleTimelineView)
+
+        /* ---------------------------------------------
+         *  5. 年表一覧取得処理
          * --------------------------------------------- */
         await LoadTimelineList()
+      }
+
+      /** 年表表示モード（true: ビジュアル表示, false: テーブル表示） */
+      let IsTimelineVisualMode = false
+
+      /**
+       * 年表表示の切り替え処理
+       */
+      function ToggleTimelineView() {
+        IsTimelineVisualMode = !IsTimelineVisualMode
+        const TableArea = document.getElementById('TimelineTableArea')
+        const VisualArea = document.getElementById('TimelineVisualArea')
+        const PaginationArea = document.getElementById('PaginationArea')
+        const RecordCountArea = document.getElementById('RecordCountArea')
+        const Btn = document.getElementById('TimelineViewBtn')
+
+        if (IsTimelineVisualMode) {
+          /** ビジュアル表示モード */
+          TableArea.style.display = 'none'
+          PaginationArea.style.display = 'none'
+          RecordCountArea.style.display = 'none'
+          VisualArea.style.display = 'block'
+          Btn.innerHTML = '<i class="fas fa-table"></i> 一覧表示'
+          RenderTimelineVisual()
+        } else {
+          /** テーブル表示モード */
+          TableArea.style.display = ''
+          PaginationArea.style.display = ''
+          RecordCountArea.style.display = ''
+          VisualArea.style.display = 'none'
+          Btn.innerHTML = '<i class="fas fa-stream"></i> 年表表示'
+        }
+      }
+
+      /**
+       * 年表ビジュアル表示処理
+       */
+      function RenderTimelineVisual() {
+        const VisualArea = document.getElementById('TimelineVisualArea')
+
+        if (TimelineList.length === 0) {
+          VisualArea.innerHTML = `
+            <div style="text-align:center;padding:40px;color:#999;">
+              <i class="fas fa-stream" style="font-size:48px;margin-bottom:15px;"></i>
+              <p>年表データがありません</p>
+            </div>
+          `
+          return
+        }
+
+        /** 日付でソート（eventDateの昇順） */
+        const SortedList = [...TimelineList].sort((a, b) => {
+          const DateA = (a.eventDate || '').replace(/[^0-9]/g, '')
+          const DateB = (b.eventDate || '').replace(/[^0-9]/g, '')
+          return DateA.localeCompare(DateB)
+        })
+
+        /** 年表ビジュアルHTML生成 */
+        let Html = '<div class="TimelineVisual">'
+
+        SortedList.forEach((Item, Index) => {
+          const IsLeft = Index % 2 === 0
+          const PositionClass = IsLeft ? 'TimelineLeft' : 'TimelineRight'
+          const EventDateDisplay = FormatDate(Item.eventDate) || '不明'
+          const EndDateDisplay = Item.endDate
+            ? ` ～ ${FormatDate(Item.endDate)}`
+            : ''
+
+          Html += `
+            <div class="TimelineItem ${PositionClass}">
+              <div class="TimelineContent">
+                <div class="TimelineDate">${EventDateDisplay}${EndDateDisplay}</div>
+                <div class="TimelineTitle">${EscapeHtml(Item.title || '')}</div>
+                ${
+                  Item.content
+                    ? `<div class="TimelineDesc">${EscapeHtml(
+                        Item.content,
+                      )}</div>`
+                    : ''
+                }
+              </div>
+            </div>
+          `
+        })
+
+        Html += '</div>'
+        VisualArea.innerHTML = Html
       }
 
       /**
@@ -2912,7 +3405,7 @@
         Table.appendChild(Tbody)
         // 2. 年表一覧表示エリアを初期化
         TableArea.innerHTML = ''
-          // 3. テーブルを年表一覧表示エリアに追加
+        // 3. テーブルを年表一覧表示エリアに追加
         TableArea.appendChild(Table)
         // 4. ページネーション表示エリアを初期化
         PaginationArea.innerHTML = ''
@@ -3016,12 +3509,532 @@
         ShowPlaceholder('建物設定', 'landmark')
       }
 
-      function ShowPowerSetting() {
-        ShowPlaceholder('能力設定', 'bolt')
+      /* ==========================================================================
+       * 能力設定画面 (3.9 PowerInfo)
+       * ========================================================================== */
+      let PowerList = []
+      let SelectedPowerId = null
+
+      async function ShowPowerSetting() {
+        CurrentPage = 1
+        SelectedPowerId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('能力設定', 'bolt')}
+          <div class="FormGroup">
+            <input type="text" class="InputForm" id="PowerName" placeholder="能力名" maxlength="150" ${
+              !CanEditFlg ? 'disabled' : ''
+            }>
+          </div>
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="PowerDescription" placeholder="説明" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerDescriptionBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="PowerDescriptionHidden">
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="PowerConditions" placeholder="発動条件" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerConditionsBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="PowerConditionsHidden">
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="PowerRisk" placeholder="代償・副作用" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerRiskBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="PowerRiskHidden">
+          ${
+            CanEditFlg
+              ? `
+          <div class="ButtonGroup">
+            <button class="ButtonClass ClearButton" id="PowerClearButton"><i class="fas fa-sync"></i> クリア</button>
+            <button class="ButtonClass SaveButton" id="PowerSaveButton"><i class="fas fa-save"></i> 保存</button>
+            <button class="ButtonClass DeleteButton Hidden" id="PowerDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+          </div>
+          `
+              : ''
+          }
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="PowerTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        /** イベント設定 */
+        if (CanEditFlg) {
+          document
+            .getElementById('PowerDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'PowerDescription',
+                'PowerDescriptionHidden',
+                CanEditFlg,
+              ),
+            )
+          document
+            .getElementById('PowerConditionsBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'PowerConditions',
+                'PowerConditionsHidden',
+                CanEditFlg,
+              ),
+            )
+          document
+            .getElementById('PowerRiskBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog('PowerRisk', 'PowerRiskHidden', CanEditFlg),
+            )
+          document
+            .getElementById('PowerClearButton')
+            .addEventListener('click', ClearPowerForm)
+          document
+            .getElementById('PowerSaveButton')
+            .addEventListener('click', SavePower)
+          document
+            .getElementById('PowerDeleteButton')
+            .addEventListener('click', DeletePower)
+        } else {
+          document
+            .getElementById('PowerDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'PowerDescription',
+                'PowerDescriptionHidden',
+                false,
+              ),
+            )
+          document
+            .getElementById('PowerConditionsBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'PowerConditions',
+                'PowerConditionsHidden',
+                false,
+              ),
+            )
+          document
+            .getElementById('PowerRiskBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog('PowerRisk', 'PowerRiskHidden', false),
+            )
+        }
+
+        await LoadPowerList()
       }
 
-      function ShowWeaponSetting() {
-        ShowPlaceholder('武器設定', 'shield-alt')
+      async function LoadPowerList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetPowerList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            PowerList = Response.Data.PowerList || []
+            RenderPowerTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '能力一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('能力一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderPowerTable() {
+        const TotalCount = PowerList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = PowerList.slice(Start, End)
+        let TableHtml = `
+          <table class="DataTable">
+            <thead><tr><th>能力名</th><th>説明</th><th>発動条件</th><th>代償・副作用</th></tr></thead>
+            <tbody>
+        `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (P) => `
+              <tr data-id="${P.PowerId}">
+                <td>${EscapeHtml(P.PowerName || '')}</td>
+                <td>${TruncateText(EscapeHtml(P.Description || ''), 20)}</td>
+                <td>${TruncateText(EscapeHtml(P.Conditions || ''), 20)}</td>
+                <td>${TruncateText(EscapeHtml(P.Risk || ''), 20)}</td>
+              </tr>
+            `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('PowerTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#PowerTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectPower(Row.dataset.id))
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderPowerTable()
+          }),
+        )
+      }
+
+      function SelectPower(PowerId) {
+        const Item = PowerList.find((P) => P.PowerId == PowerId)
+        if (!Item) return
+        SelectedPowerId = PowerId
+        document.getElementById('PowerName').value = Item.PowerName || ''
+        document.getElementById('PowerDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('PowerDescriptionHidden').value =
+          Item.Description || ''
+        document.getElementById('PowerConditions').value = TruncateText(
+          Item.Conditions || '',
+          30,
+        )
+        document.getElementById('PowerConditionsHidden').value =
+          Item.Conditions || ''
+        document.getElementById('PowerRisk').value = TruncateText(
+          Item.Risk || '',
+          30,
+        )
+        document.getElementById('PowerRiskHidden').value = Item.Risk || ''
+        const DeleteBtn = document.getElementById('PowerDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearPowerForm() {
+        SelectedPowerId = null
+        document.getElementById('PowerName').value = ''
+        document.getElementById('PowerDescription').value = ''
+        document.getElementById('PowerDescriptionHidden').value = ''
+        document.getElementById('PowerConditions').value = ''
+        document.getElementById('PowerConditionsHidden').value = ''
+        document.getElementById('PowerRisk').value = ''
+        document.getElementById('PowerRiskHidden').value = ''
+        const DeleteBtn = document.getElementById('PowerDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SavePower() {
+        const PowerName = document.getElementById('PowerName').value.trim()
+        if (!PowerName) {
+          await ShowErrorDialog('能力名を入力してください')
+          return
+        }
+        try {
+          const Response = await CallApi('/SavePower.php', 'POST', {
+            PowerId: SelectedPowerId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            PowerName: PowerName,
+            Description: document.getElementById('PowerDescriptionHidden')
+              .value,
+            Conditions: document.getElementById('PowerConditionsHidden').value,
+            Risk: document.getElementById('PowerRiskHidden').value,
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', '能力を保存しました')
+            ClearPowerForm()
+            await LoadPowerList()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeletePower() {
+        if (!SelectedPowerId) return
+        if (!(await ShowConfirmDialog('この能力を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeletePower.php', 'POST', {
+            PowerId: SelectedPowerId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '能力を削除しました')
+            ClearPowerForm()
+            await LoadPowerList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
+      }
+
+      /* ==========================================================================
+       * 武器設定画面 (3.10 WeaponInfo)
+       * ========================================================================== */
+      let WeaponList = []
+      let SelectedWeaponId = null
+
+      async function ShowWeaponSetting() {
+        CurrentPage = 1
+        SelectedWeaponId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('武器設定', 'shield-alt')}
+          <div class="FormGroup">
+            <input type="text" class="InputForm" id="WeaponName" placeholder="武器名" maxlength="150" ${
+              !CanEditFlg ? 'disabled' : ''
+            }>
+          </div>
+          <div class="FormGroup InputWithButton">
+            <input type="text" class="InputForm" id="WeaponDescription" placeholder="説明" disabled>
+            <button class="ButtonClass SecondaryButton ButtonSmall" id="WeaponDescriptionBtn"><i class="fas fa-edit"></i></button>
+          </div>
+          <input type="hidden" id="WeaponDescriptionHidden">
+          ${
+            CanEditFlg
+              ? `
+          <div class="FormGroup">
+            <div class="ImageUploadArea" id="WeaponImageArea">
+              <div class="ImageBox" id="WeaponImageBox">
+                <span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>
+              </div>
+              <input type="file" id="WeaponImageInput" accept="image/*" style="display:none;">
+            </div>
+          </div>
+          <div class="ButtonGroup">
+            <button class="ButtonClass ClearButton" id="WeaponClearButton"><i class="fas fa-sync"></i> クリア</button>
+            <button class="ButtonClass SaveButton" id="WeaponSaveButton"><i class="fas fa-save"></i> 保存</button>
+            <button class="ButtonClass DeleteButton Hidden" id="WeaponDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+          </div>
+          `
+              : ''
+          }
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="WeaponTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        /** イベント設定 */
+        if (CanEditFlg) {
+          document
+            .getElementById('WeaponDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'WeaponDescription',
+                'WeaponDescriptionHidden',
+                CanEditFlg,
+              ),
+            )
+          document
+            .getElementById('WeaponImageBox')
+            .addEventListener('click', () =>
+              document.getElementById('WeaponImageInput').click(),
+            )
+          document
+            .getElementById('WeaponImageInput')
+            .addEventListener('change', (E) =>
+              PreviewImage(E, 'WeaponImageBox'),
+            )
+          document
+            .getElementById('WeaponClearButton')
+            .addEventListener('click', ClearWeaponForm)
+          document
+            .getElementById('WeaponSaveButton')
+            .addEventListener('click', SaveWeapon)
+          document
+            .getElementById('WeaponDeleteButton')
+            .addEventListener('click', DeleteWeapon)
+        } else {
+          document
+            .getElementById('WeaponDescriptionBtn')
+            .addEventListener('click', () =>
+              ShowInputAreaDialog(
+                'WeaponDescription',
+                'WeaponDescriptionHidden',
+                false,
+              ),
+            )
+        }
+
+        await LoadWeaponList()
+      }
+
+      async function LoadWeaponList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetWeaponList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            WeaponList = Response.Data.WeaponList || []
+            RenderWeaponTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '武器一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('武器一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderWeaponTable() {
+        const TotalCount = WeaponList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = WeaponList.slice(Start, End)
+        let TableHtml = `
+          <table class="DataTable">
+            <thead><tr><th>武器名</th><th>説明</th><th>画像</th></tr></thead>
+            <tbody>
+        `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (W) => `
+              <tr data-id="${W.WeaponId}">
+                <td>${EscapeHtml(W.WeaponName || '')}</td>
+                <td>${TruncateText(EscapeHtml(W.Description || ''), 30)}</td>
+                <td>${
+                  W.ImgPath
+                    ? `<img src="${API_BASE_URL}${W.ImgPath}" class="TableThumbnail" alt="武器画像">`
+                    : '-'
+                }</td>
+              </tr>
+            `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="3" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('WeaponTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#WeaponTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectWeapon(Row.dataset.id))
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderWeaponTable()
+          }),
+        )
+      }
+
+      function SelectWeapon(WeaponId) {
+        const Item = WeaponList.find((W) => W.WeaponId == WeaponId)
+        if (!Item) return
+        SelectedWeaponId = WeaponId
+        document.getElementById('WeaponName').value = Item.WeaponName || ''
+        document.getElementById('WeaponDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('WeaponDescriptionHidden').value =
+          Item.Description || ''
+        const ImageBox = document.getElementById('WeaponImageBox')
+        if (ImageBox && Item.ImgPath) {
+          ImageBox.innerHTML = `<img src="${API_BASE_URL}${Item.ImgPath}" alt="武器画像">`
+        }
+        const DeleteBtn = document.getElementById('WeaponDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearWeaponForm() {
+        SelectedWeaponId = null
+        document.getElementById('WeaponName').value = ''
+        document.getElementById('WeaponDescription').value = ''
+        document.getElementById('WeaponDescriptionHidden').value = ''
+        const ImageBox = document.getElementById('WeaponImageBox')
+        if (ImageBox) {
+          ImageBox.innerHTML =
+            '<span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>'
+        }
+        const ImageInput = document.getElementById('WeaponImageInput')
+        if (ImageInput) ImageInput.value = ''
+        const DeleteBtn = document.getElementById('WeaponDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveWeapon() {
+        const WeaponName = document.getElementById('WeaponName').value.trim()
+        if (!WeaponName) {
+          await ShowErrorDialog('武器名を入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const FormData = new window.FormData()
+          if (SelectedWeaponId) FormData.append('WeaponId', SelectedWeaponId)
+          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
+          FormData.append('WeaponName', WeaponName)
+          FormData.append(
+            'Description',
+            document.getElementById('WeaponDescriptionHidden').value,
+          )
+          FormData.append('UserId', sessionStorage.getItem('UserId'))
+          const ImageFile = document.getElementById('WeaponImageInput').files[0]
+          if (ImageFile) FormData.append('Image', ImageFile)
+          const Response = await fetch(`${API_BASE_URL}/SaveWeapon.php`, {
+            method: 'POST',
+            body: FormData,
+          })
+          const Result = await Response.json()
+          HideSpinner()
+          if (Result.Success) {
+            await ShowInfoDialog('保存完了', '武器を保存しました')
+            ClearWeaponForm()
+            await LoadWeaponList()
+          } else {
+            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteWeapon() {
+        if (!SelectedWeaponId) return
+        if (!(await ShowConfirmDialog('この武器を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteWeapon.php', 'POST', {
+            WeaponId: SelectedWeaponId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '武器を削除しました')
+            ClearWeaponForm()
+            await LoadWeaponList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       function ShowMoveSetting() {
@@ -4914,8 +5927,156 @@
         )
       }
 
-      function ShowParticipants() {
-        ShowPlaceholder('参加者一覧', 'user-friends')
+      /* ==========================================================================
+       * 作品作成参加者一覧画面 (2.2 CreaterList)
+       * ========================================================================== */
+      let ParticipantList = []
+
+      async function ShowParticipants() {
+        CurrentPage = 1
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+          ${CreateContentHeader('参加者一覧', 'user-friends')}
+          <div id="RecordCountArea" class="MarginTop20"></div>
+          <div class="TableContainer" id="ParticipantTableArea"></div>
+          <div id="PaginationArea"></div>
+        `
+
+        await LoadParticipantList()
+      }
+
+      async function LoadParticipantList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetParticipantList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            ParticipantList = Response.Data.ParticipantList || []
+            RenderParticipantTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '参加者一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('参加者一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderParticipantTable() {
+        const CanEditFlg = CanEdit()
+        const TotalCount = ParticipantList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = ParticipantList.slice(Start, End)
+        let TableHtml = `
+          <table class="DataTable">
+            <thead><tr>
+              <th>ユーザーID</th>
+              <th>利用者区分</th>
+              <th>参加日</th>
+              ${CanEditFlg ? '<th>アクセス権限</th>' : ''}
+            </tr></thead>
+            <tbody>
+        `
+        if (PageData.length) {
+          TableHtml += PageData.map((P) => {
+            const RoleLabel = P.IsCreator ? '作成者' : 'アシスタント'
+            const LockBtnLabel = P.ProjectLockFlg
+              ? 'アクセス許可'
+              : 'アクセス禁止'
+            const LockBtnClass = P.ProjectLockFlg
+              ? 'SuccessButton'
+              : 'DangerButton'
+            return `
+              <tr data-id="${P.Id}" data-userid="${EscapeHtml(P.UserId)}">
+                <td>${EscapeHtml(P.UserId || '')}</td>
+                <td>${RoleLabel}</td>
+                <td>${FormatTimestamp(P.RegistDate)}</td>
+                ${
+                  CanEditFlg
+                    ? `<td>
+                        <button class="ButtonClass ${LockBtnClass} ButtonSmall ParticipantLockBtn"
+                                data-id="${P.Id}"
+                                data-locked="${
+                                  P.ProjectLockFlg ? 'true' : 'false'
+                                }">
+                          <i class="fas fa-${
+                            P.ProjectLockFlg ? 'unlock' : 'lock'
+                          }"></i> ${LockBtnLabel}
+                        </button>
+                      </td>`
+                    : ''
+                }
+              </tr>
+            `
+          }).join('')
+        } else {
+          TableHtml += `<tr><td colspan="${
+            CanEditFlg ? '4' : '3'
+          }" class="NoData">データがありません</td></tr>`
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('ParticipantTableArea').innerHTML = TableHtml
+
+        /** アクセス権限ボタンのイベント設定 */
+        if (CanEditFlg) {
+          document.querySelectorAll('.ParticipantLockBtn').forEach((Btn) => {
+            Btn.addEventListener('click', (E) => {
+              const Id = E.currentTarget.dataset.id
+              const IsLocked = E.currentTarget.dataset.locked === 'true'
+              ToggleParticipantLock(Id, IsLocked)
+            })
+          })
+        }
+
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderParticipantTable()
+          }),
+        )
+      }
+
+      async function ToggleParticipantLock(Id, CurrentLockStatus) {
+        const NewLockStatus = !CurrentLockStatus
+        const Message = NewLockStatus
+          ? 'このユーザーのアクセスを禁止しますか？'
+          : 'このユーザーのアクセスを許可しますか？'
+
+        if (!(await ShowConfirmDialog(Message))) return
+
+        try {
+          const Response = await CallApi('/UpdateParticipant.php', 'POST', {
+            Id: Id,
+            WorkId: sessionStorage.getItem('WorkId'),
+            ProjectLockFlg: NewLockStatus,
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            const InfoMessage = NewLockStatus
+              ? 'アクセスを禁止しました'
+              : 'アクセスを許可しました'
+            await ShowInfoDialog('更新完了', InfoMessage)
+            await LoadParticipantList()
+          } else {
+            await ShowErrorDialog(Response.Message || '更新に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('更新中にエラーが発生しました')
+        }
       }
 
       /**

@@ -33,10 +33,11 @@ try {
             c.workId AS \"WorkId\",
             c.userId AS \"UserId\",
             c.isCreator AS \"IsCreator\",
-            c.projectBanFlg AS \"ProjectBanFlg\",
+            w.projectLockFlg AS \"ProjectLockFlg\",
             c.registDate AS \"RegistDate\",
             c.updateDate AS \"UpdateDate\"
         FROM CreaterList c
+        LEFT JOIN WorkInfo w ON c.workId = w.workId
         WHERE c.workId = :workId
         ORDER BY c.isCreator DESC, c.registDate ASC
     ";
