@@ -895,8 +895,8 @@
           )
 
           if (Response.Success) {
-            IsCreator = Response.IsCreator
-            IsAssistant = !Response.IsCreator
+            IsCreator = Response.Data.IsCreator
+            IsAssistant = !Response.Data.IsCreator
           }
         } catch (Error) {
           console.error('権限チェックエラー:', Error)
@@ -5017,19 +5017,30 @@
        * @returns {Promise<void>}
        */
       async function ExportStoryToWord() {
+        ShowSpinner()
         try {
-          ShowSpinner()
-          const Response = await CallApi('/ExportStory.php', 'POST', {
-            WorkId: sessionStorage.getItem('WorkId'),
-            UserId: sessionStorage.getItem('UserId'),
+          const Response = await fetch('/Back/Api/ExportStory.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              WorkId: sessionStorage.getItem('WorkId'),
+              UserId: sessionStorage.getItem('UserId'),
+            }),
           })
-          if (!Response.ok) throw new Error('出力に失敗しました')
+
+          if (!Response.ok) {
+            throw new Error('出力に失敗しました')
+          }
+
           const Blob = await Response.blob()
           const WorkTitle = WorkInfo?.WorkTitle || '作品'
           DownloadFile(Blob, `${WorkTitle}_ストーリー.docx`)
+
           HideSpinner()
+
           await ShowInfoDialog('出力完了', 'Wordファイルをダウンロードしました')
         } catch (Error) {
+          console.error(Error)
           HideSpinner()
           await ShowErrorDialog('出力中にエラーが発生しました')
         }
@@ -5970,8 +5981,12 @@
         }
       }
 
+      /**
+       * 参加者一覧表示処理
+       **/
       function RenderParticipantTable() {
         const CanEditFlg = CanEdit()
+        console.log('CanEditFlg', CanEditFlg)
         const TotalCount = ParticipantList.length
         document.getElementById(
           'RecordCountArea',
@@ -5991,31 +6006,32 @@
         `
         if (PageData.length) {
           TableHtml += PageData.map((P) => {
+            console.log('P', P)
             const RoleLabel = P.IsCreator ? '作成者' : 'アシスタント'
-            const LockBtnLabel = P.ProjectLockFlg
-              ? 'アクセス許可'
-              : 'アクセス禁止'
-            const LockBtnClass = P.ProjectLockFlg
+            const LockBtnLabel = P.UserLockFlg ? 'アクセス許可' : 'アクセス禁止'
+            const LockBtnClass = P.UserLockFlg
               ? 'SuccessButton'
               : 'DangerButton'
             return `
-              <tr data-id="${P.Id}" data-userid="${EscapeHtml(P.UserId)}">
+              <tr data-userid="${EscapeHtml(P.UserId)}">
                 <td>${EscapeHtml(P.UserId || '')}</td>
                 <td>${RoleLabel}</td>
                 <td>${FormatTimestamp(P.RegistDate)}</td>
                 ${
-                  CanEditFlg
+                  CanEditFlg && !P.IsCreator
                     ? `<td>
-                        <button class="ButtonClass ${LockBtnClass} ButtonSmall ParticipantLockBtn"
-                                data-id="${P.Id}"
-                                data-locked="${
-                                  P.ProjectLockFlg ? 'true' : 'false'
-                                }">
+                        <button
+                          class="ButtonClass ${LockBtnClass} ButtonSmall ParticipantLockBtn"
+                          data-userid="${EscapeHtml(P.UserId)}"
+                          data-locked="${P.UserLockFlg ? 'true' : 'false'}">
                           <i class="fas fa-${
-                            P.ProjectLockFlg ? 'unlock' : 'lock'
-                          }"></i> ${LockBtnLabel}
+                            P.UserLockFlg ? 'lock' : 'unlock'
+                          }"></i>
+                          ${LockBtnLabel}
                         </button>
                       </td>`
+                    : CanEditFlg
+                    ? '<td></td>'
                     : ''
                 }
               </tr>
@@ -6033,9 +6049,9 @@
         if (CanEditFlg) {
           document.querySelectorAll('.ParticipantLockBtn').forEach((Btn) => {
             Btn.addEventListener('click', (E) => {
-              const Id = E.currentTarget.dataset.id
+              const TargetUserId = E.currentTarget.dataset.userid
               const IsLocked = E.currentTarget.dataset.locked === 'true'
-              ToggleParticipantLock(Id, IsLocked)
+              ChangeParticipantLock(TargetUserId, IsLocked)
             })
           })
         }
@@ -6050,31 +6066,62 @@
         )
       }
 
-      async function ToggleParticipantLock(Id, CurrentLockStatus) {
+      /**
+       * ユーザーのプロジェクト参加を制御
+       * */
+      async function ChangeParticipantLock(TargetUserId, CurrentLockStatus) {
+        /* ---------------------------------------------
+         *  1. Enterキー押下時の処理
+         * --------------------------------------------- */
+        // 1. ロック制御状態を取得
         const NewLockStatus = !CurrentLockStatus
+        // 2. 状態に応じたメッセージを設定
         const Message = NewLockStatus
           ? 'このユーザーのアクセスを禁止しますか？'
           : 'このユーザーのアクセスを許可しますか？'
 
-        if (!(await ShowConfirmDialog(Message))) return
+        /* ---------------------------------------------
+         *  2. いいえが選択された場合
+         * --------------------------------------------- */
+        if (!(await ShowConfirmDialog(Message))) {
+          // 1. 処理終了
+          return
+        }
 
+        /* ---------------------------------------------
+         *  3. API通信
+         * --------------------------------------------- */
         try {
+          /* 1. API呼び出し */
           const Response = await CallApi('/UpdateParticipant.php', 'POST', {
-            Id: Id,
+            // 1. ID
+            TargetUserId: TargetUserId,
+            // 2. 作品ID
             WorkId: sessionStorage.getItem('WorkId'),
-            ProjectLockFlg: NewLockStatus,
+            // 3. ユーザーID
             UserId: sessionStorage.getItem('UserId'),
           })
+
+          /* 2. 処理成功時 */
           if (Response.Success) {
+            // 1. 状態に応じてメッセージ設定
             const InfoMessage = NewLockStatus
               ? 'アクセスを禁止しました'
               : 'アクセスを許可しました'
+            // 2. インフォダイアログ表示
             await ShowInfoDialog('更新完了', InfoMessage)
+            // 3.参加者一覧表示
             await LoadParticipantList()
           } else {
+            /* 3. 処理失敗時 */
+            // 1. エラーダイアログ表示
             await ShowErrorDialog(Response.Message || '更新に失敗しました')
           }
         } catch (Error) {
+          /* ---------------------------------------------
+           *  4. 例外処理
+           * --------------------------------------------- */
+          // 1. エラーダイアログ表示
           await ShowErrorDialog('更新中にエラーが発生しました')
         }
       }
