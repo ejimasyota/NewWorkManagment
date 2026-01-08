@@ -13,7 +13,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
   font-size: 14px;
@@ -612,8 +613,12 @@ html, body {
 }
 
 @keyframes SpinnerAnimation {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================
@@ -812,6 +817,8 @@ html, body {
   border-radius: 4px;
   padding: 10px 12px;
   cursor: pointer;
+  height: 30px;
+  width: 30px;
 }
 
 @media screen and (max-width: 768px) {

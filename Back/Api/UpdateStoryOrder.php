@@ -33,24 +33,42 @@ try {
     $Pdo = Database::GetConnection();
     Database::BeginTransaction();
 
-    /** 各ストーリーのindexNumを更新 */
-    $UpdateSql = "
-        UPDATE StoryInfo SET
-            indexNum = :indexNum,
-            updateDate = CURRENT_TIMESTAMP(3),
-            updateUser = :updateUser
-        WHERE storyId = :storyId AND workId = :workId
-    ";
-    $UpdateStmt = $Pdo->prepare($UpdateSql);
 
-    foreach ($OrderList as $Order) {
-        $UpdateStmt->execute([
-            ':storyId' => $Order['StoryId'],
-            ':workId' => $WorkId,
-            ':indexNum' => $Order['IndexNum'],
-            ':updateUser' => $UserId
-        ]);
-    }
+        /** 1. 一時的なindexNum（負数）で全件更新し、ユニーク制約違反を回避 */
+        $TempUpdateSql = "
+            UPDATE StoryInfo SET
+                indexNum = :tempIndexNum,
+                updateDate = CURRENT_TIMESTAMP(3),
+                updateUser = :updateUser
+            WHERE storyId = :storyId AND workId = :workId
+        ";
+        $TempUpdateStmt = $Pdo->prepare($TempUpdateSql);
+        foreach ($OrderList as $Order) {
+            $TempUpdateStmt->execute([
+                ':storyId' => $Order['StoryId'],
+                ':workId' => $WorkId,
+                ':tempIndexNum' => -1 * $Order['IndexNum'],
+                ':updateUser' => $UserId
+            ]);
+        }
+
+        /** 2. 正しいindexNumで再度全件更新 */
+        $UpdateSql = "
+            UPDATE StoryInfo SET
+                indexNum = :indexNum,
+                updateDate = CURRENT_TIMESTAMP(3),
+                updateUser = :updateUser
+            WHERE storyId = :storyId AND workId = :workId
+        ";
+        $UpdateStmt = $Pdo->prepare($UpdateSql);
+        foreach ($OrderList as $Order) {
+            $UpdateStmt->execute([
+                ':storyId' => $Order['StoryId'],
+                ':workId' => $WorkId,
+                ':indexNum' => $Order['IndexNum'],
+                ':updateUser' => $UserId
+            ]);
+        }
 
     /** 作品情報の更新年月日を更新 */
     $UpdateWorkSql = "

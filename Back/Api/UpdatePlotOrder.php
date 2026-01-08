@@ -43,7 +43,25 @@ try {
     $Pdo = Database::GetConnection();
     Database::BeginTransaction();
 
-    /** 各プロットのindexNumを更新 */
+    /** 1. 一時的なindexNum（負数）で全件更新し、ユニーク制約違反を回避 */
+    $TempUpdateSql = "
+        UPDATE PlotInfo SET
+            indexNum = :tempIndexNum,
+            updateDate = CURRENT_TIMESTAMP(3),
+            updateUser = :updateUser
+        WHERE plotId = :plotId AND workId = :workId
+    ";
+    $TempUpdateStmt = $Pdo->prepare($TempUpdateSql);
+    foreach ($OrderList as $Order) {
+        $TempUpdateStmt->execute([
+            ':plotId' => $Order['PlotId'],
+            ':workId' => $WorkId,
+            ':tempIndexNum' => -1 * $Order['IndexNum'],
+            ':updateUser' => $UserId
+        ]);
+    }
+
+    /** 2. 正しいindexNumで再度全件更新 */
     $UpdateSql = "
         UPDATE PlotInfo SET
             indexNum = :indexNum,
@@ -52,7 +70,6 @@ try {
         WHERE plotId = :plotId AND workId = :workId
     ";
     $UpdateStmt = $Pdo->prepare($UpdateSql);
-
     foreach ($OrderList as $Order) {
         $UpdateStmt->execute([
             ':plotId' => $Order['PlotId'],

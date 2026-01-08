@@ -1182,38 +1182,60 @@
             <div class="TabContent Active" id="TabBasic">
               <div class="FormRow">
                 <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaName" placeholder="キャラ名" maxlength="255" ${!CanEditFlg ? 'disabled' : ''}>
+                  <input type="text" class="InputForm" id="CharaName" placeholder="キャラ名" maxlength="255" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
                 </div>
                 <div class="FormGroup">
-                  <select class="SelectForm" id="CharaGender" ${!CanEditFlg ? 'disabled' : ''}>${PullDownList('Gender')}</select>
+                  <select class="SelectForm" id="CharaGender" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>${PullDownList('Gender')}</select>
                 </div>
               </div>
               <div class="FormRow">
                 <div class="FormGroup InputWithButton">
-                  <input type="text" class="InputForm" id="CharaBirthDate" placeholder="生年月日" readonly ${!CanEditFlg ? 'disabled' : ''}>
-                  ${CanEditFlg ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBirthDateBtn"><i class="fas fa-calendar"></i></button>` : ''}
+                  <input type="text" class="InputForm" id="CharaBirthDate" placeholder="生年月日" readonly ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                  ${
+                    CanEditFlg
+                      ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBirthDateBtn"><i class="fas fa-calendar"></i></button>`
+                      : ''
+                  }
                 </div>
                 <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaAge" placeholder="年齢" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
-                </div>
-              </div>
-              <div class="FormRow">
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaHeight" placeholder="身長" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
-                </div>
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaWeight" placeholder="体重" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
-                </div>
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaBloodType" placeholder="血液型" maxlength="10" ${!CanEditFlg ? 'disabled' : ''}>
+                  <input type="text" class="InputForm" id="CharaAge" placeholder="年齢" maxlength="50" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
                 </div>
               </div>
               <div class="FormRow">
                 <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaFirstPerson" placeholder="一人称" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
+                  <input type="text" class="InputForm" id="CharaHeight" placeholder="身長" maxlength="50" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
                 </div>
                 <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaSecondPerson" placeholder="二人称" maxlength="50" ${!CanEditFlg ? 'disabled' : ''}>
+                  <input type="text" class="InputForm" id="CharaWeight" placeholder="体重" maxlength="50" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaBloodType" placeholder="血液型" maxlength="10" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaFirstPerson" placeholder="一人称" maxlength="50" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+                <div class="FormGroup">
+                  <input type="text" class="InputForm" id="CharaSecondPerson" placeholder="二人称" maxlength="50" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
                 </div>
               </div>
               <div class="FormGroup InputWithButton">
@@ -1227,24 +1249,32 @@
             <div class="TabContent" id="TabAffiliation">
               <div class="FormRow">
                 <div class="FormGroup">
-                  <select class="SelectForm" id="CharaRace" ${!CanEditFlg ? 'disabled' : ''}>
+                  <select class="SelectForm" id="CharaRace" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
                     <option value="">種族を選択</option>
                   </select>
                 </div>
                 <div class="FormGroup">
-                  <select class="SelectForm" id="CharaOrganization" ${!CanEditFlg ? 'disabled' : ''}>
+                  <select class="SelectForm" id="CharaOrganization" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
                     <option value="">組織を選択</option>
                   </select>
                 </div>
               </div>
               <div class="FormRow">
                 <div class="FormGroup">
-                  <select class="SelectForm" id="CharaTeam" ${!CanEditFlg ? 'disabled' : ''}>
+                  <select class="SelectForm" id="CharaTeam" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
                     <option value="">チームを選択</option>
                   </select>
                 </div>
                 <div class="FormGroup">
-                  <select class="SelectForm" id="CharaClass" ${!CanEditFlg ? 'disabled' : ''}>
+                  <select class="SelectForm" id="CharaClass" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
                     <option value="">階級を選択</option>
                   </select>
                 </div>
@@ -1278,13 +1308,17 @@
             </div>
           </div>
 
-          ${CanEditFlg ? `
+          ${
+            CanEditFlg
+              ? `
           <div class="ButtonGroup">
             <button class="ButtonClass ClearButton" id="CharaClearButton"><i class="fas fa-sync"></i> クリア</button>
             <button class="ButtonClass SaveButton" id="CharaSaveButton"><i class="fas fa-save"></i> 保存</button>
             <button class="ButtonClass DeleteButton Hidden" id="CharaDeleteButton"><i class="fas fa-trash"></i> 削除</button>
           </div>
-          ` : ''}
+          `
+              : ''
+          }
           <div id="RecordCountArea" class="MarginTop20"></div>
           <div class="TableContainer" id="CharacterTableArea"></div>
           <div id="PaginationArea"></div>
@@ -1299,11 +1333,20 @@
       function SetupCharacterTabEvents() {
         document.querySelectorAll('.TabButton').forEach((Btn) => {
           Btn.addEventListener('click', function () {
-            document.querySelectorAll('.TabButton').forEach((B) => B.classList.remove('Active'))
-            document.querySelectorAll('.TabContent').forEach((C) => C.classList.remove('Active'))
+            document
+              .querySelectorAll('.TabButton')
+              .forEach((B) => B.classList.remove('Active'))
+            document
+              .querySelectorAll('.TabContent')
+              .forEach((C) => C.classList.remove('Active'))
             this.classList.add('Active')
             const TabId = this.dataset.tab
-            const TabMap = { basic: 'TabBasic', affiliation: 'TabAffiliation', detail: 'TabDetail', image: 'TabImage' }
+            const TabMap = {
+              basic: 'TabBasic',
+              affiliation: 'TabAffiliation',
+              detail: 'TabDetail',
+              image: 'TabImage',
+            }
             document.getElementById(TabMap[TabId]).classList.add('Active')
           })
         })
@@ -1313,10 +1356,22 @@
         try {
           const WorkId = sessionStorage.getItem('WorkId')
           const [OrgRes, TeamRes, RaceRes, ClassRes] = await Promise.all([
-            CallApi(`/GetOrganizationList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
-            CallApi(`/GetTeamList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
-            CallApi(`/GetRaceList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
-            CallApi(`/GetClassList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
+            CallApi(
+              `/GetOrganizationList.php?WorkId=${encodeURIComponent(WorkId)}`,
+              'GET',
+            ),
+            CallApi(
+              `/GetTeamList.php?WorkId=${encodeURIComponent(WorkId)}`,
+              'GET',
+            ),
+            CallApi(
+              `/GetRaceList.php?WorkId=${encodeURIComponent(WorkId)}`,
+              'GET',
+            ),
+            CallApi(
+              `/GetClassList.php?WorkId=${encodeURIComponent(WorkId)}`,
+              'GET',
+            ),
           ])
           CharacterOrganizationList = OrgRes.Success ? OrgRes.Data || [] : []
           CharacterTeamList = TeamRes.Success ? TeamRes.Data || [] : []
@@ -1333,43 +1388,99 @@
         const TeamSelect = document.getElementById('CharaTeam')
         const RaceSelect = document.getElementById('CharaRace')
         const ClassSelect = document.getElementById('CharaClass')
-        OrgSelect.innerHTML = '<option value="">組織を選択</option>' + CharacterOrganizationList.map((I) => `<option value="${I.OrgId}">${I.OrgName}</option>`).join('')
-        TeamSelect.innerHTML = '<option value="">チームを選択</option>' + CharacterTeamList.map((I) => `<option value="${I.TeamId}">${I.TeamName}</option>`).join('')
-        RaceSelect.innerHTML = '<option value="">種族を選択</option>' + CharacterRaceList.map((I) => `<option value="${I.RaceId}">${I.RaceName}</option>`).join('')
-        ClassSelect.innerHTML = '<option value="">階級を選択</option>' + CharacterClassList.map((I) => `<option value="${I.ClassId}">${I.ClassName}</option>`).join('')
+        OrgSelect.innerHTML =
+          '<option value="">組織を選択</option>' +
+          CharacterOrganizationList.map(
+            (I) => `<option value="${I.OrgId}">${I.OrgName}</option>`,
+          ).join('')
+        TeamSelect.innerHTML =
+          '<option value="">チームを選択</option>' +
+          CharacterTeamList.map(
+            (I) => `<option value="${I.TeamId}">${I.TeamName}</option>`,
+          ).join('')
+        RaceSelect.innerHTML =
+          '<option value="">種族を選択</option>' +
+          CharacterRaceList.map(
+            (I) => `<option value="${I.RaceId}">${I.RaceName}</option>`,
+          ).join('')
+        ClassSelect.innerHTML =
+          '<option value="">階級を選択</option>' +
+          CharacterClassList.map(
+            (I) => `<option value="${I.ClassId}">${I.ClassName}</option>`,
+          ).join('')
       }
 
       function SetupCharacterFormEvents(CanEditFlg) {
         if (CanEditFlg) {
           const DatePickerInstance = new DatePicker()
-          document.getElementById('CharaBirthDateBtn')?.addEventListener('click', () => DatePickerInstance.OpenDialog('CharaBirthDate'))
-          document.getElementById('CharaClearButton').addEventListener('click', ClearCharacterForm)
-          document.getElementById('CharaSaveButton').addEventListener('click', SaveCharacter)
-          document.getElementById('CharaDeleteButton').addEventListener('click', DeleteCharacter)
-          document.getElementById('CharaImageBox').addEventListener('click', () => document.getElementById('CharaImageInput').click())
-          document.getElementById('CharaImageInput').addEventListener('change', HandleCharacterImageChange)
+          document
+            .getElementById('CharaBirthDateBtn')
+            ?.addEventListener('click', () =>
+              DatePickerInstance.OpenDialog('CharaBirthDate'),
+            )
+          document
+            .getElementById('CharaClearButton')
+            .addEventListener('click', ClearCharacterForm)
+          document
+            .getElementById('CharaSaveButton')
+            .addEventListener('click', SaveCharacter)
+          document
+            .getElementById('CharaDeleteButton')
+            .addEventListener('click', DeleteCharacter)
+          document
+            .getElementById('CharaImageBox')
+            .addEventListener('click', () =>
+              document.getElementById('CharaImageInput').click(),
+            )
+          document
+            .getElementById('CharaImageInput')
+            .addEventListener('change', HandleCharacterImageChange)
         }
-        document.getElementById('CharaRoleInfoBtn').addEventListener('click', async () => {
-          const Result = await ShowInputAreaDialog(document.getElementById('CharaRoleInfoHidden').value, !CanEditFlg)
-          if (Result !== null && CanEditFlg) {
-            document.getElementById('CharaRoleInfoHidden').value = Result
-            document.getElementById('CharaRoleInfo').value = TruncateText(Result, 30)
-          }
-        })
-        document.getElementById('CharaPersonalityBtn').addEventListener('click', async () => {
-          const Result = await ShowInputAreaDialog(document.getElementById('CharaPersonalityHidden').value, !CanEditFlg)
-          if (Result !== null && CanEditFlg) {
-            document.getElementById('CharaPersonalityHidden').value = Result
-            document.getElementById('CharaPersonality').value = TruncateText(Result, 30)
-          }
-        })
-        document.getElementById('CharaBiographyBtn').addEventListener('click', async () => {
-          const Result = await ShowInputAreaDialog(document.getElementById('CharaBiographyHidden').value, !CanEditFlg)
-          if (Result !== null && CanEditFlg) {
-            document.getElementById('CharaBiographyHidden').value = Result
-            document.getElementById('CharaBiography').value = TruncateText(Result, 30)
-          }
-        })
+        document
+          .getElementById('CharaRoleInfoBtn')
+          .addEventListener('click', async () => {
+            const Result = await ShowInputAreaDialog(
+              document.getElementById('CharaRoleInfoHidden').value,
+              !CanEditFlg,
+            )
+            if (Result !== null && CanEditFlg) {
+              document.getElementById('CharaRoleInfoHidden').value = Result
+              document.getElementById('CharaRoleInfo').value = TruncateText(
+                Result,
+                30,
+              )
+            }
+          })
+        document
+          .getElementById('CharaPersonalityBtn')
+          .addEventListener('click', async () => {
+            const Result = await ShowInputAreaDialog(
+              document.getElementById('CharaPersonalityHidden').value,
+              !CanEditFlg,
+            )
+            if (Result !== null && CanEditFlg) {
+              document.getElementById('CharaPersonalityHidden').value = Result
+              document.getElementById('CharaPersonality').value = TruncateText(
+                Result,
+                30,
+              )
+            }
+          })
+        document
+          .getElementById('CharaBiographyBtn')
+          .addEventListener('click', async () => {
+            const Result = await ShowInputAreaDialog(
+              document.getElementById('CharaBiographyHidden').value,
+              !CanEditFlg,
+            )
+            if (Result !== null && CanEditFlg) {
+              document.getElementById('CharaBiographyHidden').value = Result
+              document.getElementById('CharaBiography').value = TruncateText(
+                Result,
+                30,
+              )
+            }
+          })
       }
 
       function HandleCharacterImageChange(E) {
@@ -1394,12 +1505,17 @@
       async function LoadCharacterList() {
         try {
           const WorkId = sessionStorage.getItem('WorkId')
-          const Response = await CallApi(`/GetCharacterList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET')
+          const Response = await CallApi(
+            `/GetCharacterList.php?WorkId=${encodeURIComponent(WorkId)}`,
+            'GET',
+          )
           if (Response.Success) {
             CharacterList = Response.Data || []
             RenderCharacterTable()
           } else {
-            await ShowErrorDialog(Response.Message || 'キャラ一覧の取得に失敗しました')
+            await ShowErrorDialog(
+              Response.Message || 'キャラ一覧の取得に失敗しました',
+            )
           }
         } catch (Error) {
           console.error(Error)
@@ -1420,16 +1536,29 @@
         Table.appendChild(Thead)
         const Tbody = document.createElement('tbody')
         const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE
-        const EndIndex = Math.min(StartIndex + RECORDS_PER_PAGE, CharacterList.length)
+        const EndIndex = Math.min(
+          StartIndex + RECORDS_PER_PAGE,
+          CharacterList.length,
+        )
         const PageData = CharacterList.slice(StartIndex, EndIndex)
         if (PageData.length === 0) {
-          Tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;">データがありません</td></tr>'
+          Tbody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center;color:#999;">データがありません</td></tr>'
         } else {
           PageData.forEach((Item, Idx) => {
             const Row = document.createElement('tr')
             Row.style.cursor = 'pointer'
-            Row.innerHTML = `<td title="${Item.CharaName}">${TruncateText(Item.CharaName, 15)}</td><td>${GetKeyInfo('Gender', Item.Gender)}</td><td>${Item.Age || '-'}</td><td>${Item.RaceName || '-'}</td><td>${Item.OrgName || '-'}</td><td>${FormatTimestamp(Item.RegistDate)}</td>`
-            Row.addEventListener('dblclick', () => SelectCharacter(StartIndex + Idx))
+            Row.innerHTML = `<td title="${Item.CharaName}">${TruncateText(
+              Item.CharaName,
+              15,
+            )}</td><td>${GetKeyInfo('Gender', Item.Gender)}</td><td>${
+              Item.Age || '-'
+            }</td><td>${Item.RaceName || '-'}</td><td>${
+              Item.OrgName || '-'
+            }</td><td>${FormatTimestamp(Item.RegistDate)}</td>`
+            Row.addEventListener('dblclick', () =>
+              SelectCharacter(StartIndex + Idx),
+            )
             Tbody.appendChild(Row)
           })
         }
@@ -1437,7 +1566,12 @@
         TableArea.innerHTML = ''
         TableArea.appendChild(Table)
         PaginationArea.innerHTML = ''
-        PaginationArea.appendChild(CreatePagination(CharacterList.length, CurrentPage, (Page) => { CurrentPage = Page; RenderCharacterTable() }))
+        PaginationArea.appendChild(
+          CreatePagination(CharacterList.length, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderCharacterTable()
+          }),
+        )
       }
 
       function SelectCharacter(Index) {
@@ -1450,18 +1584,32 @@
         document.getElementById('CharaHeight').value = Item.Height || ''
         document.getElementById('CharaWeight').value = Item.Weight || ''
         document.getElementById('CharaBloodType').value = Item.BloodType || ''
-        document.getElementById('CharaFirstPerson').value = Item.FirstPerson || ''
-        document.getElementById('CharaSecondPerson').value = Item.SecondPerson || ''
-        document.getElementById('CharaRoleInfo').value = TruncateText(Item.RoleInfo, 30)
-        document.getElementById('CharaRoleInfoHidden').value = Item.RoleInfo || ''
+        document.getElementById('CharaFirstPerson').value =
+          Item.FirstPerson || ''
+        document.getElementById('CharaSecondPerson').value =
+          Item.SecondPerson || ''
+        document.getElementById('CharaRoleInfo').value = TruncateText(
+          Item.RoleInfo,
+          30,
+        )
+        document.getElementById('CharaRoleInfoHidden').value =
+          Item.RoleInfo || ''
         document.getElementById('CharaRace').value = Item.RaceId || ''
         document.getElementById('CharaOrganization').value = Item.OrgId || ''
         document.getElementById('CharaTeam').value = Item.TeamId || ''
         document.getElementById('CharaClass').value = Item.ClassId || ''
-        document.getElementById('CharaPersonality').value = TruncateText(Item.Personality, 30)
-        document.getElementById('CharaPersonalityHidden').value = Item.Personality || ''
-        document.getElementById('CharaBiography').value = TruncateText(Item.Biography, 30)
-        document.getElementById('CharaBiographyHidden').value = Item.Biography || ''
+        document.getElementById('CharaPersonality').value = TruncateText(
+          Item.Personality,
+          30,
+        )
+        document.getElementById('CharaPersonalityHidden').value =
+          Item.Personality || ''
+        document.getElementById('CharaBiography').value = TruncateText(
+          Item.Biography,
+          30,
+        )
+        document.getElementById('CharaBiographyHidden').value =
+          Item.Biography || ''
         if (Item.ImgPath) {
           const ImageBox = document.getElementById('CharaImageBox')
           ImageBox.innerHTML = `<img src="${Item.ImgPath}" alt="キャラ画像">`
@@ -1492,7 +1640,9 @@
         document.getElementById('CharaPersonalityHidden').value = ''
         document.getElementById('CharaBiography').value = ''
         document.getElementById('CharaBiographyHidden').value = ''
-        document.getElementById('CharaImageBox').innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
+        document.getElementById(
+          'CharaImageBox',
+        ).innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
         document.getElementById('CharaImagePath').value = ''
         document.getElementById('CharaImageInput').value = ''
         const DeleteBtn = document.getElementById('CharaDeleteButton')
@@ -1501,32 +1651,74 @@
 
       async function SaveCharacter() {
         const CharaName = document.getElementById('CharaName').value.trim()
-        if (!CharaName) { await ShowErrorDialog('キャラ名を入力してください'); return }
+        if (!CharaName) {
+          await ShowErrorDialog('キャラ名を入力してください')
+          return
+        }
         try {
           const FormData = new window.FormData()
           FormData.append('CharaId', SelectedCharacterId || '')
           FormData.append('WorkId', sessionStorage.getItem('WorkId'))
           FormData.append('CharaName', CharaName)
-          FormData.append('Gender', document.getElementById('CharaGender').value)
-          FormData.append('BirthDate', document.getElementById('CharaBirthDate').value)
+          FormData.append(
+            'Gender',
+            document.getElementById('CharaGender').value,
+          )
+          FormData.append(
+            'BirthDate',
+            document.getElementById('CharaBirthDate').value,
+          )
           FormData.append('Age', document.getElementById('CharaAge').value)
-          FormData.append('Height', document.getElementById('CharaHeight').value)
-          FormData.append('Weight', document.getElementById('CharaWeight').value)
-          FormData.append('BloodType', document.getElementById('CharaBloodType').value)
-          FormData.append('FirstPerson', document.getElementById('CharaFirstPerson').value)
-          FormData.append('SecondPerson', document.getElementById('CharaSecondPerson').value)
-          FormData.append('RoleInfo', document.getElementById('CharaRoleInfoHidden').value)
+          FormData.append(
+            'Height',
+            document.getElementById('CharaHeight').value,
+          )
+          FormData.append(
+            'Weight',
+            document.getElementById('CharaWeight').value,
+          )
+          FormData.append(
+            'BloodType',
+            document.getElementById('CharaBloodType').value,
+          )
+          FormData.append(
+            'FirstPerson',
+            document.getElementById('CharaFirstPerson').value,
+          )
+          FormData.append(
+            'SecondPerson',
+            document.getElementById('CharaSecondPerson').value,
+          )
+          FormData.append(
+            'RoleInfo',
+            document.getElementById('CharaRoleInfoHidden').value,
+          )
           FormData.append('RaceId', document.getElementById('CharaRace').value)
-          FormData.append('OrgId', document.getElementById('CharaOrganization').value)
+          FormData.append(
+            'OrgId',
+            document.getElementById('CharaOrganization').value,
+          )
           FormData.append('TeamId', document.getElementById('CharaTeam').value)
-          FormData.append('ClassId', document.getElementById('CharaClass').value)
-          FormData.append('Personality', document.getElementById('CharaPersonalityHidden').value)
-          FormData.append('Biography', document.getElementById('CharaBiographyHidden').value)
+          FormData.append(
+            'ClassId',
+            document.getElementById('CharaClass').value,
+          )
+          FormData.append(
+            'Personality',
+            document.getElementById('CharaPersonalityHidden').value,
+          )
+          FormData.append(
+            'Biography',
+            document.getElementById('CharaBiographyHidden').value,
+          )
           FormData.append('UserId', sessionStorage.getItem('UserId'))
           const ImageInput = document.getElementById('CharaImageInput')
           if (ImageInput.files[0]) FormData.append('Image', ImageInput.files[0])
           ShowSpinner()
-          const Response = await fetch(`${API_BASE_URL}/SaveCharacter.php`, { method: 'POST', body: FormData })
+          const Response = await fetch(`${API_BASE_URL}/SaveCharacter.php`, {
+            method: 'POST',
+            body: FormData,
+          })
           const Result = await Response.json()
           HideSpinner()
           if (Result.Success) {
@@ -1546,7 +1738,10 @@
         if (!SelectedCharacterId) return
         if (!(await ShowConfirmDialog('このキャラを削除しますか？'))) return
         try {
-          const Response = await CallApi('/DeleteCharacter.php', 'POST', { CharaId: SelectedCharacterId, UserId: sessionStorage.getItem('UserId') })
+          const Response = await CallApi('/DeleteCharacter.php', 'POST', {
+            CharaId: SelectedCharacterId,
+            UserId: sessionStorage.getItem('UserId'),
+          })
           if (Response.Success) {
             await ShowInfoDialog('削除完了', 'キャラを削除しました')
             ClearCharacterForm()
@@ -1884,7 +2079,9 @@
         const CanEditFlg = CanEdit()
         ContentArea.innerHTML = `
           ${CreateContentHeader('相関図作成', 'project-diagram')}
-          ${CanEditFlg ? `
+          ${
+            CanEditFlg
+              ? `
           <div class="ButtonGroup MarginBottom20">
             <button class="ButtonClass PrimaryButton" id="RelationSaveBtn"><i class="fas fa-save"></i> 保存</button>
             <button class="ButtonClass SecondaryButton" id="RelationAddGroupBtn"><i class="fas fa-object-group"></i> グループ追加</button>
@@ -1894,9 +2091,18 @@
             </select>
           </div>
           <div class="RelationTypeSelector" id="RelationTypeSelector">
-            ${RelationTypes.map((T, I) => `<div class="RelationTypeOption ${I === 0 ? 'selected' : ''}" data-type="${T.name}" data-color="${T.color}" style="color:${T.color};border-color:${T.color};">${T.name}</div>`).join('')}
+            ${RelationTypes.map(
+              (T, I) =>
+                `<div class="RelationTypeOption ${
+                  I === 0 ? 'selected' : ''
+                }" data-type="${T.name}" data-color="${T.color}" style="color:${
+                  T.color
+                };border-color:${T.color};">${T.name}</div>`,
+            ).join('')}
           </div>
-          ` : ''}
+          `
+              : ''
+          }
           <div class="RelationContainer">
             <div class="RelationSidebar" id="RelationSidebar">
               <div class="RelationSidebarTitle"><i class="fas fa-users"></i> キャラクター</div>
@@ -1904,7 +2110,11 @@
             </div>
             <div class="RelationCanvas" id="RelationCanvas">
               <svg class="RelationCanvasSvg" id="RelationSvg"></svg>
-              ${CanEditFlg ? `<div class="TrashZone" id="TrashZone"><i class="fas fa-trash"></i></div>` : ''}
+              ${
+                CanEditFlg
+                  ? `<div class="TrashZone" id="TrashZone"><i class="fas fa-trash"></i></div>`
+                  : ''
+              }
             </div>
           </div>
         `
@@ -1916,18 +2126,26 @@
       async function LoadRelationCharaList() {
         try {
           const WorkId = sessionStorage.getItem('WorkId')
-          const Response = await CallApi(`/GetCharacterList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET')
+          const Response = await CallApi(
+            `/GetCharacterList.php?WorkId=${encodeURIComponent(WorkId)}`,
+            'GET',
+          )
           if (Response.Success) {
             RelationCharaList = Response.Data || []
             RenderRelationCharaList()
           }
-        } catch (Error) { console.error(Error) }
+        } catch (Error) {
+          console.error(Error)
+        }
       }
 
       function RenderRelationCharaList() {
         const Container = document.getElementById('RelationCharaList')
         if (!Container) return
-        Container.innerHTML = RelationCharaList.map((C) => `<div class="CharacterListItem" draggable="true" data-charaid="${C.CharaId}" data-charaname="${C.CharaName}">${C.CharaName}</div>`).join('')
+        Container.innerHTML = RelationCharaList.map(
+          (C) =>
+            `<div class="CharacterListItem" draggable="true" data-charaid="${C.CharaId}" data-charaname="${C.CharaName}">${C.CharaName}</div>`,
+        ).join('')
         if (CanEdit()) {
           Container.querySelectorAll('.CharacterListItem').forEach((Item) => {
             Item.addEventListener('dragstart', HandleCharaDragStart)
@@ -1937,30 +2155,48 @@
       }
 
       function HandleCharaDragStart(E) {
-        E.dataTransfer.setData('text/plain', JSON.stringify({ charaId: E.target.dataset.charaid, charaName: E.target.dataset.charaname }))
+        E.dataTransfer.setData(
+          'text/plain',
+          JSON.stringify({
+            charaId: E.target.dataset.charaid,
+            charaName: E.target.dataset.charaname,
+          }),
+        )
         E.target.classList.add('dragging')
       }
 
-      function HandleCharaDragEnd(E) { E.target.classList.remove('dragging') }
+      function HandleCharaDragEnd(E) {
+        E.target.classList.remove('dragging')
+      }
 
       async function LoadRelationData() {
         try {
           const WorkId = sessionStorage.getItem('WorkId')
           const [ObjRes, LineRes] = await Promise.all([
-            CallApi(`/GetRelationObjects.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
-            CallApi(`/GetRelationLines.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET'),
+            CallApi(
+              `/GetRelationObjects.php?WorkId=${encodeURIComponent(WorkId)}`,
+              'GET',
+            ),
+            CallApi(
+              `/GetRelationLines.php?WorkId=${encodeURIComponent(WorkId)}`,
+              'GET',
+            ),
           ])
           RelationObjects = ObjRes.Success ? ObjRes.Data || [] : []
           RelationLines = LineRes.Success ? LineRes.Data || [] : []
           RenderRelationCanvas()
-        } catch (Error) { console.error(Error) }
+        } catch (Error) {
+          console.error(Error)
+        }
       }
 
       function RenderRelationCanvas() {
         const Canvas = document.getElementById('RelationCanvas')
         const Svg = document.getElementById('RelationSvg')
         if (!Canvas || !Svg) return
-        Canvas.querySelectorAll('.RelationObject, .RelationGroupBox').forEach((E) => E.remove())
+        Canvas.querySelectorAll('.RelationObject, .RelationGroupBox').forEach(
+          (E) => E.remove(),
+        )
         Svg.innerHTML = ''
         RelationObjects.forEach((Obj) => {
           if (Obj.ObjType === 2) {
@@ -1972,7 +2208,10 @@
             GroupBox.style.width = (Obj.Width || 150) + 'px'
             GroupBox.style.height = (Obj.Height || 100) + 'px'
             if (Obj.BgColor) GroupBox.style.borderColor = Obj.BgColor
-            if (Obj.Label) GroupBox.innerHTML = `<div class="RelationGroupLabel" style="background:${Obj.BgColor || '#9b59b6'}">${Obj.Label}</div>`
+            if (Obj.Label)
+              GroupBox.innerHTML = `<div class="RelationGroupLabel" style="background:${
+                Obj.BgColor || '#9b59b6'
+              }">${Obj.Label}</div>`
             Canvas.insertBefore(GroupBox, Svg)
           } else {
             const CharaObj = document.createElement('div')
@@ -1981,34 +2220,60 @@
             CharaObj.dataset.charaid = Obj.TargetId
             CharaObj.style.left = Obj.PosX + 'px'
             CharaObj.style.top = Obj.PosY + 'px'
-            const Chara = RelationCharaList.find((C) => C.CharaId === Obj.TargetId)
-            CharaObj.innerHTML = `${Chara?.ImgPath ? `<img src="${Chara.ImgPath}" alt="">` : ''}<div>${Chara?.CharaName || Obj.Label || '不明'}</div>`
+            const Chara = RelationCharaList.find(
+              (C) => C.CharaId === Obj.TargetId,
+            )
+            CharaObj.innerHTML = `${
+              Chara?.ImgPath ? `<img src="${Chara.ImgPath}" alt="">` : ''
+            }<div>${Chara?.CharaName || Obj.Label || '不明'}</div>`
             Canvas.appendChild(CharaObj)
           }
         })
         RelationLines.forEach((Line) => {
-          const SourceObj = RelationObjects.find((O) => O.ObjId == Line.SourceObjId)
-          const TargetObj = RelationObjects.find((O) => O.ObjId == Line.TargetObjId)
+          const SourceObj = RelationObjects.find(
+            (O) => O.ObjId == Line.SourceObjId,
+          )
+          const TargetObj = RelationObjects.find(
+            (O) => O.ObjId == Line.TargetObjId,
+          )
           if (!SourceObj || !TargetObj) return
-          const X1 = SourceObj.PosX + 50, Y1 = SourceObj.PosY + 40
-          const X2 = TargetObj.PosX + 50, Y2 = TargetObj.PosY + 40
+          const X1 = SourceObj.PosX + 50,
+            Y1 = SourceObj.PosY + 40
+          const X2 = TargetObj.PosX + 50,
+            Y2 = TargetObj.PosY + 40
           if (Line.LineType === 1) {
-            const Path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-            const Dx = X2 - X1, Dy = Y2 - Y1, Len = Math.sqrt(Dx * Dx + Dy * Dy)
-            const UnitX = Dx / Len, UnitY = Dy / Len
-            const ArrowLen = 10, ArrowX = X2 - UnitX * 15, ArrowY = Y2 - UnitY * 15
+            const Path = document.createElementNS(
+              'http://www.w3.org/2000/svg',
+              'path',
+            )
+            const Dx = X2 - X1,
+              Dy = Y2 - Y1,
+              Len = Math.sqrt(Dx * Dx + Dy * Dy)
+            const UnitX = Dx / Len,
+              UnitY = Dy / Len
+            const ArrowLen = 10,
+              ArrowX = X2 - UnitX * 15,
+              ArrowY = Y2 - UnitY * 15
             const LeftX = ArrowX - UnitY * ArrowLen - UnitX * ArrowLen
             const LeftY = ArrowY + UnitX * ArrowLen - UnitY * ArrowLen
             const RightX = ArrowX + UnitY * ArrowLen - UnitX * ArrowLen
             const RightY = ArrowY - UnitX * ArrowLen - UnitY * ArrowLen
-            Path.setAttribute('d', `M${X1},${Y1} L${X2 - UnitX * 15},${Y2 - UnitY * 15} M${ArrowX},${ArrowY} L${LeftX},${LeftY} M${ArrowX},${ArrowY} L${RightX},${RightY}`)
+            Path.setAttribute(
+              'd',
+              `M${X1},${Y1} L${X2 - UnitX * 15},${
+                Y2 - UnitY * 15
+              } M${ArrowX},${ArrowY} L${LeftX},${LeftY} M${ArrowX},${ArrowY} L${RightX},${RightY}`,
+            )
             Path.setAttribute('stroke', Line.Color || '#e74c3c')
             Path.setAttribute('stroke-width', '2')
             Path.setAttribute('fill', 'none')
             Path.dataset.relationid = Line.RelationId
             Svg.appendChild(Path)
           } else {
-            const LineEl = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+            const LineEl = document.createElementNS(
+              'http://www.w3.org/2000/svg',
+              'line',
+            )
             LineEl.setAttribute('x1', X1)
             LineEl.setAttribute('y1', Y1)
             LineEl.setAttribute('x2', X2)
@@ -2018,8 +2283,12 @@
             LineEl.dataset.relationid = Line.RelationId
             Svg.appendChild(LineEl)
           }
-          const TextX = (X1 + X2) / 2, TextY = (Y1 + Y2) / 2 - 5
-          const Text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+          const TextX = (X1 + X2) / 2,
+            TextY = (Y1 + Y2) / 2 - 5
+          const Text = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'text',
+          )
           Text.setAttribute('x', TextX)
           Text.setAttribute('y', TextY)
           Text.setAttribute('fill', Line.Color || '#333')
@@ -2035,12 +2304,22 @@
         const Canvas = document.getElementById('RelationCanvas')
         Canvas.addEventListener('dragover', (E) => E.preventDefault())
         Canvas.addEventListener('drop', HandleCanvasDrop)
-        document.getElementById('RelationSaveBtn').addEventListener('click', SaveRelationData)
-        document.getElementById('RelationAddGroupBtn').addEventListener('click', AddRelationGroup)
-        document.getElementById('RelationLineTypeSelect').addEventListener('change', (E) => { CurrentLineType = parseInt(E.target.value) })
+        document
+          .getElementById('RelationSaveBtn')
+          .addEventListener('click', SaveRelationData)
+        document
+          .getElementById('RelationAddGroupBtn')
+          .addEventListener('click', AddRelationGroup)
+        document
+          .getElementById('RelationLineTypeSelect')
+          .addEventListener('change', (E) => {
+            CurrentLineType = parseInt(E.target.value)
+          })
         document.querySelectorAll('.RelationTypeOption').forEach((Opt) => {
           Opt.addEventListener('click', function () {
-            document.querySelectorAll('.RelationTypeOption').forEach((O) => O.classList.remove('selected'))
+            document
+              .querySelectorAll('.RelationTypeOption')
+              .forEach((O) => O.classList.remove('selected'))
             this.classList.add('selected')
             CurrentRelationType = this.dataset.type
             CurrentRelationColor = this.dataset.color
@@ -2081,14 +2360,18 @@
 
       function StartDragObject(E) {
         if (E.target.closest('.TrashZone')) return
-        SelectedRelationObject = E.target.closest('.RelationObject, .RelationGroupBox')
+        SelectedRelationObject = E.target.closest(
+          '.RelationObject, .RelationGroupBox',
+        )
         if (!SelectedRelationObject) return
         IsDraggingObject = true
         DragStartX = E.clientX - SelectedRelationObject.offsetLeft
         DragStartY = E.clientY - SelectedRelationObject.offsetTop
         document.addEventListener('mousemove', DragObject)
         document.addEventListener('mouseup', EndDragObject)
-        document.querySelectorAll('.RelationObject').forEach((O) => O.classList.remove('selected'))
+        document
+          .querySelectorAll('.RelationObject')
+          .forEach((O) => O.classList.remove('selected'))
         SelectedRelationObject.classList.add('selected')
       }
 
@@ -2098,18 +2381,32 @@
         const Rect = Canvas.getBoundingClientRect()
         let NewX = E.clientX - DragStartX
         let NewY = E.clientY - DragStartY
-        NewX = Math.max(0, Math.min(NewX, Rect.width - SelectedRelationObject.offsetWidth))
-        NewY = Math.max(0, Math.min(NewY, Rect.height - SelectedRelationObject.offsetHeight))
+        NewX = Math.max(
+          0,
+          Math.min(NewX, Rect.width - SelectedRelationObject.offsetWidth),
+        )
+        NewY = Math.max(
+          0,
+          Math.min(NewY, Rect.height - SelectedRelationObject.offsetHeight),
+        )
         SelectedRelationObject.style.left = NewX + 'px'
         SelectedRelationObject.style.top = NewY + 'px'
         const ObjId = SelectedRelationObject.dataset.objid
         const Obj = RelationObjects.find((O) => O.ObjId == ObjId)
-        if (Obj) { Obj.PosX = NewX; Obj.PosY = NewY }
+        if (Obj) {
+          Obj.PosX = NewX
+          Obj.PosY = NewY
+        }
         RenderRelationLines()
         const TrashZone = document.getElementById('TrashZone')
         if (TrashZone) {
           const TrashRect = TrashZone.getBoundingClientRect()
-          if (E.clientX >= TrashRect.left && E.clientX <= TrashRect.right && E.clientY >= TrashRect.top && E.clientY <= TrashRect.bottom) {
+          if (
+            E.clientX >= TrashRect.left &&
+            E.clientX <= TrashRect.right &&
+            E.clientY >= TrashRect.top &&
+            E.clientY <= TrashRect.bottom
+          ) {
             TrashZone.classList.add('active')
           } else {
             TrashZone.classList.remove('active')
@@ -2122,36 +2419,65 @@
         if (!Svg) return
         Svg.innerHTML = ''
         RelationLines.forEach((Line) => {
-          const SourceObj = RelationObjects.find((O) => O.ObjId == Line.SourceObjId)
-          const TargetObj = RelationObjects.find((O) => O.ObjId == Line.TargetObjId)
+          const SourceObj = RelationObjects.find(
+            (O) => O.ObjId == Line.SourceObjId,
+          )
+          const TargetObj = RelationObjects.find(
+            (O) => O.ObjId == Line.TargetObjId,
+          )
           if (!SourceObj || !TargetObj) return
-          const X1 = SourceObj.PosX + 50, Y1 = SourceObj.PosY + 40
-          const X2 = TargetObj.PosX + 50, Y2 = TargetObj.PosY + 40
+          const X1 = SourceObj.PosX + 50,
+            Y1 = SourceObj.PosY + 40
+          const X2 = TargetObj.PosX + 50,
+            Y2 = TargetObj.PosY + 40
           if (Line.LineType === 1) {
-            const Path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-            const Dx = X2 - X1, Dy = Y2 - Y1, Len = Math.sqrt(Dx * Dx + Dy * Dy) || 1
-            const UnitX = Dx / Len, UnitY = Dy / Len
-            const ArrowLen = 10, ArrowX = X2 - UnitX * 15, ArrowY = Y2 - UnitY * 15
+            const Path = document.createElementNS(
+              'http://www.w3.org/2000/svg',
+              'path',
+            )
+            const Dx = X2 - X1,
+              Dy = Y2 - Y1,
+              Len = Math.sqrt(Dx * Dx + Dy * Dy) || 1
+            const UnitX = Dx / Len,
+              UnitY = Dy / Len
+            const ArrowLen = 10,
+              ArrowX = X2 - UnitX * 15,
+              ArrowY = Y2 - UnitY * 15
             const LeftX = ArrowX - UnitY * ArrowLen - UnitX * ArrowLen
             const LeftY = ArrowY + UnitX * ArrowLen - UnitY * ArrowLen
             const RightX = ArrowX + UnitY * ArrowLen - UnitX * ArrowLen
             const RightY = ArrowY - UnitX * ArrowLen - UnitY * ArrowLen
-            Path.setAttribute('d', `M${X1},${Y1} L${X2 - UnitX * 15},${Y2 - UnitY * 15} M${ArrowX},${ArrowY} L${LeftX},${LeftY} M${ArrowX},${ArrowY} L${RightX},${RightY}`)
+            Path.setAttribute(
+              'd',
+              `M${X1},${Y1} L${X2 - UnitX * 15},${
+                Y2 - UnitY * 15
+              } M${ArrowX},${ArrowY} L${LeftX},${LeftY} M${ArrowX},${ArrowY} L${RightX},${RightY}`,
+            )
             Path.setAttribute('stroke', Line.Color || '#e74c3c')
             Path.setAttribute('stroke-width', '2')
             Path.setAttribute('fill', 'none')
             Svg.appendChild(Path)
           } else {
-            const LineEl = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-            LineEl.setAttribute('x1', X1); LineEl.setAttribute('y1', Y1)
-            LineEl.setAttribute('x2', X2); LineEl.setAttribute('y2', Y2)
+            const LineEl = document.createElementNS(
+              'http://www.w3.org/2000/svg',
+              'line',
+            )
+            LineEl.setAttribute('x1', X1)
+            LineEl.setAttribute('y1', Y1)
+            LineEl.setAttribute('x2', X2)
+            LineEl.setAttribute('y2', Y2)
             LineEl.setAttribute('stroke', Line.Color || '#3498db')
             LineEl.setAttribute('stroke-width', '2')
             Svg.appendChild(LineEl)
           }
-          const TextX = (X1 + X2) / 2, TextY = (Y1 + Y2) / 2 - 5
-          const Text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-          Text.setAttribute('x', TextX); Text.setAttribute('y', TextY)
+          const TextX = (X1 + X2) / 2,
+            TextY = (Y1 + Y2) / 2 - 5
+          const Text = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'text',
+          )
+          Text.setAttribute('x', TextX)
+          Text.setAttribute('y', TextY)
           Text.setAttribute('fill', Line.Color || '#333')
           Text.setAttribute('font-size', '10')
           Text.setAttribute('text-anchor', 'middle')
@@ -2163,10 +2489,16 @@
       function EndDragObject(E) {
         if (!IsDraggingObject) return
         const TrashZone = document.getElementById('TrashZone')
-        if (TrashZone && TrashZone.classList.contains('active') && SelectedRelationObject) {
+        if (
+          TrashZone &&
+          TrashZone.classList.contains('active') &&
+          SelectedRelationObject
+        ) {
           const ObjId = SelectedRelationObject.dataset.objid
           RelationObjects = RelationObjects.filter((O) => O.ObjId != ObjId)
-          RelationLines = RelationLines.filter((L) => L.SourceObjId != ObjId && L.TargetObjId != ObjId)
+          RelationLines = RelationLines.filter(
+            (L) => L.SourceObjId != ObjId && L.TargetObjId != ObjId,
+          )
           RenderRelationCanvas()
         }
         IsDraggingObject = false
@@ -2183,7 +2515,10 @@
           IsDrawingLine = true
           LineStartObjId = Obj.dataset.objid
           Obj.classList.add('selected')
-          ShowInfoDialog('線の描画', '接続先のキャラをダブルクリックしてください')
+          ShowInfoDialog(
+            '線の描画',
+            '接続先のキャラをダブルクリックしてください',
+          )
         } else {
           const EndObjId = Obj.dataset.objid
           if (LineStartObjId !== EndObjId) {
@@ -2200,7 +2535,9 @@
           }
           IsDrawingLine = false
           LineStartObjId = null
-          document.querySelectorAll('.RelationObject').forEach((O) => O.classList.remove('selected'))
+          document
+            .querySelectorAll('.RelationObject')
+            .forEach((O) => O.classList.remove('selected'))
         }
       }
 
@@ -2238,16 +2575,24 @@
           const Dialog = document.createElement('div')
           Dialog.className = 'DialogContainer DialogSmall'
           Dialog.innerHTML = `
-            <div class="DialogTitle">${IsEdit ? 'グループ編集' : 'グループ追加'}</div>
+            <div class="DialogTitle">${
+              IsEdit ? 'グループ編集' : 'グループ追加'
+            }</div>
             <div class="DialogContent">
               <div class="FormGroup">
-                <input type="text" class="InputForm" id="GroupLabelInput" placeholder="グループ名" value="${Group?.Label || ''}" maxlength="50">
+                <input type="text" class="InputForm" id="GroupLabelInput" placeholder="グループ名" value="${
+                  Group?.Label || ''
+                }" maxlength="50">
               </div>
               <div class="FormGroup">
                 <label class="FormLabel">背景色</label>
                 <div class="ColorPickerWrapper">
-                  <input type="color" class="ColorPicker" id="GroupColorInput" value="${Group?.BgColor || '#9b59b6'}">
-                  <input type="text" class="InputForm ColorCodeInput" id="GroupColorCodeInput" placeholder="#9b59b6" value="${Group?.BgColor || '#9b59b6'}" maxlength="7">
+                  <input type="color" class="ColorPicker" id="GroupColorInput" value="${
+                    Group?.BgColor || '#9b59b6'
+                  }">
+                  <input type="text" class="InputForm ColorCodeInput" id="GroupColorCodeInput" placeholder="#9b59b6" value="${
+                    Group?.BgColor || '#9b59b6'
+                  }" maxlength="7">
                 </div>
               </div>
             </div>
@@ -2262,17 +2607,24 @@
           /** カラーピッカーとテキスト入力の同期 */
           const ColorPicker = Dialog.querySelector('#GroupColorInput')
           const ColorCode = Dialog.querySelector('#GroupColorCodeInput')
-          ColorPicker.addEventListener('input', () => { ColorCode.value = ColorPicker.value })
+          ColorPicker.addEventListener('input', () => {
+            ColorCode.value = ColorPicker.value
+          })
           ColorCode.addEventListener('input', () => {
             const Val = ColorCode.value
-            if (/^#[0-9A-Fa-f]{6}$/.test(Val)) { ColorPicker.value = Val }
+            if (/^#[0-9A-Fa-f]{6}$/.test(Val)) {
+              ColorPicker.value = Val
+            }
           })
 
           /** 閉じるボタン */
-          Dialog.querySelector('#GroupDialogClose').addEventListener('click', () => {
-            Overlay.remove()
-            Resolve(null)
-          })
+          Dialog.querySelector('#GroupDialogClose').addEventListener(
+            'click',
+            () => {
+              Overlay.remove()
+              Resolve(null)
+            },
+          )
 
           /** オーバーレイクリックで閉じる */
           Overlay.addEventListener('click', (E) => {
@@ -2283,28 +2635,37 @@
           })
 
           /** 決定ボタン */
-          Dialog.querySelector('#GroupDialogSave').addEventListener('click', async () => {
-            const Label = Dialog.querySelector('#GroupLabelInput').value.trim()
-            const BgColor = ColorCode.value.trim()
-            if (!Label) {
-              await ShowErrorDialog('グループ名を入力してください')
-              return
-            }
-            if (BgColor && !/^#[0-9A-Fa-f]{6}$/.test(BgColor)) {
-              await ShowErrorDialog('カラーコードの形式が正しくありません（例: #9b59b6）')
-              return
-            }
-            Overlay.remove()
-            Resolve({ Label: Label, BgColor: BgColor || '#9b59b6' })
-          })
+          Dialog.querySelector('#GroupDialogSave').addEventListener(
+            'click',
+            async () => {
+              const Label =
+                Dialog.querySelector('#GroupLabelInput').value.trim()
+              const BgColor = ColorCode.value.trim()
+              if (!Label) {
+                await ShowErrorDialog('グループ名を入力してください')
+                return
+              }
+              if (BgColor && !/^#[0-9A-Fa-f]{6}$/.test(BgColor)) {
+                await ShowErrorDialog(
+                  'カラーコードの形式が正しくありません（例: #9b59b6）',
+                )
+                return
+              }
+              Overlay.remove()
+              Resolve({ Label: Label, BgColor: BgColor || '#9b59b6' })
+            },
+          )
 
           /** Enterキーで決定 */
-          Dialog.querySelector('#GroupLabelInput').addEventListener('keydown', (E) => {
-            if (E.key === 'Enter') {
-              E.preventDefault()
-              Dialog.querySelector('#GroupDialogSave').click()
-            }
-          })
+          Dialog.querySelector('#GroupLabelInput').addEventListener(
+            'keydown',
+            (E) => {
+              if (E.key === 'Enter') {
+                E.preventDefault()
+                Dialog.querySelector('#GroupDialogSave').click()
+              }
+            },
+          )
 
           /** 初期フォーカス */
           Dialog.querySelector('#GroupLabelInput').focus()
@@ -2344,19 +2705,27 @@
         const CanEditFlg = CanEdit()
         ContentArea.innerHTML = `
           ${CreateContentHeader('ストーリー作成', 'book')}
-          ${CanEditFlg ? `
+          ${
+            CanEditFlg
+              ? `
           <div class="ButtonGroup MarginBottom20">
             <button class="ButtonClass PrimaryButton" id="StoryAddBtn"><i class="fas fa-plus"></i> 行追加</button>
             <button class="ButtonClass SuccessButton" id="StoryExportBtn"><i class="fas fa-file-word"></i> Word出力</button>
           </div>
-          ` : ''}
+          `
+              : ''
+          }
           <div id="RecordCountArea"></div>
           <div class="StoryList" id="StoryListArea"></div>
           <div id="PaginationArea"></div>
         `
         if (CanEditFlg) {
-          document.getElementById('StoryAddBtn').addEventListener('click', () => ShowStoryDialog())
-          document.getElementById('StoryExportBtn').addEventListener('click', ExportStoryToWord)
+          document
+            .getElementById('StoryAddBtn')
+            .addEventListener('click', () => ShowStoryDialog())
+          document
+            .getElementById('StoryExportBtn')
+            .addEventListener('click', ExportStoryToWord)
         }
         await LoadStoryList()
       }
@@ -2364,12 +2733,19 @@
       async function LoadStoryList() {
         try {
           const WorkId = sessionStorage.getItem('WorkId')
-          const Response = await CallApi(`/GetStoryList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET')
+          const Response = await CallApi(
+            `/GetStoryList.php?WorkId=${encodeURIComponent(WorkId)}`,
+            'GET',
+          )
           if (Response.Success) {
-            StoryList = (Response.Data || []).sort((A, B) => A.IndexNum - B.IndexNum)
+            StoryList = (Response.Data.StoryList || []).sort(
+              (A, B) => A.IndexNum - B.IndexNum,
+            )
             RenderStoryList()
           } else {
-            await ShowErrorDialog(Response.Message || 'ストーリー一覧の取得に失敗しました')
+            await ShowErrorDialog(
+              Response.Message || 'ストーリー一覧の取得に失敗しました',
+            )
           }
         } catch (Error) {
           console.error(Error)
@@ -2385,21 +2761,30 @@
         RecordCountArea.appendChild(CreateRecordCount(StoryList.length))
         const CanEditFlg = CanEdit()
         if (StoryList.length === 0) {
-          ListArea.innerHTML = '<div style="text-align:center;color:#999;padding:50px;">データがありません</div>'
+          ListArea.innerHTML =
+            '<div style="text-align:center;color:#999;padding:50px;">データがありません</div>'
           return
         }
-        ListArea.innerHTML = StoryList.map((Item, Idx) => `
-          <div class="StoryItem" data-storyid="${Item.StoryId}" data-index="${Idx}" ${CanEditFlg ? 'draggable="true"' : ''}>
+        ListArea.innerHTML = StoryList.map(
+          (Item, Idx) => `
+          <div class="StoryItem" data-storyid="${
+            Item.StoryId
+          }" data-index="${Idx}" ${CanEditFlg ? 'draggable="true"' : ''}>
             <div class="StoryNumber">${Idx + 1}</div>
             <div class="StoryContent">
-              <div class="StoryNarrator">${Item.Narrator ? `語り手: ${Item.Narrator}` : 'ナレーション'}</div>
+              <div class="StoryNarrator">${
+                Item.Narrator ? `語り手: ${Item.Narrator}` : 'ナレーション'
+              }</div>
               <div class="StoryText">${Item.Content || ''}</div>
             </div>
           </div>
-        `).join('')
+        `,
+        ).join('')
         if (CanEditFlg) {
           ListArea.querySelectorAll('.StoryItem').forEach((Item) => {
-            Item.addEventListener('dblclick', () => ShowStoryDialog(Item.dataset.storyid))
+            Item.addEventListener('dblclick', () =>
+              ShowStoryDialog(Item.dataset.storyid),
+            )
             Item.addEventListener('dragstart', HandleStoryDragStart)
             Item.addEventListener('dragend', HandleStoryDragEnd)
             Item.addEventListener('dragover', HandleStoryDragOver)
@@ -2416,7 +2801,9 @@
 
       function HandleStoryDragEnd(E) {
         E.target.classList.remove('dragging')
-        document.querySelectorAll('.StoryItem').forEach((I) => I.classList.remove('drag-over'))
+        document
+          .querySelectorAll('.StoryItem')
+          .forEach((I) => I.classList.remove('drag-over'))
         StoryDragItem = null
       }
 
@@ -2424,11 +2811,18 @@
         E.preventDefault()
         const Item = E.target.closest('.StoryItem')
         if (Item && Item !== StoryDragItem) {
-          document.querySelectorAll('.StoryItem').forEach((I) => I.classList.remove('drag-over'))
+          document
+            .querySelectorAll('.StoryItem')
+            .forEach((I) => I.classList.remove('drag-over'))
           Item.classList.add('drag-over')
         }
       }
 
+      /**
+       * ストーリーの並び替えを処理する
+       * @param {DragEvent} E
+       * @returns {Promise<void>}
+       */
       async function HandleStoryDrop(E) {
         E.preventDefault()
         const DropItem = E.target.closest('.StoryItem')
@@ -2437,20 +2831,34 @@
         const ToIndex = parseInt(DropItem.dataset.index)
         const MovedItem = StoryList.splice(FromIndex, 1)[0]
         StoryList.splice(ToIndex, 0, MovedItem)
-        StoryList.forEach((Item, Idx) => { Item.IndexNum = Idx + 1 })
+        StoryList.forEach((Item, Idx) => {
+          Item.IndexNum = Idx + 1
+        })
         RenderStoryList()
         await SaveStoryOrder()
       }
 
+      /**
+       * ストーリーの並び順を保存する
+       * @returns {Promise<void>}
+       */
       async function SaveStoryOrder() {
         try {
           const Response = await CallApi('/UpdateStoryOrder.php', 'POST', {
             WorkId: sessionStorage.getItem('WorkId'),
-            Orders: StoryList.map((Item) => ({ StoryId: Item.StoryId, IndexNum: Item.IndexNum })),
+            OrderList: StoryList.map((Item) => ({
+              StoryId: Item.StoryId,
+              IndexNum: Item.IndexNum,
+            })),
             UserId: sessionStorage.getItem('UserId'),
           })
-          if (!Response.Success) await ShowErrorDialog(Response.Message || '並び順の保存に失敗しました')
-        } catch (Error) { console.error(Error) }
+          if (!Response.Success)
+            await ShowErrorDialog(
+              Response.Message || '並び順の保存に失敗しました',
+            )
+        } catch (Error) {
+          console.error(Error)
+        }
       }
 
       async function ShowStoryDialog(StoryId = null) {
@@ -2462,30 +2870,56 @@
           const Dialog = document.createElement('div')
           Dialog.className = 'DialogContainer DialogMedium'
           Dialog.innerHTML = `
-            <div class="DialogTitle">${IsEdit ? 'ストーリー編集' : 'ストーリー追加'}</div>
+            <div class="DialogTitle">${
+              IsEdit ? 'ストーリー編集' : 'ストーリー追加'
+            }</div>
             <div class="DialogContent">
               <div class="FormGroup">
                 <div class="CheckboxWrapper">
-                  <input type="checkbox" id="StoryNarratorToggle" ${Item?.Narrator ? '' : 'checked'}>
+                  <input type="checkbox" id="StoryNarratorToggle" ${
+                    Item?.Narrator ? '' : 'checked'
+                  }>
                   <label>自由入力</label>
                 </div>
               </div>
               <div class="FormGroup" id="StoryNarratorSelectGroup">
                 <select class="SelectForm" id="StoryNarratorSelect">
                   <option value="">語り手を選択</option>
-                  ${RelationCharaList.length ? RelationCharaList.map((C) => `<option value="${C.CharaName}" ${Item?.Narrator === C.CharaName ? 'selected' : ''}>${C.CharaName}</option>`).join('') : CharacterList.map((C) => `<option value="${C.CharaName}" ${Item?.Narrator === C.CharaName ? 'selected' : ''}>${C.CharaName}</option>`).join('')}
+                  ${
+                    RelationCharaList.length
+                      ? RelationCharaList.map(
+                          (C) =>
+                            `<option value="${C.CharaName}" ${
+                              Item?.Narrator === C.CharaName ? 'selected' : ''
+                            }>${C.CharaName}</option>`,
+                        ).join('')
+                      : CharacterList.map(
+                          (C) =>
+                            `<option value="${C.CharaName}" ${
+                              Item?.Narrator === C.CharaName ? 'selected' : ''
+                            }>${C.CharaName}</option>`,
+                        ).join('')
+                  }
                 </select>
               </div>
               <div class="FormGroup Hidden" id="StoryNarratorInputGroup">
-                <input type="text" class="InputForm" id="StoryNarratorInput" placeholder="語り手（空白でナレーション）" value="${Item?.Narrator || ''}">
+                <input type="text" class="InputForm" id="StoryNarratorInput" placeholder="語り手（空白でナレーション）" value="${
+                  Item?.Narrator || ''
+                }">
               </div>
               <div class="FormGroup">
-                <textarea class="TextAreaForm" id="StoryContentInput" placeholder="内容" style="min-height:150px;">${Item?.Content || ''}</textarea>
+                <textarea class="TextAreaForm" id="StoryContentInput" placeholder="内容" style="min-height:150px;">${
+                  Item?.Content || ''
+                }</textarea>
               </div>
             </div>
             <div class="DialogButtonArea">
               <button class="ButtonClass CloseButton" id="StoryDialogClose"><i class="fas fa-times"></i> 閉じる</button>
-              ${IsEdit ? `<button class="ButtonClass DeleteButton" id="StoryDialogDelete"><i class="fas fa-trash"></i> 削除</button>` : ''}
+              ${
+                IsEdit
+                  ? `<button class="ButtonClass DeleteButton" id="StoryDialogDelete"><i class="fas fa-trash"></i> 削除</button>`
+                  : ''
+              }
               <button class="ButtonClass SaveButton" id="StoryDialogSave"><i class="fas fa-save"></i> 保存</button>
             </div>
           `
@@ -2495,58 +2929,104 @@
           const SelectGroup = Dialog.querySelector('#StoryNarratorSelectGroup')
           const InputGroup = Dialog.querySelector('#StoryNarratorInputGroup')
           const UpdateToggle = () => {
-            if (Toggle.checked) { SelectGroup.classList.add('Hidden'); InputGroup.classList.remove('Hidden') }
-            else { SelectGroup.classList.remove('Hidden'); InputGroup.classList.add('Hidden') }
+            if (Toggle.checked) {
+              SelectGroup.classList.add('Hidden')
+              InputGroup.classList.remove('Hidden')
+            } else {
+              SelectGroup.classList.remove('Hidden')
+              InputGroup.classList.add('Hidden')
+            }
           }
           UpdateToggle()
           Toggle.addEventListener('change', UpdateToggle)
-          Dialog.querySelector('#StoryDialogClose').addEventListener('click', () => { Overlay.remove(); Resolve(null) })
-          Dialog.querySelector('#StoryDialogSave').addEventListener('click', async () => {
-            let Narrator = Toggle.checked ? Dialog.querySelector('#StoryNarratorInput').value.trim() : Dialog.querySelector('#StoryNarratorSelect').value
-            let Content = Dialog.querySelector('#StoryContentInput').value.trim()
-            if (!Content) { await ShowErrorDialog('内容を入力してください'); return }
-            if (Narrator) Content = `「${Content.replace(/^「/, '').replace(/」$/, '')}」`
-            try {
-              const Response = await CallApi('/SaveStory.php', 'POST', {
-                StoryId: IsEdit ? StoryId : null,
-                WorkId: sessionStorage.getItem('WorkId'),
-                IndexNum: IsEdit ? Item.IndexNum : StoryList.length + 1,
-                Narrator: Narrator,
-                Content: Content,
-                UserId: sessionStorage.getItem('UserId'),
-              })
-              if (Response.Success) {
-                Overlay.remove()
-                await ShowInfoDialog('保存完了', 'ストーリーを保存しました')
-                await LoadStoryList()
-                Resolve(true)
-              } else { await ShowErrorDialog(Response.Message || '保存に失敗しました') }
-            } catch (Error) { await ShowErrorDialog('保存中にエラーが発生しました') }
-          })
-          if (IsEdit) {
-            Dialog.querySelector('#StoryDialogDelete').addEventListener('click', async () => {
-              if (!(await ShowConfirmDialog('このストーリーを削除しますか？'))) return
+          Dialog.querySelector('#StoryDialogClose').addEventListener(
+            'click',
+            () => {
+              Overlay.remove()
+              Resolve(null)
+            },
+          )
+          Dialog.querySelector('#StoryDialogSave').addEventListener(
+            'click',
+            async () => {
+              let Narrator = Toggle.checked
+                ? Dialog.querySelector('#StoryNarratorInput').value.trim()
+                : Dialog.querySelector('#StoryNarratorSelect').value
+              let Content =
+                Dialog.querySelector('#StoryContentInput').value.trim()
+              if (!Content) {
+                await ShowErrorDialog('内容を入力してください')
+                return
+              }
+              if (Narrator)
+                Content = `「${Content.replace(/^「/, '').replace(/」$/, '')}」`
               try {
-                const Response = await CallApi('/DeleteStory.php', 'POST', { StoryId: StoryId, UserId: sessionStorage.getItem('UserId') })
+                const Response = await CallApi('/SaveStory.php', 'POST', {
+                  StoryId: IsEdit ? StoryId : null,
+                  WorkId: sessionStorage.getItem('WorkId'),
+                  IndexNum: IsEdit ? Item.IndexNum : StoryList.length + 1,
+                  Narrator: Narrator,
+                  Content: Content,
+                  UserId: sessionStorage.getItem('UserId'),
+                })
                 if (Response.Success) {
                   Overlay.remove()
-                  await ShowInfoDialog('削除完了', 'ストーリーを削除しました')
+                  await ShowInfoDialog('保存完了', 'ストーリーを保存しました')
                   await LoadStoryList()
                   Resolve(true)
-                } else { await ShowErrorDialog(Response.Message || '削除に失敗しました') }
-              } catch (Error) { await ShowErrorDialog('削除中にエラーが発生しました') }
-            })
+                } else {
+                  await ShowErrorDialog(
+                    Response.Message || '保存に失敗しました',
+                  )
+                }
+              } catch (Error) {
+                await ShowErrorDialog('保存中にエラーが発生しました')
+              }
+            },
+          )
+          if (IsEdit) {
+            Dialog.querySelector('#StoryDialogDelete').addEventListener(
+              'click',
+              async () => {
+                if (
+                  !(await ShowConfirmDialog('このストーリーを削除しますか？'))
+                )
+                  return
+                try {
+                  const Response = await CallApi('/DeleteStory.php', 'POST', {
+                    StoryId: StoryId,
+                    UserId: sessionStorage.getItem('UserId'),
+                    WorkId: sessionStorage.getItem('WorkId'),
+                  })
+                  if (Response.Success) {
+                    Overlay.remove()
+                    await ShowInfoDialog('削除完了', 'ストーリーを削除しました')
+                    await LoadStoryList()
+                    Resolve(true)
+                  } else {
+                    await ShowErrorDialog(
+                      Response.Message || '削除に失敗しました',
+                    )
+                  }
+                } catch (Error) {
+                  await ShowErrorDialog('削除中にエラーが発生しました')
+                }
+              },
+            )
           }
         })
       }
 
+      /**
+       * ストーリーをWordファイルにエクスポートする
+       * @returns {Promise<void>}
+       */
       async function ExportStoryToWord() {
         try {
           ShowSpinner()
-          const Response = await fetch(`${API_BASE_URL}/ExportStory.php`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ WorkId: sessionStorage.getItem('WorkId'), UserId: sessionStorage.getItem('UserId') }),
+          const Response = await CallApi('/ExportStory.php', 'POST', {
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
           })
           if (!Response.ok) throw new Error('出力に失敗しました')
           const Blob = await Response.blob()
@@ -2576,19 +3056,27 @@
         const CanEditFlg = CanEdit()
         ContentArea.innerHTML = `
           ${CreateContentHeader('プロット作成', 'sitemap')}
-          ${CanEditFlg ? `
+          ${
+            CanEditFlg
+              ? `
           <div class="ButtonGroup MarginBottom20">
             <button class="ButtonClass PrimaryButton" id="PlotAddBtn"><i class="fas fa-plus"></i> 行追加</button>
             <button class="ButtonClass SuccessButton" id="PlotExportBtn"><i class="fas fa-file-word"></i> Word出力</button>
           </div>
-          ` : ''}
+          `
+              : ''
+          }
           <div id="RecordCountArea"></div>
           <div class="StoryList" id="PlotListArea"></div>
           <div id="PaginationArea"></div>
         `
         if (CanEditFlg) {
-          document.getElementById('PlotAddBtn').addEventListener('click', () => ShowPlotDialog())
-          document.getElementById('PlotExportBtn').addEventListener('click', ExportPlotToWord)
+          document
+            .getElementById('PlotAddBtn')
+            .addEventListener('click', () => ShowPlotDialog())
+          document
+            .getElementById('PlotExportBtn')
+            .addEventListener('click', ExportPlotToWord)
         }
         await LoadPlotList()
       }
@@ -2596,12 +3084,19 @@
       async function LoadPlotList() {
         try {
           const WorkId = sessionStorage.getItem('WorkId')
-          const Response = await CallApi(`/GetPlotList.php?WorkId=${encodeURIComponent(WorkId)}`, 'GET')
+          const Response = await CallApi(
+            `/GetPlotList.php?WorkId=${encodeURIComponent(WorkId)}`,
+            'GET',
+          )
           if (Response.Success) {
-            PlotList = (Response.Data || []).sort((A, B) => A.IndexNum - B.IndexNum)
+            PlotList = (Response.Data.PlotList || []).sort(
+              (A, B) => A.IndexNum - B.IndexNum,
+            )
             RenderPlotList()
           } else {
-            await ShowErrorDialog(Response.Message || 'プロット一覧の取得に失敗しました')
+            await ShowErrorDialog(
+              Response.Message || 'プロット一覧の取得に失敗しました',
+            )
           }
         } catch (Error) {
           console.error(Error)
@@ -2617,21 +3112,30 @@
         RecordCountArea.appendChild(CreateRecordCount(PlotList.length))
         const CanEditFlg = CanEdit()
         if (PlotList.length === 0) {
-          ListArea.innerHTML = '<div style="text-align:center;color:#999;padding:50px;">データがありません</div>'
+          ListArea.innerHTML =
+            '<div style="text-align:center;color:#999;padding:50px;">データがありません</div>'
           return
         }
-        ListArea.innerHTML = PlotList.map((Item, Idx) => `
-          <div class="StoryItem" data-plotid="${Item.PlotId}" data-index="${Idx}" ${CanEditFlg ? 'draggable="true"' : ''}>
+        ListArea.innerHTML = PlotList.map(
+          (Item, Idx) => `
+          <div class="StoryItem" data-plotid="${
+            Item.PlotId
+          }" data-index="${Idx}" ${CanEditFlg ? 'draggable="true"' : ''}>
             <div class="StoryNumber">${Idx + 1}</div>
             <div class="StoryContent">
-              <span class="PlotBadge ${PlotStructureClasses[Item.StructureType] || ''}">${PlotStructureLabels[Item.StructureType] || '?'}</span>
+              <span class="PlotBadge ${
+                PlotStructureClasses[Item.StructureType] || ''
+              }">${PlotStructureLabels[Item.StructureType] || '?'}</span>
               <span class="StoryText">${Item.Content || ''}</span>
             </div>
           </div>
-        `).join('')
+        `,
+        ).join('')
         if (CanEditFlg) {
           ListArea.querySelectorAll('.StoryItem').forEach((Item) => {
-            Item.addEventListener('dblclick', () => ShowPlotDialog(Item.dataset.plotid))
+            Item.addEventListener('dblclick', () =>
+              ShowPlotDialog(Item.dataset.plotid),
+            )
             Item.addEventListener('dragstart', HandlePlotDragStart)
             Item.addEventListener('dragend', HandlePlotDragEnd)
             Item.addEventListener('dragover', HandlePlotDragOver)
@@ -2648,7 +3152,9 @@
 
       function HandlePlotDragEnd(E) {
         E.target.classList.remove('dragging')
-        document.querySelectorAll('.StoryItem').forEach((I) => I.classList.remove('drag-over'))
+        document
+          .querySelectorAll('.StoryItem')
+          .forEach((I) => I.classList.remove('drag-over'))
         PlotDragItem = null
       }
 
@@ -2656,7 +3162,9 @@
         E.preventDefault()
         const Item = E.target.closest('.StoryItem')
         if (Item && Item !== PlotDragItem) {
-          document.querySelectorAll('.StoryItem').forEach((I) => I.classList.remove('drag-over'))
+          document
+            .querySelectorAll('.StoryItem')
+            .forEach((I) => I.classList.remove('drag-over'))
           Item.classList.add('drag-over')
         }
       }
@@ -2669,7 +3177,9 @@
         const ToIndex = parseInt(DropItem.dataset.index)
         const MovedItem = PlotList.splice(FromIndex, 1)[0]
         PlotList.splice(ToIndex, 0, MovedItem)
-        PlotList.forEach((Item, Idx) => { Item.IndexNum = Idx + 1 })
+        PlotList.forEach((Item, Idx) => {
+          Item.IndexNum = Idx + 1
+        })
         RenderPlotList()
         await SavePlotOrder()
       }
@@ -2678,11 +3188,19 @@
         try {
           const Response = await CallApi('/UpdatePlotOrder.php', 'POST', {
             WorkId: sessionStorage.getItem('WorkId'),
-            Orders: PlotList.map((Item) => ({ PlotId: Item.PlotId, IndexNum: Item.IndexNum })),
+            OrderList: PlotList.map((Item) => ({
+              PlotId: Item.PlotId,
+              IndexNum: Item.IndexNum,
+            })),
             UserId: sessionStorage.getItem('UserId'),
           })
-          if (!Response.Success) await ShowErrorDialog(Response.Message || '並び順の保存に失敗しました')
-        } catch (Error) { console.error(Error) }
+          if (!Response.Success)
+            await ShowErrorDialog(
+              Response.Message || '並び順の保存に失敗しました',
+            )
+        } catch (Error) {
+          console.error(Error)
+        }
       }
 
       async function ShowPlotDialog(PlotId = null) {
@@ -2694,64 +3212,111 @@
           const Dialog = document.createElement('div')
           Dialog.className = 'DialogContainer DialogMedium'
           Dialog.innerHTML = `
-            <div class="DialogTitle">${IsEdit ? 'プロット編集' : 'プロット追加'}</div>
+            <div class="DialogTitle">${
+              IsEdit ? 'プロット編集' : 'プロット追加'
+            }</div>
             <div class="DialogContent">
               <div class="FormGroup">
                 <select class="SelectForm" id="PlotStructureSelect">
-                  ${PlotStructureLabels.map((L, I) => `<option value="${I}" ${Item?.StructureType == I ? 'selected' : ''}>${L}</option>`).join('')}
+                  ${PlotStructureLabels.map(
+                    (L, I) =>
+                      `<option value="${I}" ${
+                        Item?.StructureType == I ? 'selected' : ''
+                      }>${L}</option>`,
+                  ).join('')}
                 </select>
               </div>
               <div class="FormGroup">
-                <textarea class="TextAreaForm" id="PlotContentInput" placeholder="内容" style="min-height:150px;">${Item?.Content || ''}</textarea>
+                <textarea class="TextAreaForm" id="PlotContentInput" placeholder="内容" style="min-height:150px;">${
+                  Item?.Content || ''
+                }</textarea>
               </div>
             </div>
             <div class="DialogButtonArea">
               <button class="ButtonClass CloseButton" id="PlotDialogClose"><i class="fas fa-times"></i> 閉じる</button>
-              ${IsEdit ? `<button class="ButtonClass DeleteButton" id="PlotDialogDelete"><i class="fas fa-trash"></i> 削除</button>` : ''}
+              ${
+                IsEdit
+                  ? `<button class="ButtonClass DeleteButton" id="PlotDialogDelete"><i class="fas fa-trash"></i> 削除</button>`
+                  : ''
+              }
               <button class="ButtonClass SaveButton" id="PlotDialogSave"><i class="fas fa-save"></i> 保存</button>
             </div>
           `
           document.body.appendChild(Overlay)
           Overlay.appendChild(Dialog)
-          Dialog.querySelector('#PlotDialogClose').addEventListener('click', () => { Overlay.remove(); Resolve(null) })
-          Dialog.querySelector('#PlotDialogSave').addEventListener('click', async () => {
-            const StructureType = parseInt(Dialog.querySelector('#PlotStructureSelect').value)
-            const Content = Dialog.querySelector('#PlotContentInput').value.trim()
-            if (!Content) { await ShowErrorDialog('内容を入力してください'); return }
-            if (!IsEdit && !ValidatePlotOrder(StructureType)) {
-              await ShowErrorDialog('起承転結の順序で登録してください')
-              return
-            }
-            try {
-              const Response = await CallApi('/SavePlot.php', 'POST', {
-                PlotId: IsEdit ? PlotId : null,
-                WorkId: sessionStorage.getItem('WorkId'),
-                IndexNum: IsEdit ? Item.IndexNum : PlotList.length + 1,
-                StructureType: StructureType,
-                Content: Content,
-                UserId: sessionStorage.getItem('UserId'),
-              })
-              if (Response.Success) {
-                Overlay.remove()
-                await ShowInfoDialog('保存完了', 'プロットを保存しました')
-                await LoadPlotList()
-                Resolve(true)
-              } else { await ShowErrorDialog(Response.Message || '保存に失敗しました') }
-            } catch (Error) { await ShowErrorDialog('保存中にエラーが発生しました') }
-          })
-          if (IsEdit) {
-            Dialog.querySelector('#PlotDialogDelete').addEventListener('click', async () => {
-              if (!(await ShowConfirmDialog('このプロットを削除しますか？'))) return
+          Dialog.querySelector('#PlotDialogClose').addEventListener(
+            'click',
+            () => {
+              Overlay.remove()
+              Resolve(null)
+            },
+          )
+          Dialog.querySelector('#PlotDialogSave').addEventListener(
+            'click',
+            async () => {
+              const StructureType = parseInt(
+                Dialog.querySelector('#PlotStructureSelect').value,
+              )
+              const Content =
+                Dialog.querySelector('#PlotContentInput').value.trim()
+              if (!Content) {
+                await ShowErrorDialog('内容を入力してください')
+                return
+              }
+              if (!IsEdit && !ValidatePlotOrder(StructureType)) {
+                await ShowErrorDialog('起承転結の順序で登録してください')
+                return
+              }
               try {
-                const Response = await CallApi('/DeletePlot.php', 'POST', { PlotId: PlotId, UserId: sessionStorage.getItem('UserId') })
+                const Response = await CallApi('/SavePlot.php', 'POST', {
+                  PlotId: IsEdit ? PlotId : null,
+                  WorkId: sessionStorage.getItem('WorkId'),
+                  IndexNum: IsEdit ? Item.IndexNum : PlotList.length + 1,
+                  StructureType: StructureType,
+                  Content: Content,
+                  UserId: sessionStorage.getItem('UserId'),
+                })
                 if (Response.Success) {
                   Overlay.remove()
-                  await ShowInfoDialog('削除完了', 'プロットを削除しました')
+                  await ShowInfoDialog('保存完了', 'プロットを保存しました')
                   await LoadPlotList()
                   Resolve(true)
-                } else { await ShowErrorDialog(Response.Message || '削除に失敗しました') }
-              } catch (Error) { await ShowErrorDialog('削除中にエラーが発生しました') }
-            })
+                } else {
+                  await ShowErrorDialog(
+                    Response.Message || '保存に失敗しました',
+                  )
+                }
+              } catch (Error) {
+                await ShowErrorDialog('保存中にエラーが発生しました')
+              }
+            },
+          )
+          if (IsEdit) {
+            Dialog.querySelector('#PlotDialogDelete').addEventListener(
+              'click',
+              async () => {
+                if (!(await ShowConfirmDialog('このプロットを削除しますか？')))
+                  return
+                try {
+                  const Response = await CallApi('/DeletePlot.php', 'POST', {
+                    PlotId: PlotId,
+                    UserId: sessionStorage.getItem('UserId'),
+                  })
+                  if (Response.Success) {
+                    Overlay.remove()
+                    await ShowInfoDialog('削除完了', 'プロットを削除しました')
+                    await LoadPlotList()
+                    Resolve(true)
+                  } else {
+                    await ShowErrorDialog(
+                      Response.Message || '削除に失敗しました',
+                    )
+                  }
+                } catch (Error) {
+                  await ShowErrorDialog('削除中にエラーが発生しました')
+                }
+              },
+            )
           }
         })
       }
@@ -2768,7 +3333,10 @@
           const Response = await fetch(`${API_BASE_URL}/ExportPlot.php`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ WorkId: sessionStorage.getItem('WorkId'), UserId: sessionStorage.getItem('UserId') }),
+            body: JSON.stringify({
+              WorkId: sessionStorage.getItem('WorkId'),
+              UserId: sessionStorage.getItem('UserId'),
+            }),
           })
           if (!Response.ok) throw new Error('出力に失敗しました')
           const Blob = await Response.blob()
