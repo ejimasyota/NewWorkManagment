@@ -664,6 +664,121 @@
           color: #3498db;
         }
       }
+
+      /* 階級組織図表示スタイル */
+      .ClassChart {
+        padding: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+      }
+
+      .ClassChartGroup {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        min-width: 280px;
+        max-width: 400px;
+        flex: 1;
+      }
+
+      .ClassChartGroupTitle {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: #fff;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .ClassChartGroupTitle i {
+        font-size: 18px;
+      }
+
+      .ClassChartHierarchy {
+        padding: 15px;
+        position: relative;
+      }
+
+      .ClassChartHierarchy::before {
+        content: '';
+        position: absolute;
+        left: 30px;
+        top: 15px;
+        bottom: 15px;
+        width: 3px;
+        background: linear-gradient(180deg, #3498db 0%, #9b59b6 50%, #e74c3c 100%);
+        border-radius: 2px;
+      }
+
+      .ClassChartItem {
+        position: relative;
+        padding: 8px 0 8px 55px;
+      }
+
+      .ClassChartItem::before {
+        content: '';
+        position: absolute;
+        left: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        background: #fff;
+        border: 3px solid #3498db;
+        border-radius: 50%;
+        z-index: 1;
+      }
+
+      .ClassChartNode {
+        background: #f8f9fa;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .ClassChartNode:hover {
+        transform: translateX(5px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .ClassChartRank {
+        font-size: 11px;
+        font-weight: 600;
+        color: #3498db;
+        margin-bottom: 3px;
+      }
+
+      .ClassChartName {
+        font-size: 15px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+
+      .ClassChartDesc {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+        line-height: 1.4;
+      }
+
+      /* レスポンシブ対応 */
+      @media screen and (max-width: 768px) {
+        .ClassChart {
+          flex-direction: column;
+          padding: 10px;
+        }
+
+        .ClassChartGroup {
+          max-width: 100%;
+          min-width: auto;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1463,10 +1578,14 @@
               'GET',
             ),
           ])
-          CharacterOrganizationList = OrgRes.Success ? OrgRes.Data || [] : []
-          CharacterTeamList = TeamRes.Success ? TeamRes.Data || [] : []
-          CharacterRaceList = RaceRes.Success ? RaceRes.Data || [] : []
-          CharacterClassList = ClassRes.Success ? ClassRes.Data || [] : []
+          CharacterOrganizationList = OrgRes.Success
+            ? OrgRes.Data.OrganizationList || []
+            : []
+          CharacterTeamList = TeamRes.Success ? TeamRes.Data.TeamList || [] : []
+          CharacterRaceList = RaceRes.Success ? RaceRes.Data.RaceList || [] : []
+          CharacterClassList = ClassRes.Success
+            ? ClassRes.Data.ClassList || []
+            : []
           PopulateCharacterSelects()
         } catch (Error) {
           console.error('マスタデータ取得エラー:', Error)
@@ -3169,10 +3288,13 @@
       let ClassList = []
       let OrgListForClass = []
       let SelectedClassId = null
+      /** 組織図表示モード（true: 組織図表示, false: テーブル表示） */
+      let IsClassChartMode = false
 
       async function ShowClassSetting() {
         CurrentPage = 1
         SelectedClassId = null
+        IsClassChartMode = false
         const ContentArea = document.getElementById('ContentArea')
         const CanEditFlg = CanEdit()
 
@@ -3204,19 +3326,21 @@
                 <button class="ButtonClass SecondaryButton ButtonSmall" id="ClassDescriptionBtn"><i class="fas fa-edit"></i></button>
               </div>
               <input type="hidden" id="ClassDescriptionHidden">
-              ${
-                CanEditFlg
-                  ? `
               <div class="ButtonGroup">
+                <button class="ButtonClass SecondaryButton" id="ClassChartBtn"><i class="fas fa-sitemap"></i> 組織図</button>
+                ${
+                  CanEditFlg
+                    ? `
                 <button class="ButtonClass ClearButton" id="ClassClearButton"><i class="fas fa-sync"></i> クリア</button>
                 <button class="ButtonClass SaveButton" id="ClassSaveButton"><i class="fas fa-save"></i> 保存</button>
                 <button class="ButtonClass DeleteButton Hidden" id="ClassDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+                `
+                    : ''
+                }
               </div>
-              `
-                  : ''
-              }
               <div id="RecordCountArea" class="MarginTop20"></div>
               <div class="TableContainer" id="ClassTableArea"></div>
+              <div id="ClassVisualArea" class="Hidden"></div>
               <div id="PaginationArea"></div>
             `
 
@@ -3250,6 +3374,11 @@
               ),
             )
         }
+
+        // 組織図ボタンイベント（編集権限に関係なく使用可能）
+        document
+          .getElementById('ClassChartBtn')
+          .addEventListener('click', ToggleClassChartView)
 
         await LoadClassList()
       }
@@ -3334,6 +3463,133 @@
             RenderClassTable()
           }),
         )
+      }
+
+      /**
+       * 組織図表示の切り替え処理
+       */
+      function ToggleClassChartView() {
+        IsClassChartMode = !IsClassChartMode
+        const TableArea = document.getElementById('ClassTableArea')
+        const VisualArea = document.getElementById('ClassVisualArea')
+        const PaginationArea = document.getElementById('PaginationArea')
+        const RecordCountArea = document.getElementById('RecordCountArea')
+        const Btn = document.getElementById('ClassChartBtn')
+
+        if (IsClassChartMode) {
+          /** 組織図表示モード */
+          TableArea.style.display = 'none'
+          PaginationArea.style.display = 'none'
+          RecordCountArea.style.display = 'none'
+          VisualArea.classList.remove('Hidden')
+          VisualArea.style.display = 'block'
+          Btn.innerHTML = '<i class="fas fa-table"></i> 一覧表示'
+          RenderClassChart()
+        } else {
+          /** テーブル表示モード */
+          TableArea.style.display = ''
+          PaginationArea.style.display = ''
+          RecordCountArea.style.display = ''
+          VisualArea.classList.add('Hidden')
+          VisualArea.style.display = 'none'
+          Btn.innerHTML = '<i class="fas fa-sitemap"></i> 組織図'
+        }
+      }
+
+      /**
+       * 階級組織図表示処理（序列の昇順でソート）
+       */
+      function RenderClassChart() {
+        const VisualArea = document.getElementById('ClassVisualArea')
+
+        if (ClassList.length === 0) {
+          VisualArea.innerHTML = `
+            <div style="text-align:center;padding:40px;color:#999;">
+              <i class="fas fa-sitemap" style="font-size:48px;margin-bottom:15px;"></i>
+              <p>階級データがありません</p>
+            </div>
+          `
+          return
+        }
+
+        /** 組織ごとにグループ化 */
+        const OrgGroups = {}
+        const CommonClasses = []
+
+        ClassList.forEach((Item) => {
+          if (Item.OrgId && Item.OrgName) {
+            if (!OrgGroups[Item.OrgId]) {
+              OrgGroups[Item.OrgId] = {
+                OrgName: Item.OrgName,
+                Classes: [],
+              }
+            }
+            OrgGroups[Item.OrgId].Classes.push(Item)
+          } else {
+            CommonClasses.push(Item)
+          }
+        })
+
+        /** 序列でソート（昇順、nullは最後） */
+        const SortByRank = (a, b) => {
+          if (a.RankOrder === null && b.RankOrder === null) return 0
+          if (a.RankOrder === null) return 1
+          if (b.RankOrder === null) return -1
+          return a.RankOrder - b.RankOrder
+        }
+
+        CommonClasses.sort(SortByRank)
+        Object.values(OrgGroups).forEach((Group) => Group.Classes.sort(SortByRank))
+
+        /** 組織図HTML生成 */
+        let Html = '<div class="ClassChart">'
+
+        /** 共通階級を表示 */
+        if (CommonClasses.length > 0) {
+          Html += `
+            <div class="ClassChartGroup">
+              <div class="ClassChartGroupTitle"><i class="fas fa-globe"></i> 共通階級</div>
+              <div class="ClassChartHierarchy">
+          `
+          CommonClasses.forEach((Item, Index) => {
+            const RankDisplay = Item.RankOrder !== null ? `[${Item.RankOrder}]` : ''
+            Html += `
+              <div class="ClassChartItem" style="--level: ${Index};">
+                <div class="ClassChartNode">
+                  <div class="ClassChartRank">${RankDisplay}</div>
+                  <div class="ClassChartName">${EscapeHtml(Item.ClassName)}</div>
+                  ${Item.Description ? `<div class="ClassChartDesc">${EscapeHtml(TruncateText(Item.Description, 50))}</div>` : ''}
+                </div>
+              </div>
+            `
+          })
+          Html += '</div></div>'
+        }
+
+        /** 組織ごとの階級を表示 */
+        Object.entries(OrgGroups).forEach(([OrgId, Group]) => {
+          Html += `
+            <div class="ClassChartGroup">
+              <div class="ClassChartGroupTitle"><i class="fas fa-building"></i> ${EscapeHtml(Group.OrgName)}</div>
+              <div class="ClassChartHierarchy">
+          `
+          Group.Classes.forEach((Item, Index) => {
+            const RankDisplay = Item.RankOrder !== null ? `[${Item.RankOrder}]` : ''
+            Html += `
+              <div class="ClassChartItem" style="--level: ${Index};">
+                <div class="ClassChartNode">
+                  <div class="ClassChartRank">${RankDisplay}</div>
+                  <div class="ClassChartName">${EscapeHtml(Item.ClassName)}</div>
+                  ${Item.Description ? `<div class="ClassChartDesc">${EscapeHtml(TruncateText(Item.Description, 50))}</div>` : ''}
+                </div>
+              </div>
+            `
+          })
+          Html += '</div></div>'
+        })
+
+        Html += '</div>'
+        VisualArea.innerHTML = Html
       }
 
       function SelectClass(ClassId) {
@@ -4736,7 +4992,9 @@
             (B) => `
                   <tr data-id="${B.BuildId}">
                     <td>${EscapeHtml(B.BuildName)}</td>
-                    <td>${EscapeHtml(FormatDateDisplay(B.BuildDate) || '')}</td>
+                    <td>${EscapeHtml(
+                      FormatDateTimeWithWeekday(B.BuildDate) || '',
+                    )}</td>
                     <td>${EscapeHtml(B.Height || '')}</td>
                     <td>${EscapeHtml(B.Area || '')}</td>
                     <td>${EscapeHtml(
@@ -5406,8 +5664,254 @@
         }
       }
 
-      function ShowMoveSetting() {
-        ShowPlaceholder('技設定', 'fire')
+      /* ==========================================================================
+       * 技設定画面 (3.11 MoveInfo)
+       * ========================================================================== */
+      let MoveList = []
+      let PowerListForMove = []
+      let SelectedMoveId = null
+
+      async function ShowMoveSetting() {
+        CurrentPage = 1
+        SelectedMoveId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+              ${CreateContentHeader('技設定', 'fire')}
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="MoveName" placeholder="技名" maxlength="150" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+                <div class="FormGroup Flex1">
+                  <select class="SelectForm" id="MovePowerId" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                    <option value="">関連能力を選択</option>
+                  </select>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="MoveDescription" placeholder="説明" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="MoveDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="MoveDescriptionHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="MoveClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="MoveSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="MoveDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="MoveTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('MoveDescriptionBtn')
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('MoveDescriptionHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('MoveDescriptionHidden').value = Result
+                document.getElementById('MoveDescription').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+
+          document
+            .getElementById('MoveClearButton')
+            .addEventListener('click', ClearMoveForm)
+          document
+            .getElementById('MoveSaveButton')
+            .addEventListener('click', SaveMove)
+          document
+            .getElementById('MoveDeleteButton')
+            .addEventListener('click', DeleteMove)
+        } else {
+          document
+            .getElementById('MoveDescriptionBtn')
+            .addEventListener('click', async () => {
+              await ShowInputAreaDialog(
+                document.getElementById('MoveDescriptionHidden').value,
+                true,
+              )
+            })
+        }
+
+        await LoadMoveList()
+      }
+
+      async function LoadMoveList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetMoveList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            MoveList = Response.Data.MoveList || []
+            PowerListForMove = Response.Data.PowerList || []
+            UpdateMovePowerSelect()
+            RenderMoveTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '技一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('技一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function UpdateMovePowerSelect() {
+        const Select = document.getElementById('MovePowerId')
+        if (!Select) return
+        Select.innerHTML =
+          '<option value="">関連能力を選択</option>' +
+          PowerListForMove.map(
+            (P) => `<option value="${P.PowerId}">${P.PowerName}</option>`,
+          ).join('')
+      }
+
+      function RenderMoveTable() {
+        const TotalCount = MoveList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = MoveList.slice(Start, End)
+        let TableHtml = `
+              <table class="DataTable">
+                <thead><tr><th>技名</th><th>関連能力</th><th>説明</th></tr></thead>
+                <tbody>
+            `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (M) => `
+                  <tr data-id="${M.MoveId}">
+                    <td>${EscapeHtml(M.MoveName)}</td>
+                    <td>${EscapeHtml(M.PowerName || '')}</td>
+                    <td>${EscapeHtml(
+                      TruncateText(M.Description || '', 30),
+                    )}</td>
+                  </tr>
+                `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="3" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('MoveTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#MoveTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectMove(Row.dataset.id))
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderMoveTable()
+          }),
+        )
+      }
+
+      function SelectMove(MoveId) {
+        const Item = MoveList.find((M) => M.MoveId == MoveId)
+        if (!Item) return
+        SelectedMoveId = MoveId
+        document.getElementById('MoveName').value = Item.MoveName || ''
+        document.getElementById('MovePowerId').value = Item.PowerId || ''
+        document.getElementById('MoveDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('MoveDescriptionHidden').value =
+          Item.Description || ''
+        const DeleteBtn = document.getElementById('MoveDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearMoveForm() {
+        SelectedMoveId = null
+        document.getElementById('MoveName').value = ''
+        document.getElementById('MovePowerId').value = ''
+        document.getElementById('MoveDescription').value = ''
+        document.getElementById('MoveDescriptionHidden').value = ''
+        const DeleteBtn = document.getElementById('MoveDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveMove() {
+        const MoveName = document.getElementById('MoveName').value.trim()
+        if (!MoveName) {
+          await ShowErrorDialog('技名を入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const RequestData = {
+            WorkId: sessionStorage.getItem('WorkId'),
+            MoveName: MoveName,
+            PowerId: document.getElementById('MovePowerId').value,
+            Description: document.getElementById('MoveDescriptionHidden').value,
+            UserId: sessionStorage.getItem('UserId'),
+          }
+          if (SelectedMoveId) RequestData.MoveId = SelectedMoveId
+
+          const Response = await CallApi('/SaveMove.php', 'POST', RequestData)
+          HideSpinner()
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', Response.Data.Message)
+            ClearMoveForm()
+            await LoadMoveList()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteMove() {
+        if (!SelectedMoveId) return
+        if (!(await ShowConfirmDialog('この技を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteMove.php', 'POST', {
+            MoveId: SelectedMoveId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '技を削除しました')
+            ClearMoveForm()
+            await LoadMoveList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       /* ==========================================================================
@@ -6976,8 +7480,268 @@
         }
       }
 
-      function ShowClueMemo() {
-        ShowPlaceholder('伏線メモ', 'puzzle-piece')
+      /* ==========================================================================
+       * 伏線メモ画面 (6.4 ClueInfo)
+       * ========================================================================== */
+      let ClueList = []
+      let SelectedClueId = null
+
+      async function ShowClueMemo() {
+        CurrentPage = 1
+        SelectedClueId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+              ${CreateContentHeader('伏線メモ', 'puzzle-piece')}
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="ClueTitle" placeholder="タイトル" maxlength="255" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="ClueContent" placeholder="伏線内容" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="ClueContentBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="ClueContentHidden">
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="ClueRecoveryStatus" placeholder="回収状況・備考" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="ClueRecoveryStatusBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="ClueRecoveryStatusHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="ClueClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="ClueSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="ClueDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="ClueTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('ClueContentBtn')
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('ClueContentHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('ClueContentHidden').value = Result
+                document.getElementById('ClueContent').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+
+          document
+            .getElementById('ClueRecoveryStatusBtn')
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('ClueRecoveryStatusHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('ClueRecoveryStatusHidden').value =
+                  Result
+                document.getElementById('ClueRecoveryStatus').value =
+                  TruncateText(Result, 30)
+              }
+            })
+
+          document
+            .getElementById('ClueClearButton')
+            .addEventListener('click', ClearClueForm)
+          document
+            .getElementById('ClueSaveButton')
+            .addEventListener('click', SaveClue)
+          document
+            .getElementById('ClueDeleteButton')
+            .addEventListener('click', DeleteClue)
+        } else {
+          document
+            .getElementById('ClueContentBtn')
+            .addEventListener('click', async () => {
+              await ShowInputAreaDialog(
+                document.getElementById('ClueContentHidden').value,
+                true,
+              )
+            })
+          document
+            .getElementById('ClueRecoveryStatusBtn')
+            .addEventListener('click', async () => {
+              await ShowInputAreaDialog(
+                document.getElementById('ClueRecoveryStatusHidden').value,
+                true,
+              )
+            })
+        }
+
+        await LoadClueList()
+      }
+
+      async function LoadClueList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetClueList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            ClueList = Response.Data.ClueList || []
+            RenderClueTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '伏線メモ一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('伏線メモ一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderClueTable() {
+        const TotalCount = ClueList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = ClueList.slice(Start, End)
+        let TableHtml = `
+              <table class="DataTable">
+                <thead><tr><th>タイトル</th><th>伏線内容</th><th>回収状況</th></tr></thead>
+                <tbody>
+            `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (C) => `
+                  <tr data-id="${C.ClueId}">
+                    <td>${EscapeHtml(C.Title)}</td>
+                    <td>${EscapeHtml(TruncateText(C.Content || '', 30))}</td>
+                    <td>${EscapeHtml(
+                      TruncateText(C.RecoveryStatus || '', 30),
+                    )}</td>
+                  </tr>
+                `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="3" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('ClueTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#ClueTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectClue(Row.dataset.id))
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderClueTable()
+          }),
+        )
+      }
+
+      function SelectClue(ClueId) {
+        const Item = ClueList.find((C) => C.ClueId == ClueId)
+        if (!Item) return
+        SelectedClueId = ClueId
+        document.getElementById('ClueTitle').value = Item.Title || ''
+        document.getElementById('ClueContent').value = TruncateText(
+          Item.Content || '',
+          30,
+        )
+        document.getElementById('ClueContentHidden').value = Item.Content || ''
+        document.getElementById('ClueRecoveryStatus').value = TruncateText(
+          Item.RecoveryStatus || '',
+          30,
+        )
+        document.getElementById('ClueRecoveryStatusHidden').value =
+          Item.RecoveryStatus || ''
+        const DeleteBtn = document.getElementById('ClueDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearClueForm() {
+        SelectedClueId = null
+        document.getElementById('ClueTitle').value = ''
+        document.getElementById('ClueContent').value = ''
+        document.getElementById('ClueContentHidden').value = ''
+        document.getElementById('ClueRecoveryStatus').value = ''
+        document.getElementById('ClueRecoveryStatusHidden').value = ''
+        const DeleteBtn = document.getElementById('ClueDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveClue() {
+        const Title = document.getElementById('ClueTitle').value.trim()
+        if (!Title) {
+          await ShowErrorDialog('タイトルを入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const RequestData = {
+            WorkId: sessionStorage.getItem('WorkId'),
+            Title: Title,
+            Content: document.getElementById('ClueContentHidden').value,
+            RecoveryStatus: document.getElementById('ClueRecoveryStatusHidden')
+              .value,
+            UserId: sessionStorage.getItem('UserId'),
+          }
+          if (SelectedClueId) RequestData.ClueId = SelectedClueId
+
+          const Response = await CallApi('/SaveClue.php', 'POST', RequestData)
+          HideSpinner()
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', Response.Data.Message)
+            ClearClueForm()
+            await LoadClueList()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteClue() {
+        if (!SelectedClueId) return
+        if (!(await ShowConfirmDialog('この伏線メモを削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteClue.php', 'POST', {
+            ClueId: SelectedClueId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '伏線メモを削除しました')
+            ClearClueForm()
+            await LoadClueList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       /* ==========================================================================
@@ -7185,8 +7949,254 @@
         }
       }
 
-      function ShowWorkMemo() {
-        ShowPlaceholder('作品作成用メモ', 'sticky-note')
+      /* ==========================================================================
+       * 作品作成用メモ画面 (7.2 WorkMemoInfo)
+       * ※全ユーザが登録可能。更新・削除は自身の投稿のみ可能。
+       * ========================================================================== */
+      let WorkMemoList = []
+      let SelectedWorkMemoId = null
+      let SelectedWorkMemoOwner = null
+
+      async function ShowWorkMemo() {
+        CurrentPage = 1
+        SelectedWorkMemoId = null
+        SelectedWorkMemoOwner = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CurrentUserId = sessionStorage.getItem('UserId')
+
+        ContentArea.innerHTML = `
+              ${CreateContentHeader('作品作成用メモ', 'sticky-note')}
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="WorkMemoTitle" placeholder="タイトル" maxlength="255">
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="WorkMemoContent" placeholder="内容" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="WorkMemoContentBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="WorkMemoContentHidden">
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="WorkMemoClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="WorkMemoSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="WorkMemoDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="WorkMemoTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
+
+        document
+          .getElementById('WorkMemoContentBtn')
+          .addEventListener('click', async () => {
+            const Result = await ShowInputAreaDialog(
+              document.getElementById('WorkMemoContentHidden').value,
+              false,
+            )
+            if (Result !== null) {
+              document.getElementById('WorkMemoContentHidden').value = Result
+              document.getElementById('WorkMemoContent').value = TruncateText(
+                Result,
+                30,
+              )
+            }
+          })
+
+        document
+          .getElementById('WorkMemoClearButton')
+          .addEventListener('click', ClearWorkMemoForm)
+        document
+          .getElementById('WorkMemoSaveButton')
+          .addEventListener('click', SaveWorkMemo)
+        document
+          .getElementById('WorkMemoDeleteButton')
+          .addEventListener('click', DeleteWorkMemo)
+
+        await LoadWorkMemoList()
+      }
+
+      async function LoadWorkMemoList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetWorkMemoList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            WorkMemoList = Response.Data.MemoList || []
+            RenderWorkMemoTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || 'メモ一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('メモ一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderWorkMemoTable() {
+        const TotalCount = WorkMemoList.length
+        const CurrentUserId = sessionStorage.getItem('UserId')
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = WorkMemoList.slice(Start, End)
+        let TableHtml = `
+              <table class="DataTable">
+                <thead><tr><th>タイトル</th><th>内容</th><th>投稿者</th><th>投稿日</th></tr></thead>
+                <tbody>
+            `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (M) => `
+                  <tr data-id="${M.MemoId}" data-owner="${
+              M.RegistUser
+            }" class="${M.RegistUser === CurrentUserId ? 'OwnRow' : ''}">
+                    <td>${EscapeHtml(M.Title)}</td>
+                    <td>${EscapeHtml(TruncateText(M.Content || '', 30))}</td>
+                    <td>${EscapeHtml(M.RegistUser || '')}</td>
+                    <td>${FormatDateTimeWithWeekday(M.RegistDate)}</td>
+                  </tr>
+                `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('WorkMemoTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#WorkMemoTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () =>
+              SelectWorkMemo(Row.dataset.id, Row.dataset.owner),
+            )
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderWorkMemoTable()
+          }),
+        )
+      }
+
+      function SelectWorkMemo(MemoId, Owner) {
+        const Item = WorkMemoList.find((M) => M.MemoId == MemoId)
+        if (!Item) return
+        const CurrentUserId = sessionStorage.getItem('UserId')
+
+        SelectedWorkMemoId = MemoId
+        SelectedWorkMemoOwner = Owner
+        document.getElementById('WorkMemoTitle').value = Item.Title || ''
+        document.getElementById('WorkMemoContent').value = TruncateText(
+          Item.Content || '',
+          30,
+        )
+        document.getElementById('WorkMemoContentHidden').value =
+          Item.Content || ''
+
+        /** 自身の投稿の場合のみ編集・削除可能 */
+        const TitleInput = document.getElementById('WorkMemoTitle')
+        const DeleteBtn = document.getElementById('WorkMemoDeleteButton')
+
+        if (Owner === CurrentUserId) {
+          TitleInput.disabled = false
+          if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+        } else {
+          TitleInput.disabled = true
+          if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+        }
+      }
+
+      function ClearWorkMemoForm() {
+        SelectedWorkMemoId = null
+        SelectedWorkMemoOwner = null
+        document.getElementById('WorkMemoTitle').value = ''
+        document.getElementById('WorkMemoTitle').disabled = false
+        document.getElementById('WorkMemoContent').value = ''
+        document.getElementById('WorkMemoContentHidden').value = ''
+        const DeleteBtn = document.getElementById('WorkMemoDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveWorkMemo() {
+        const Title = document.getElementById('WorkMemoTitle').value.trim()
+        if (!Title) {
+          await ShowErrorDialog('タイトルを入力してください')
+          return
+        }
+
+        const CurrentUserId = sessionStorage.getItem('UserId')
+        /** 更新の場合、自身の投稿かどうかをチェック */
+        if (SelectedWorkMemoId && SelectedWorkMemoOwner !== CurrentUserId) {
+          await ShowErrorDialog('他のユーザが投稿したメモは更新できません')
+          return
+        }
+
+        try {
+          ShowSpinner()
+          const RequestData = {
+            WorkId: sessionStorage.getItem('WorkId'),
+            Title: Title,
+            Content: document.getElementById('WorkMemoContentHidden').value,
+            UserId: CurrentUserId,
+          }
+          if (SelectedWorkMemoId) RequestData.MemoId = SelectedWorkMemoId
+
+          const Response = await CallApi(
+            '/SaveWorkMemo.php',
+            'POST',
+            RequestData,
+          )
+          HideSpinner()
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', Response.Data.Message)
+            ClearWorkMemoForm()
+            await LoadWorkMemoList()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteWorkMemo() {
+        if (!SelectedWorkMemoId) return
+
+        const CurrentUserId = sessionStorage.getItem('UserId')
+        /** 自身の投稿かどうかをチェック */
+        if (SelectedWorkMemoOwner !== CurrentUserId) {
+          await ShowErrorDialog('他のユーザが投稿したメモは削除できません')
+          return
+        }
+
+        if (!(await ShowConfirmDialog('このメモを削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteWorkMemo.php', 'POST', {
+            MemoId: SelectedWorkMemoId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: CurrentUserId,
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', 'メモを削除しました')
+            ClearWorkMemoForm()
+            await LoadWorkMemoList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       /* ==========================================================================
