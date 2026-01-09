@@ -2937,8 +2937,230 @@
         }
       }
 
-      function ShowRaceSetting() {
-        ShowPlaceholder('種族設定', 'dna')
+      /* ==========================================================================
+       * 種族設定画面 (3.8 RaceInfo)
+       * ========================================================================== */
+      let RaceList = []
+      let SelectedRaceId = null
+
+      async function ShowRaceSetting() {
+        CurrentPage = 1
+        SelectedRaceId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+              ${CreateContentHeader('種族設定', 'dna')}
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="RaceName" placeholder="種族名" maxlength="150" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="RaceDescription" placeholder="説明" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="RaceDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="RaceDescriptionHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="RaceClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="RaceSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="RaceDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="RaceTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('RaceDescriptionBtn')
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('RaceDescriptionHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('RaceDescriptionHidden').value = Result
+                document.getElementById('RaceDescription').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+
+          document
+            .getElementById('RaceClearButton')
+            .addEventListener('click', ClearRaceForm)
+          document
+            .getElementById('RaceSaveButton')
+            .addEventListener('click', SaveRace)
+          document
+            .getElementById('RaceDeleteButton')
+            .addEventListener('click', DeleteRace)
+        } else {
+          document
+            .getElementById('RaceDescriptionBtn')
+            .addEventListener('click', async () => {
+              await ShowInputAreaDialog(
+                document.getElementById('RaceDescriptionHidden').value,
+                true,
+              )
+            })
+        }
+
+        await LoadRaceList()
+      }
+
+      async function LoadRaceList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetRaceList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            RaceList = Response.Data.RaceList || []
+            RenderRaceTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '種族一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('種族一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderRaceTable() {
+        const TotalCount = RaceList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = RaceList.slice(Start, End)
+        let TableHtml = `
+              <table class="DataTable">
+                <thead><tr><th>種族名</th><th>説明</th></tr></thead>
+                <tbody>
+            `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (R) => `
+                  <tr data-id="${R.RaceId}">
+                    <td>${EscapeHtml(R.RaceName)}</td>
+                    <td>${EscapeHtml(
+                      TruncateText(R.Description || '', 30),
+                    )}</td>
+                  </tr>
+                `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="2" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('RaceTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#RaceTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectRace(Row.dataset.id))
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderRaceTable()
+          }),
+        )
+      }
+
+      function SelectRace(RaceId) {
+        const Item = RaceList.find((R) => R.RaceId == RaceId)
+        if (!Item) return
+        SelectedRaceId = RaceId
+        document.getElementById('RaceName').value = Item.RaceName || ''
+        document.getElementById('RaceDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('RaceDescriptionHidden').value =
+          Item.Description || ''
+        const DeleteBtn = document.getElementById('RaceDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearRaceForm() {
+        SelectedRaceId = null
+        document.getElementById('RaceName').value = ''
+        document.getElementById('RaceDescription').value = ''
+        document.getElementById('RaceDescriptionHidden').value = ''
+        const DeleteBtn = document.getElementById('RaceDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveRace() {
+        const RaceName = document.getElementById('RaceName').value.trim()
+        if (!RaceName) {
+          await ShowErrorDialog('種族名を入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const RequestData = {
+            WorkId: sessionStorage.getItem('WorkId'),
+            RaceName: RaceName,
+            Description: document.getElementById('RaceDescriptionHidden').value,
+            UserId: sessionStorage.getItem('UserId'),
+          }
+          if (SelectedRaceId) RequestData.RaceId = SelectedRaceId
+
+          const Response = await CallApi('/SaveRace.php', 'POST', RequestData)
+          HideSpinner()
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', Response.Data.Message)
+            ClearRaceForm()
+            await LoadRaceList()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteRace() {
+        if (!SelectedRaceId) return
+        if (!(await ShowConfirmDialog('この種族を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteRace.php', 'POST', {
+            RaceId: SelectedRaceId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '種族を削除しました')
+            ClearRaceForm()
+            await LoadRaceList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       /* ==========================================================================
@@ -3993,12 +4215,653 @@
         }
       }
 
-      function ShowStageSetting() {
-        ShowPlaceholder('舞台設定', 'map-marked-alt')
+      /* ==========================================================================
+       * 舞台設定画面 (3.4 StageInfo)
+       * ========================================================================== */
+      let StageList = []
+      let SelectedStageId = null
+
+      async function ShowStageSetting() {
+        CurrentPage = 1
+        SelectedStageId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+              ${CreateContentHeader('舞台設定', 'map-marked-alt')}
+              <div class="FormRow">
+                <div class="Flex1">
+                  <div class="ImageBox" id="StageImageBox">
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-map-marked-alt"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <input type="file" id="StageImageInput" accept="image/*" style="display:none;">
+              <input type="hidden" id="StageImagePath">
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="StageName" placeholder="舞台名" maxlength="255" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="StagePopulation" placeholder="人口" maxlength="100" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="StageAreaSize" placeholder="面積" maxlength="100" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="StageDescription" placeholder="説明" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="StageDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="StageDescriptionHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="StageClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="StageSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="StageDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="StageTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('StageDescriptionBtn')
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('StageDescriptionHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('StageDescriptionHidden').value = Result
+                document.getElementById('StageDescription').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+
+          document
+            .getElementById('StageImageBox')
+            .addEventListener('click', async () => {
+              const StageImageBox = document.getElementById('StageImageBox')
+              const ImgElement = StageImageBox.querySelector('img')
+
+              if (!ImgElement) {
+                document.getElementById('StageImageInput').click()
+                return
+              }
+
+              const Deleted = await ShowImageDialog(ImgElement.src, CanEdit())
+
+              if (Deleted) {
+                StageImageBox.innerHTML = `
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-map-marked-alt"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  `
+                document.getElementById('StageImagePath').value = ''
+                document.getElementById('StageImageInput').value = ''
+              }
+            })
+
+          document
+            .getElementById('StageImageInput')
+            .addEventListener('change', HandleStageImageChange)
+          document
+            .getElementById('StageClearButton')
+            .addEventListener('click', ClearStageForm)
+          document
+            .getElementById('StageSaveButton')
+            .addEventListener('click', SaveStage)
+          document
+            .getElementById('StageDeleteButton')
+            .addEventListener('click', DeleteStage)
+        } else {
+          document
+            .getElementById('StageDescriptionBtn')
+            .addEventListener('click', async () => {
+              await ShowInputAreaDialog(
+                document.getElementById('StageDescriptionHidden').value,
+                true,
+              )
+            })
+        }
+
+        await LoadStageList()
       }
 
-      function ShowBuildingSetting() {
-        ShowPlaceholder('建物設定', 'landmark')
+      function HandleStageImageChange(Event) {
+        const File = Event.target.files[0]
+        if (!File) return
+
+        const Reader = new FileReader()
+        Reader.onload = function (Event) {
+          const ImageBox = document.getElementById('StageImageBox')
+          ImageBox.innerHTML = `<img src="${Event.target.result}" alt="舞台画像">`
+        }
+        Reader.readAsDataURL(File)
+      }
+
+      async function LoadStageList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetStageList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            StageList = Response.Data.StageList || []
+            RenderStageTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '舞台一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('舞台一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderStageTable() {
+        const TotalCount = StageList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = StageList.slice(Start, End)
+        let TableHtml = `
+              <table class="DataTable">
+                <thead><tr><th>舞台名</th><th>人口</th><th>面積</th><th>説明</th></tr></thead>
+                <tbody>
+            `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (S) => `
+                  <tr data-id="${S.StageId}">
+                    <td>${EscapeHtml(S.StageName)}</td>
+                    <td>${EscapeHtml(S.Population || '')}</td>
+                    <td>${EscapeHtml(S.AreaSize || '')}</td>
+                    <td>${EscapeHtml(
+                      TruncateText(S.Description || '', 30),
+                    )}</td>
+                  </tr>
+                `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('StageTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#StageTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectStage(Row.dataset.id))
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderStageTable()
+          }),
+        )
+      }
+
+      function SelectStage(StageId) {
+        const Item = StageList.find((S) => S.StageId == StageId)
+        if (!Item) return
+        SelectedStageId = StageId
+        document.getElementById('StageName').value = Item.StageName || ''
+        document.getElementById('StagePopulation').value = Item.Population || ''
+        document.getElementById('StageAreaSize').value = Item.AreaSize || ''
+        document.getElementById('StageDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('StageDescriptionHidden').value =
+          Item.Description || ''
+        if (Item.ImgPath) {
+          document.getElementById(
+            'StageImageBox',
+          ).innerHTML = `<img src="${API_BASE_URL}${Item.ImgPath}" alt="舞台画像">`
+        }
+        const DeleteBtn = document.getElementById('StageDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearStageForm() {
+        SelectedStageId = null
+        document.getElementById('StageName').value = ''
+        document.getElementById('StagePopulation').value = ''
+        document.getElementById('StageAreaSize').value = ''
+        document.getElementById('StageDescription').value = ''
+        document.getElementById('StageDescriptionHidden').value = ''
+        document.getElementById('StageImageBox').innerHTML =
+          '<div class="ImageBoxPlaceholder"><i class="fas fa-map-marked-alt"></i><div>クリックで画像選択</div></div>'
+        document.getElementById('StageImageInput').value = ''
+        const DeleteBtn = document.getElementById('StageDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveStage() {
+        const StageName = document.getElementById('StageName').value.trim()
+        if (!StageName) {
+          await ShowErrorDialog('舞台名を入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const FormData = new window.FormData()
+          if (SelectedStageId) FormData.append('StageId', SelectedStageId)
+          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
+          FormData.append('StageName', StageName)
+          FormData.append('Population', document.getElementById('StagePopulation').value)
+          FormData.append('AreaSize', document.getElementById('StageAreaSize').value)
+          FormData.append(
+            'Description',
+            document.getElementById('StageDescriptionHidden').value,
+          )
+          FormData.append('UserId', sessionStorage.getItem('UserId'))
+          const ImageFile = document.getElementById('StageImageInput').files[0]
+          if (ImageFile) FormData.append('Image', ImageFile)
+          const Response = await fetch(`${API_BASE_URL}/SaveStage.php`, {
+            method: 'POST',
+            body: FormData,
+          })
+          const Result = await Response.json()
+          HideSpinner()
+          if (Result.Success) {
+            await ShowInfoDialog('保存完了', Result.Data.Message)
+            ClearStageForm()
+            await LoadStageList()
+          } else {
+            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteStage() {
+        if (!SelectedStageId) return
+        if (!(await ShowConfirmDialog('この舞台を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteStage.php', 'POST', {
+            StageId: SelectedStageId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '舞台を削除しました')
+            ClearStageForm()
+            await LoadStageList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
+      }
+
+      /* ==========================================================================
+       * 建物設定画面 (3.3 BuildInfo)
+       * ========================================================================== */
+      let BuildList = []
+      let SelectedBuildId = null
+
+      async function ShowBuildingSetting() {
+        CurrentPage = 1
+        SelectedBuildId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+              ${CreateContentHeader('建物設定', 'landmark')}
+              <div class="FormRow">
+                <div class="Flex1">
+                  <div class="ImageBox" id="BuildImageBox">
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-landmark"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <input type="file" id="BuildImageInput" accept="image/*" style="display:none;">
+              <input type="hidden" id="BuildImagePath">
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="BuildName" placeholder="建物名" maxlength="255" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup Flex1 InputWithButton">
+                  <input type="text" class="InputForm" id="BuildDate" placeholder="建築日" readonly ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                  <button class="ButtonClass SecondaryButton ButtonSmall" id="BuildDateBtn"><i class="fas fa-calendar"></i></button>
+                </div>
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="BuildHeight" placeholder="高さ" maxlength="50" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="BuildArea" placeholder="面積" maxlength="50" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="BuildDescription" placeholder="説明" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="BuildDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="BuildDescriptionHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="BuildClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="BuildSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="BuildDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="BuildTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('BuildDescriptionBtn')
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('BuildDescriptionHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('BuildDescriptionHidden').value = Result
+                document.getElementById('BuildDescription').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+
+          document
+            .getElementById('BuildDateBtn')
+            .addEventListener('click', async () => {
+              const DatePickerInstance = new DatePicker()
+              await DatePickerInstance.openDialog('BuildDate')
+            })
+
+          document
+            .getElementById('BuildImageBox')
+            .addEventListener('click', async () => {
+              const BuildImageBox = document.getElementById('BuildImageBox')
+              const ImgElement = BuildImageBox.querySelector('img')
+
+              if (!ImgElement) {
+                document.getElementById('BuildImageInput').click()
+                return
+              }
+
+              const Deleted = await ShowImageDialog(ImgElement.src, CanEdit())
+
+              if (Deleted) {
+                BuildImageBox.innerHTML = `
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-landmark"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  `
+                document.getElementById('BuildImagePath').value = ''
+                document.getElementById('BuildImageInput').value = ''
+              }
+            })
+
+          document
+            .getElementById('BuildImageInput')
+            .addEventListener('change', HandleBuildImageChange)
+          document
+            .getElementById('BuildClearButton')
+            .addEventListener('click', ClearBuildForm)
+          document
+            .getElementById('BuildSaveButton')
+            .addEventListener('click', SaveBuild)
+          document
+            .getElementById('BuildDeleteButton')
+            .addEventListener('click', DeleteBuild)
+        } else {
+          document
+            .getElementById('BuildDescriptionBtn')
+            .addEventListener('click', async () => {
+              await ShowInputAreaDialog(
+                document.getElementById('BuildDescriptionHidden').value,
+                true,
+              )
+            })
+          document
+            .getElementById('BuildDateBtn')
+            .addEventListener('click', async () => {
+              const DatePickerInstance = new DatePicker()
+              await DatePickerInstance.openDialog('BuildDate')
+            })
+        }
+
+        await LoadBuildList()
+      }
+
+      function HandleBuildImageChange(Event) {
+        const File = Event.target.files[0]
+        if (!File) return
+
+        const Reader = new FileReader()
+        Reader.onload = function (Event) {
+          const ImageBox = document.getElementById('BuildImageBox')
+          ImageBox.innerHTML = `<img src="${Event.target.result}" alt="建物画像">`
+        }
+        Reader.readAsDataURL(File)
+      }
+
+      async function LoadBuildList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetBuildList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            BuildList = Response.Data.BuildList || []
+            RenderBuildTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || '建物一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('建物一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function RenderBuildTable() {
+        const TotalCount = BuildList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = BuildList.slice(Start, End)
+        let TableHtml = `
+              <table class="DataTable">
+                <thead><tr><th>建物名</th><th>建築日</th><th>高さ</th><th>面積</th><th>説明</th></tr></thead>
+                <tbody>
+            `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (B) => `
+                  <tr data-id="${B.BuildId}">
+                    <td>${EscapeHtml(B.BuildName)}</td>
+                    <td>${EscapeHtml(FormatDateDisplay(B.BuildDate) || '')}</td>
+                    <td>${EscapeHtml(B.Height || '')}</td>
+                    <td>${EscapeHtml(B.Area || '')}</td>
+                    <td>${EscapeHtml(
+                      TruncateText(B.Description || '', 30),
+                    )}</td>
+                  </tr>
+                `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="5" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('BuildTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#BuildTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectBuild(Row.dataset.id))
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderBuildTable()
+          }),
+        )
+      }
+
+      function SelectBuild(BuildId) {
+        const Item = BuildList.find((B) => B.BuildId == BuildId)
+        if (!Item) return
+        SelectedBuildId = BuildId
+        document.getElementById('BuildName').value = Item.BuildName || ''
+        document.getElementById('BuildDate').value = Item.BuildDate || ''
+        document.getElementById('BuildHeight').value = Item.Height || ''
+        document.getElementById('BuildArea').value = Item.Area || ''
+        document.getElementById('BuildDescription').value = TruncateText(
+          Item.Description || '',
+          30,
+        )
+        document.getElementById('BuildDescriptionHidden').value =
+          Item.Description || ''
+        if (Item.ImgPath) {
+          document.getElementById(
+            'BuildImageBox',
+          ).innerHTML = `<img src="${API_BASE_URL}${Item.ImgPath}" alt="建物画像">`
+        }
+        const DeleteBtn = document.getElementById('BuildDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearBuildForm() {
+        SelectedBuildId = null
+        document.getElementById('BuildName').value = ''
+        document.getElementById('BuildDate').value = ''
+        document.getElementById('BuildHeight').value = ''
+        document.getElementById('BuildArea').value = ''
+        document.getElementById('BuildDescription').value = ''
+        document.getElementById('BuildDescriptionHidden').value = ''
+        document.getElementById('BuildImageBox').innerHTML =
+          '<div class="ImageBoxPlaceholder"><i class="fas fa-landmark"></i><div>クリックで画像選択</div></div>'
+        document.getElementById('BuildImageInput').value = ''
+        const DeleteBtn = document.getElementById('BuildDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveBuild() {
+        const BuildName = document.getElementById('BuildName').value.trim()
+        if (!BuildName) {
+          await ShowErrorDialog('建物名を入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const FormData = new window.FormData()
+          if (SelectedBuildId) FormData.append('BuildId', SelectedBuildId)
+          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
+          FormData.append('BuildName', BuildName)
+          FormData.append('BuildDate', document.getElementById('BuildDate').value)
+          FormData.append('Height', document.getElementById('BuildHeight').value)
+          FormData.append('Area', document.getElementById('BuildArea').value)
+          FormData.append(
+            'Description',
+            document.getElementById('BuildDescriptionHidden').value,
+          )
+          FormData.append('UserId', sessionStorage.getItem('UserId'))
+          const ImageFile = document.getElementById('BuildImageInput').files[0]
+          if (ImageFile) FormData.append('Image', ImageFile)
+          const Response = await fetch(`${API_BASE_URL}/SaveBuild.php`, {
+            method: 'POST',
+            body: FormData,
+          })
+          const Result = await Response.json()
+          HideSpinner()
+          if (Result.Success) {
+            await ShowInfoDialog('保存完了', Result.Data.Message)
+            ClearBuildForm()
+            await LoadBuildList()
+          } else {
+            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteBuild() {
+        if (!SelectedBuildId) return
+        if (!(await ShowConfirmDialog('この建物を削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteBuild.php', 'POST', {
+            BuildId: SelectedBuildId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', '建物を削除しました')
+            ClearBuildForm()
+            await LoadBuildList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       /* ==========================================================================
@@ -4539,8 +5402,254 @@
         ShowPlaceholder('技設定', 'fire')
       }
 
-      function ShowSerifSetting() {
-        ShowPlaceholder('セリフ設定', 'comment')
+      /* ==========================================================================
+       * セリフ設定画面 (4.2 SerifInfo)
+       * ========================================================================== */
+      let SerifList = []
+      let CharaListForSerif = []
+      let SelectedSerifId = null
+
+      async function ShowSerifSetting() {
+        CurrentPage = 1
+        SelectedSerifId = null
+        const ContentArea = document.getElementById('ContentArea')
+        const CanEditFlg = CanEdit()
+
+        ContentArea.innerHTML = `
+              ${CreateContentHeader('セリフ設定', 'comment')}
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <select class="SelectForm" id="SerifCharaId" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                    <option value="">キャラクターを選択</option>
+                  </select>
+                </div>
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="SerifSituation" placeholder="場面" maxlength="255" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="SerifContent" placeholder="セリフ内容" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="SerifContentBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="SerifContentHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="SerifClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="SerifSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="SerifDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="SerifTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
+
+        if (CanEditFlg) {
+          document
+            .getElementById('SerifContentBtn')
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('SerifContentHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('SerifContentHidden').value = Result
+                document.getElementById('SerifContent').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+
+          document
+            .getElementById('SerifClearButton')
+            .addEventListener('click', ClearSerifForm)
+          document
+            .getElementById('SerifSaveButton')
+            .addEventListener('click', SaveSerif)
+          document
+            .getElementById('SerifDeleteButton')
+            .addEventListener('click', DeleteSerif)
+        } else {
+          document
+            .getElementById('SerifContentBtn')
+            .addEventListener('click', async () => {
+              await ShowInputAreaDialog(
+                document.getElementById('SerifContentHidden').value,
+                true,
+              )
+            })
+        }
+
+        await LoadSerifList()
+      }
+
+      async function LoadSerifList() {
+        try {
+          const WorkId = sessionStorage.getItem('WorkId')
+          const Response = await CallApi(
+            `/GetSerifList.php?WorkId=${encodeURIComponent(
+              WorkId,
+            )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
+            'GET',
+          )
+          if (Response.Success) {
+            SerifList = Response.Data.SerifList || []
+            CharaListForSerif = Response.Data.CharacterList || []
+            UpdateSerifCharaSelect()
+            RenderSerifTable()
+          } else {
+            await ShowErrorDialog(
+              Response.Message || 'セリフ一覧の取得に失敗しました',
+            )
+          }
+        } catch (Error) {
+          console.error(Error)
+          await ShowErrorDialog('セリフ一覧の取得中にエラーが発生しました')
+        }
+      }
+
+      function UpdateSerifCharaSelect() {
+        const Select = document.getElementById('SerifCharaId')
+        if (!Select) return
+        Select.innerHTML =
+          '<option value="">キャラクターを選択</option>' +
+          CharaListForSerif.map(
+            (C) => `<option value="${C.CharaId}">${C.CharaName}</option>`,
+          ).join('')
+      }
+
+      function RenderSerifTable() {
+        const TotalCount = SerifList.length
+        document.getElementById(
+          'RecordCountArea',
+        ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        const PageData = SerifList.slice(Start, End)
+        let TableHtml = `
+              <table class="DataTable">
+                <thead><tr><th>キャラクター</th><th>場面</th><th>セリフ内容</th></tr></thead>
+                <tbody>
+            `
+        if (PageData.length) {
+          TableHtml += PageData.map(
+            (S) => `
+                  <tr data-id="${S.SerifId}">
+                    <td>${EscapeHtml(S.CharaName || '(未設定)')}</td>
+                    <td>${EscapeHtml(S.Situation || '')}</td>
+                    <td>${EscapeHtml(
+                      TruncateText(S.Content || '', 30),
+                    )}</td>
+                  </tr>
+                `,
+          ).join('')
+        } else {
+          TableHtml +=
+            '<tr><td colspan="3" class="NoData">データがありません</td></tr>'
+        }
+        TableHtml += '</tbody></table>'
+        document.getElementById('SerifTableArea').innerHTML = TableHtml
+        document
+          .querySelectorAll('#SerifTableArea tbody tr[data-id]')
+          .forEach((Row) => {
+            Row.addEventListener('dblclick', () => SelectSerif(Row.dataset.id))
+          })
+        const PaginationArea = document.getElementById('PaginationArea')
+        PaginationArea.innerHTML = ''
+        PaginationArea.appendChild(
+          CreatePagination(TotalCount, CurrentPage, (Page) => {
+            CurrentPage = Page
+            RenderSerifTable()
+          }),
+        )
+      }
+
+      function SelectSerif(SerifId) {
+        const Item = SerifList.find((S) => S.SerifId == SerifId)
+        if (!Item) return
+        SelectedSerifId = SerifId
+        document.getElementById('SerifCharaId').value = Item.CharaId || ''
+        document.getElementById('SerifSituation').value = Item.Situation || ''
+        document.getElementById('SerifContent').value = TruncateText(
+          Item.Content || '',
+          30,
+        )
+        document.getElementById('SerifContentHidden').value =
+          Item.Content || ''
+        const DeleteBtn = document.getElementById('SerifDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+      }
+
+      function ClearSerifForm() {
+        SelectedSerifId = null
+        document.getElementById('SerifCharaId').value = ''
+        document.getElementById('SerifSituation').value = ''
+        document.getElementById('SerifContent').value = ''
+        document.getElementById('SerifContentHidden').value = ''
+        const DeleteBtn = document.getElementById('SerifDeleteButton')
+        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+      }
+
+      async function SaveSerif() {
+        const Content = document.getElementById('SerifContentHidden').value.trim()
+        if (!Content) {
+          await ShowErrorDialog('セリフ内容を入力してください')
+          return
+        }
+        try {
+          ShowSpinner()
+          const RequestData = {
+            WorkId: sessionStorage.getItem('WorkId'),
+            CharaId: document.getElementById('SerifCharaId').value,
+            Content: Content,
+            Situation: document.getElementById('SerifSituation').value,
+            UserId: sessionStorage.getItem('UserId'),
+          }
+          if (SelectedSerifId) RequestData.SerifId = SelectedSerifId
+
+          const Response = await CallApi('/SaveSerif.php', 'POST', RequestData)
+          HideSpinner()
+          if (Response.Success) {
+            await ShowInfoDialog('保存完了', Response.Data.Message)
+            ClearSerifForm()
+            await LoadSerifList()
+          } else {
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
+          }
+        } catch (Error) {
+          HideSpinner()
+          await ShowErrorDialog('保存中にエラーが発生しました')
+        }
+      }
+
+      async function DeleteSerif() {
+        if (!SelectedSerifId) return
+        if (!(await ShowConfirmDialog('このセリフを削除しますか？'))) return
+        try {
+          const Response = await CallApi('/DeleteSerif.php', 'POST', {
+            SerifId: SelectedSerifId,
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
+          })
+          if (Response.Success) {
+            await ShowInfoDialog('削除完了', 'セリフを削除しました')
+            ClearSerifForm()
+            await LoadSerifList()
+          } else {
+            await ShowErrorDialog(Response.Message || '削除に失敗しました')
+          }
+        } catch (Error) {
+          await ShowErrorDialog('削除中にエラーが発生しました')
+        }
       }
 
       /* ==========================================================================
