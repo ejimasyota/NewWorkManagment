@@ -4291,10 +4291,8 @@
               )
               if (Result !== null && CanEditFlg) {
                 document.getElementById('StageDescriptionHidden').value = Result
-                document.getElementById('StageDescription').value = TruncateText(
-                  Result,
-                  30,
-                )
+                document.getElementById('StageDescription').value =
+                  TruncateText(Result, 30)
               }
             })
 
@@ -4479,8 +4477,14 @@
           if (SelectedStageId) FormData.append('StageId', SelectedStageId)
           FormData.append('WorkId', sessionStorage.getItem('WorkId'))
           FormData.append('StageName', StageName)
-          FormData.append('Population', document.getElementById('StagePopulation').value)
-          FormData.append('AreaSize', document.getElementById('StageAreaSize').value)
+          FormData.append(
+            'Population',
+            document.getElementById('StagePopulation').value,
+          )
+          FormData.append(
+            'AreaSize',
+            document.getElementById('StageAreaSize').value,
+          )
           FormData.append(
             'Description',
             document.getElementById('StageDescriptionHidden').value,
@@ -4529,7 +4533,7 @@
       }
 
       /* ==========================================================================
-       * 建物設定画面 (3.3 BuildInfo)
+       * 建物設定画面
        * ========================================================================== */
       let BuildList = []
       let SelectedBuildId = null
@@ -4610,10 +4614,8 @@
               )
               if (Result !== null && CanEditFlg) {
                 document.getElementById('BuildDescriptionHidden').value = Result
-                document.getElementById('BuildDescription').value = TruncateText(
-                  Result,
-                  30,
-                )
+                document.getElementById('BuildDescription').value =
+                  TruncateText(Result, 30)
               }
             })
 
@@ -4814,8 +4816,14 @@
           if (SelectedBuildId) FormData.append('BuildId', SelectedBuildId)
           FormData.append('WorkId', sessionStorage.getItem('WorkId'))
           FormData.append('BuildName', BuildName)
-          FormData.append('BuildDate', document.getElementById('BuildDate').value)
-          FormData.append('Height', document.getElementById('BuildHeight').value)
+          FormData.append(
+            'BuildDate',
+            document.getElementById('BuildDate').value,
+          )
+          FormData.append(
+            'Height',
+            document.getElementById('BuildHeight').value,
+          )
           FormData.append('Area', document.getElementById('BuildArea').value)
           FormData.append(
             'Description',
@@ -5546,9 +5554,7 @@
                   <tr data-id="${S.SerifId}">
                     <td>${EscapeHtml(S.CharaName || '(未設定)')}</td>
                     <td>${EscapeHtml(S.Situation || '')}</td>
-                    <td>${EscapeHtml(
-                      TruncateText(S.Content || '', 30),
-                    )}</td>
+                    <td>${EscapeHtml(TruncateText(S.Content || '', 30))}</td>
                   </tr>
                 `,
           ).join('')
@@ -5583,8 +5589,7 @@
           Item.Content || '',
           30,
         )
-        document.getElementById('SerifContentHidden').value =
-          Item.Content || ''
+        document.getElementById('SerifContentHidden').value = Item.Content || ''
         const DeleteBtn = document.getElementById('SerifDeleteButton')
         if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
       }
@@ -5600,7 +5605,9 @@
       }
 
       async function SaveSerif() {
-        const Content = document.getElementById('SerifContentHidden').value.trim()
+        const Content = document
+          .getElementById('SerifContentHidden')
+          .value.trim()
         if (!Content) {
           await ShowErrorDialog('セリフ内容を入力してください')
           return
