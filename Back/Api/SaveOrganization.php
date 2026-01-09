@@ -8,20 +8,26 @@ require_once __DIR__ . '/../Common/Database.php';
 require_once __DIR__ . '/../Common/Logger.php';
 require_once __DIR__ . '/../Common/Response.php';
 
+// POSTメソッドのみ許可
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    Response::Error('不正なリクエストです', 405);
+}
+
 $FunctionName = '組織設定';
 $UserId = '';
 
 try {
+    $Input = Response::GetJsonInput();
     /** リクエストデータを取得（FormData対応） */
-    $OrgId = $_POST['OrgId'] ?? null;
-    $WorkId = $_POST['WorkId'] ?? '';
-    $OrgName = $_POST['OrgName'] ?? '';
-    $FoundedDate = $_POST['FoundedDate'] ?? null;
-    $PeopleNum = $_POST['PeopleNum'] ?? null;
-    $Purpose = $_POST['Purpose'] ?? null;
-    $Activity = $_POST['Activity'] ?? null;
-    $BaseBuildId = $_POST['BaseBuildId'] ?? null;
-    $UserId = $_POST['UserId'] ?? '';
+    $OrgId = $Input['OrgId'] ?? null;
+    $WorkId = $Input['WorkId'] ?? '';
+    $OrgName = $Input['OrgName'] ?? '';
+    $FoundedDate = $Input['FoundedDate'] ?? null;
+    $PeopleNum = $Input['PeopleNum'] ?? null;
+    $Purpose = $Input['Purpose'] ?? null;
+    $Activity = $Input['Activity'] ?? null;
+    $BaseBuildId = $Input['BaseBuildId'] ?? null;
+    $UserId = $Input['UserId'] ?? '';
 
     $Operation = empty($OrgId) ? '登録' : '更新';
     Logger::Info($FunctionName, $Operation . '処理開始', $UserId);

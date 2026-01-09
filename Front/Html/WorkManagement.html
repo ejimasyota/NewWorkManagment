@@ -1150,14 +1150,14 @@
       function CreateContentHeader(Title, Icon) {
         const WorkTitle = WorkInfo ? WorkInfo.WorkTitle : ''
         return `
-        <div class="WorkTitle">
-          <i class="fas fa-book"></i>
-          <span>${TruncateText(WorkTitle, 30)}</span>
-        </div>
-        <div class="ContentHeader">
-          <h2 class="ContentTitle"><i class="fas fa-${Icon}"></i> ${Title}</h2>
-        </div>
-      `
+            <div class="WorkTitle">
+              <i class="fas fa-book"></i>
+              <span>${TruncateText(WorkTitle, 30)}</span>
+            </div>
+            <div class="ContentHeader">
+              <h2 class="ContentTitle"><i class="fas fa-${Icon}"></i> ${Title}</h2>
+            </div>
+          `
       }
 
       /* ==========================================================================
@@ -1171,31 +1171,31 @@
         const CanEditFlg = CanEdit()
 
         ContentArea.innerHTML = `
-        ${CreateContentHeader('作品共通情報', 'info-circle')}
-        <div class="FormGroup">
-          <input type="text" class="InputForm" id="WorkTitle" placeholder="作品名" value="${
-            WorkInfo?.WorkTitle || ''
-          }" ${!CanEditFlg ? 'disabled' : ''}>
-        </div>
-        <div class="FormGroup">
-          <select class="SelectForm" id="Genre" ${
-            !CanEditFlg ? 'disabled' : ''
-          }>
-            ${PullDownList('Genre')}
-          </select>
-        </div>
-        ${
-          CanEditFlg
-            ? `
-        <div class="ButtonGroup">
-          <button class="ButtonClass SaveButton" id="SaveWorkInfoButton">
-            <i class="fas fa-save"></i> 保存
-          </button>
-        </div>
-        `
-            : ''
-        }
-      `
+            ${CreateContentHeader('作品共通情報', 'info-circle')}
+            <div class="FormGroup">
+              <input type="text" class="InputForm" id="WorkTitle" placeholder="作品名" value="${
+                WorkInfo?.WorkTitle || ''
+              }" ${!CanEditFlg ? 'disabled' : ''}>
+            </div>
+            <div class="FormGroup">
+              <select class="SelectForm" id="Genre" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+                ${PullDownList('Genre')}
+              </select>
+            </div>
+            ${
+              CanEditFlg
+                ? `
+            <div class="ButtonGroup">
+              <button class="ButtonClass SaveButton" id="SaveWorkInfoButton">
+                <i class="fas fa-save"></i> 保存
+              </button>
+            </div>
+            `
+                : ''
+            }
+          `
 
         if (WorkInfo) {
           document.getElementById('Genre').value = WorkInfo.Genre
@@ -1259,160 +1259,160 @@
         const CanEditFlg = CanEdit()
 
         ContentArea.innerHTML = `
-          ${CreateContentHeader('キャラ設定', 'user')}
-          <div class="TabContainer">
-            <div class="TabHeader">
-              <button class="TabButton Active" data-tab="basic">基本情報</button>
-              <button class="TabButton" data-tab="affiliation">所属情報</button>
-              <button class="TabButton" data-tab="detail">詳細情報</button>
-              <button class="TabButton" data-tab="image">画像</button>
-            </div>
+              ${CreateContentHeader('キャラ設定', 'user')}
+              <div class="TabContainer">
+                <div class="TabHeader">
+                  <button class="TabButton Active" data-tab="basic">基本情報</button>
+                  <button class="TabButton" data-tab="affiliation">所属情報</button>
+                  <button class="TabButton" data-tab="detail">詳細情報</button>
+                  <button class="TabButton" data-tab="image">画像</button>
+                </div>
 
-            <!-- 基本情報タブ -->
-            <div class="TabContent Active" id="TabBasic">
-              <div class="FormRow">
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaName" placeholder="キャラ名" maxlength="255" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
+                <!-- 基本情報タブ -->
+                <div class="TabContent Active" id="TabBasic">
+                  <div class="FormRow">
+                    <div class="FormGroup">
+                      <input type="text" class="InputForm" id="CharaName" placeholder="キャラ名" maxlength="255" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                    </div>
+                    <div class="FormGroup">
+                      <select class="SelectForm" id="CharaGender" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>${PullDownList('Gender')}</select>
+                    </div>
+                  </div>
+                  <div class="FormRow">
+                    <div class="FormGroup InputWithButton">
+                      <input type="text" class="InputForm" id="CharaBirthDate" placeholder="生年月日" readonly ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                      ${
+                        CanEditFlg
+                          ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBirthDateBtn"><i class="fas fa-calendar"></i></button>`
+                          : ''
+                      }
+                    </div>
+                    <div class="FormGroup">
+                      <input type="text" class="InputForm" id="CharaAge" placeholder="年齢" maxlength="50" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                    </div>
+                  </div>
+                  <div class="FormRow">
+                    <div class="FormGroup">
+                      <input type="text" class="InputForm" id="CharaHeight" placeholder="身長" maxlength="50" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                    </div>
+                    <div class="FormGroup">
+                      <input type="text" class="InputForm" id="CharaWeight" placeholder="体重" maxlength="50" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                    </div>
+                    <div class="FormGroup">
+                      <input type="text" class="InputForm" id="CharaBloodType" placeholder="血液型" maxlength="10" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                    </div>
+                  </div>
+                  <div class="FormRow">
+                    <div class="FormGroup">
+                      <input type="text" class="InputForm" id="CharaFirstPerson" placeholder="一人称" maxlength="50" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                    </div>
+                    <div class="FormGroup">
+                      <input type="text" class="InputForm" id="CharaSecondPerson" placeholder="二人称" maxlength="50" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                    </div>
+                  </div>
+                  <div class="FormGroup InputWithButton">
+                    <input type="text" class="InputForm" id="CharaRoleInfo" placeholder="役割" disabled>
+                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaRoleInfoBtn"><i class="fas fa-edit"></i></button>
+                  </div>
+                  <input type="hidden" id="CharaRoleInfoHidden">
                 </div>
-                <div class="FormGroup">
-                  <select class="SelectForm" id="CharaGender" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>${PullDownList('Gender')}</select>
-                </div>
-              </div>
-              <div class="FormRow">
-                <div class="FormGroup InputWithButton">
-                  <input type="text" class="InputForm" id="CharaBirthDate" placeholder="生年月日" readonly ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                  ${
-                    CanEditFlg
-                      ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBirthDateBtn"><i class="fas fa-calendar"></i></button>`
-                      : ''
-                  }
-                </div>
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaAge" placeholder="年齢" maxlength="50" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                </div>
-              </div>
-              <div class="FormRow">
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaHeight" placeholder="身長" maxlength="50" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                </div>
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaWeight" placeholder="体重" maxlength="50" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                </div>
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaBloodType" placeholder="血液型" maxlength="10" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                </div>
-              </div>
-              <div class="FormRow">
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaFirstPerson" placeholder="一人称" maxlength="50" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                </div>
-                <div class="FormGroup">
-                  <input type="text" class="InputForm" id="CharaSecondPerson" placeholder="二人称" maxlength="50" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                </div>
-              </div>
-              <div class="FormGroup InputWithButton">
-                <input type="text" class="InputForm" id="CharaRoleInfo" placeholder="役割" disabled>
-                <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaRoleInfoBtn"><i class="fas fa-edit"></i></button>
-              </div>
-              <input type="hidden" id="CharaRoleInfoHidden">
-            </div>
 
-            <!-- 所属情報タブ -->
-            <div class="TabContent" id="TabAffiliation">
-              <div class="FormRow">
-                <div class="FormGroup">
-                  <select class="SelectForm" id="CharaRace" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                    <option value="">種族を選択</option>
-                  </select>
+                <!-- 所属情報タブ -->
+                <div class="TabContent" id="TabAffiliation">
+                  <div class="FormRow">
+                    <div class="FormGroup">
+                      <select class="SelectForm" id="CharaRace" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                        <option value="">種族を選択</option>
+                      </select>
+                    </div>
+                    <div class="FormGroup">
+                      <select class="SelectForm" id="CharaOrganization" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                        <option value="">組織を選択</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="FormRow">
+                    <div class="FormGroup">
+                      <select class="SelectForm" id="CharaTeam" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                        <option value="">チームを選択</option>
+                      </select>
+                    </div>
+                    <div class="FormGroup">
+                      <select class="SelectForm" id="CharaClass" ${
+                        !CanEditFlg ? 'disabled' : ''
+                      }>
+                        <option value="">階級を選択</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
-                <div class="FormGroup">
-                  <select class="SelectForm" id="CharaOrganization" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                    <option value="">組織を選択</option>
-                  </select>
-                </div>
-              </div>
-              <div class="FormRow">
-                <div class="FormGroup">
-                  <select class="SelectForm" id="CharaTeam" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                    <option value="">チームを選択</option>
-                  </select>
-                </div>
-                <div class="FormGroup">
-                  <select class="SelectForm" id="CharaClass" ${
-                    !CanEditFlg ? 'disabled' : ''
-                  }>
-                    <option value="">階級を選択</option>
-                  </select>
-                </div>
-              </div>
-            </div>
 
-            <!-- 詳細情報タブ -->
-            <div class="TabContent" id="TabDetail">
-              <div class="FormGroup InputWithButton">
-                <input type="text" class="InputForm" id="CharaPersonality" placeholder="性格" disabled>
-                <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaPersonalityBtn"><i class="fas fa-edit"></i></button>
-              </div>
-              <input type="hidden" id="CharaPersonalityHidden">
-              <div class="FormGroup InputWithButton">
-                <input type="text" class="InputForm" id="CharaBiography" placeholder="生い立ち・経歴" disabled>
-                <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBiographyBtn"><i class="fas fa-edit"></i></button>
-              </div>
-              <input type="hidden" id="CharaBiographyHidden">
-            </div>
+                <!-- 詳細情報タブ -->
+                <div class="TabContent" id="TabDetail">
+                  <div class="FormGroup InputWithButton">
+                    <input type="text" class="InputForm" id="CharaPersonality" placeholder="性格" disabled>
+                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaPersonalityBtn"><i class="fas fa-edit"></i></button>
+                  </div>
+                  <input type="hidden" id="CharaPersonalityHidden">
+                  <div class="FormGroup InputWithButton">
+                    <input type="text" class="InputForm" id="CharaBiography" placeholder="生い立ち・経歴" disabled>
+                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBiographyBtn"><i class="fas fa-edit"></i></button>
+                  </div>
+                  <input type="hidden" id="CharaBiographyHidden">
+                </div>
 
-            <!-- 画像タブ -->
-            <div class="TabContent" id="TabImage">
-              <div class="ImageBox" id="CharaImageBox">
-                <div class="ImageBoxPlaceholder">
-                  <i class="fas fa-user"></i>
-                  <div>クリックで画像選択</div>
+                <!-- 画像タブ -->
+                <div class="TabContent" id="TabImage">
+                  <div class="ImageBox" id="CharaImageBox">
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-user"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  </div>
+                  <input type="file" id="CharaImageInput" accept="image/*" style="display:none;">
+                  <input type="hidden" id="CharaImagePath">
                 </div>
               </div>
-              <input type="file" id="CharaImageInput" accept="image/*" style="display:none;">
-              <input type="hidden" id="CharaImagePath">
-            </div>
-          </div>
 
-          ${
-            CanEditFlg
-              ? `
-          <div class="ButtonGroup">
-            <button class="ButtonClass ClearButton" id="CharaClearButton"><i class="fas fa-sync"></i> クリア</button>
-            <button class="ButtonClass SaveButton" id="CharaSaveButton"><i class="fas fa-save"></i> 保存</button>
-            <button class="ButtonClass DeleteButton Hidden" id="CharaDeleteButton"><i class="fas fa-trash"></i> 削除</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="CharacterTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="CharaClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="CharaSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="CharaDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="CharacterTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
         SetupCharacterTabEvents()
         await LoadCharacterMasterData()
@@ -1580,14 +1580,14 @@
         Reader.onload = function (Ev) {
           const ImageBox = document.getElementById('CharaImageBox')
           ImageBox.innerHTML = `<img src="${Ev.target.result}" alt="キャラ画像">`
-          ImageBox.addEventListener('click', async () => {
-            const Deleted = await ShowImageDialog(Ev.target.result, CanEdit())
-            if (Deleted) {
-              ImageBox.innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
-              document.getElementById('CharaImagePath').value = ''
-              document.getElementById('CharaImageInput').value = ''
-            }
-          })
+          // ImageBox.addEventListener('click', async () => {
+          //   const Deleted = await ShowImageDialog(Ev.target.result, CanEdit())
+          //   if (Deleted) {
+          //     ImageBox.innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
+          //     document.getElementById('CharaImagePath').value = ''
+          //     document.getElementById('CharaImageInput').value = ''
+          //   }
+          // })
         }
         Reader.readAsDataURL(File)
       }
@@ -1845,213 +1845,397 @@
       }
 
       /* ==========================================================================
-       * 組織設定画面 (3.5 OrganizationInfo)
+       * 組織設定画面
        * ========================================================================== */
+      /* ---------------------------------------------
+       *  1. 定義
+       * --------------------------------------------- */
+      // 1. 組織一覧の内容を保持する
       let OrganizationList = []
+      // 2. 建物一覧の内容を保持する
       let BuildListForOrg = []
+      // 3. 選択中の組織IDを保持する
       let SelectedOrgId = null
 
+      /**
+       * 組織設定画面を表示
+       **/
       async function ShowOrganizationSetting() {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 現座標次ページ
         CurrentPage = 1
+        // 2. 選択中の組織IDを初期化
         SelectedOrgId = null
+        // 3. コンテンツ表示エリア要素取得
         const ContentArea = document.getElementById('ContentArea')
+        // 4. 編集権限確認
         const CanEditFlg = CanEdit()
 
+        /* ---------------------------------------------
+         *  2. DOM構築
+         * --------------------------------------------- */
         ContentArea.innerHTML = `
-          ${CreateContentHeader('組織設定', 'building')}
-          <div class="FormRow">
-            <div class="FormGroup Flex1">
-              <input type="text" class="InputForm" id="OrgName" placeholder="組織名" maxlength="255" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-            </div>
-            <div class="FormGroup Flex1">
-              <select class="SelectForm" id="OrgBaseBuild" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-                <option value="">拠点建物を選択</option>
-              </select>
-            </div>
-          </div>
-          <div class="FormRow">
-            <div class="FormGroup Flex1 InputWithButton">
-              <input type="text" class="InputForm" id="OrgFoundedDate" placeholder="設立日" readonly ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-              ${
-                CanEditFlg
-                  ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="OrgFoundedDateBtn"><i class="fas fa-calendar"></i></button>`
-                  : ''
-              }
-            </div>
-            <div class="FormGroup Flex1">
-              <input type="text" class="InputForm" id="OrgPeopleNum" placeholder="人数" maxlength="50" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-            </div>
-          </div>
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="OrgPurpose" placeholder="目的" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="OrgPurposeBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="OrgPurposeHidden">
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="OrgActivity" placeholder="活動内容" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="OrgActivityBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="OrgActivityHidden">
-          ${
-            CanEditFlg
-              ? `
-          <div class="FormGroup">
-            <div class="ImageUploadArea" id="OrgImageArea">
-              <div class="ImageBox" id="OrgImageBox">
-                <span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>
+              ${CreateContentHeader('組織設定', 'building')}
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <div class="ImageBox" id="OrgImageBox">
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-building"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <input type="file" id="OrgImageInput" accept="image/*" style="display:none;">
-            </div>
-          </div>
-          <div class="ButtonGroup">
-            <button class="ButtonClass ClearButton" id="OrgClearButton"><i class="fas fa-sync"></i> クリア</button>
-            <button class="ButtonClass SaveButton" id="OrgSaveButton"><i class="fas fa-save"></i> 保存</button>
-            <button class="ButtonClass DeleteButton Hidden" id="OrgDeleteButton"><i class="fas fa-trash"></i> 削除</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="OrgTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              <input type="hidden" id="OrgImagePath">
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="OrgName" placeholder="組織名" maxlength="255" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+                <div class="FormGroup Flex1">
+                  <select class="SelectForm" id="OrgBaseBuild" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                    <option value="">拠点建物を選択</option>
+                  </select>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup Flex1 InputWithButton">
+                  <input type="text" class="InputForm" id="OrgFoundedDate" placeholder="設立日" readonly ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                  ${
+                    CanEditFlg
+                      ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="OrgFoundedDateBtn"><i class="fas fa-calendar"></i></button>`
+                      : ''
+                  }
+                </div>
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="OrgPeopleNum" placeholder="人数" maxlength="50" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="OrgPurpose" placeholder="目的" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="OrgPurposeBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="OrgPurposeHidden">
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="OrgActivity" placeholder="活動内容" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="OrgActivityBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="OrgActivityHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="OrgClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="OrgSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="OrgDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="OrgTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
+        /* ---------------------------------------------
+         *  3. 編集可能な場合
+         * --------------------------------------------- */
         if (CanEditFlg) {
+          /* 1. 定義 */
+          // 1. デートピッカーインスタンス
+          const DatePickerInstance = new DatePicker()
+
+          /* 2.イベント登録 */
+          // 1. 発生時期ボタンクリックイベント
           document
             .getElementById('OrgFoundedDateBtn')
-            .addEventListener('click', async () => {
-              const Picker = new DatePicker()
-              await Picker.openDialog('OrgFoundedDate')
-            })
+            .addEventListener('click', () =>
+              DatePickerInstance.OpenDialog('OrgFoundedDate'),
+            )
+          // 2. 目的入力欄詳細ボタンクリックイベント
           document
             .getElementById('OrgPurposeBtn')
-            .addEventListener('click', () =>
-              ShowInputAreaDialog('OrgPurpose', 'OrgPurposeHidden', CanEditFlg),
-            )
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('OrgPurposeHidden').value,
+                !CanEditFlg,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('OrgPurposeHidden').value = Result
+                document.getElementById('OrgPurpose').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+          // 3. 活動内容入力欄詳細ボタンクリックイベント
           document
             .getElementById('OrgActivityBtn')
-            .addEventListener('click', () =>
-              ShowInputAreaDialog(
-                'OrgActivity',
-                'OrgActivityHidden',
-                CanEditFlg,
-              ),
-            )
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('OrgActivityHidden').value,
+                !CanEditFlg,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('OrgActivityHidden').value = Result
+                document.getElementById('OrgActivity').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+          // 4. 画像ボックスクリックイベント
           document
             .getElementById('OrgImageBox')
-            .addEventListener('click', () =>
-              document.getElementById('OrgImageInput').click(),
-            )
+            .addEventListener('click', async () => {
+              const OrgImageBox = document.getElementById('OrgImageBox')
+              const ImgElement = OrgImageBox.querySelector('img')
+
+              if (!ImgElement) {
+                document.getElementById('OrgImageInput').click()
+                return
+              }
+
+              const Deleted = await ShowImageDialog(ImgElement.src, CanEdit())
+
+              if (Deleted) {
+                OrgImageBox.innerHTML = `
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-building"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  `
+                document.getElementById('OrgImagePath').value = ''
+                document.getElementById('OrgImageInput').value = ''
+              }
+            })
+          // 5. 画像入力変更イベント
           document
             .getElementById('OrgImageInput')
-            .addEventListener('change', (E) => PreviewImage(E, 'OrgImageBox'))
+            .addEventListener('change', HandleOrgImageChange)
+          // 6. クリアボタンクリックイベント
           document
             .getElementById('OrgClearButton')
             .addEventListener('click', ClearOrgForm)
+          // 7. 保存ボタンクリックイベント
           document
             .getElementById('OrgSaveButton')
             .addEventListener('click', SaveOrganization)
+          // 8. 削除ボタンクリックイベント
           document
             .getElementById('OrgDeleteButton')
             .addEventListener('click', DeleteOrganization)
         } else {
+          /* ---------------------------------------------
+           *  4. 編集不可能な場合
+           * --------------------------------------------- */
+          // 1. 目的入力欄詳細ボタンクリックイベント
           document
             .getElementById('OrgPurposeBtn')
-            .addEventListener('click', () =>
-              ShowInputAreaDialog('OrgPurpose', 'OrgPurposeHidden', false),
-            )
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('OrgPurposeHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('OrgPurposeHidden').value = Result
+                document.getElementById('OrgPurpose').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+          // 2. 活動内容入力欄詳細ボタンクリックイベント
           document
             .getElementById('OrgActivityBtn')
-            .addEventListener('click', () =>
-              ShowInputAreaDialog('OrgActivity', 'OrgActivityHidden', false),
-            )
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('OrgActivityHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('OrgActivityHidden').value = Result
+                document.getElementById('OrgActivity').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
         }
-
+        /* ---------------------------------------------
+         *  5. 一覧取得処理呼び出し
+         * --------------------------------------------- */
         await LoadOrganizationList()
       }
 
+      /**
+       * 組織一覧取得処理
+       * **/
       async function LoadOrganizationList() {
         try {
+          /* ---------------------------------------------
+           *  1. 定義
+           * --------------------------------------------- */
+          // 1. 作品ID取得
           const WorkId = sessionStorage.getItem('WorkId')
+          // 2. API呼び出し
           const Response = await CallApi(
             `/GetOrganizationList.php?WorkId=${encodeURIComponent(
               WorkId,
             )}&UserId=${encodeURIComponent(sessionStorage.getItem('UserId'))}`,
             'GET',
           )
+
+          /* ---------------------------------------------
+           *  2. 通信成功
+           * --------------------------------------------- */
           if (Response.Success) {
+            // 1. 組織一覧を保持
             OrganizationList = Response.Data.OrganizationList || []
+            // 2. 建物一覧を保持
             BuildListForOrg = Response.Data.BuildList || []
+            // 3. 建物プルダウンの内容更新
             UpdateBuildSelect()
+            // 4. 組織一覧表示
             RenderOrganizationTable()
           } else {
+            /* ---------------------------------------------
+             *  3. 通信失敗
+             * --------------------------------------------- */
+            // 1. エラーダイアログ表示
             await ShowErrorDialog(
               Response.Message || '組織一覧の取得に失敗しました',
             )
           }
         } catch (Error) {
-          console.error(Error)
+          /* ---------------------------------------------
+           *  4. 例外処理
+           * --------------------------------------------- */
+          // 1. エラーダイアログ
           await ShowErrorDialog('組織一覧の取得中にエラーが発生しました')
+          // 2. デバッグログ
+          console.error(Error)
         }
       }
 
+      /**
+       * 建物プルダウン更新処理
+       **/
       function UpdateBuildSelect() {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 建物のプルダウン要素取得
         const Select = document.getElementById('OrgBaseBuild')
-        if (!Select) return
+
+        /* ---------------------------------------------
+         *  2. バリデーションチェック
+         * --------------------------------------------- */
+        /* 1. 建物のプルダウン要素が存在しない場合 */
+        if (!Select) {
+          // 1. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  3. DOM構築
+         * --------------------------------------------- */
         Select.innerHTML =
           '<option value="">拠点建物を選択</option>' +
           BuildListForOrg.map(
-            (B) => `<option value="${B.BuildId}">${B.BuildName}</option>`,
+            (Build) =>
+              `<option value="${Build.BuildId}">${Build.BuildName}</option>`,
           ).join('')
       }
 
+      /**
+       * 組織一覧表示処理
+       **/
       function RenderOrganizationTable() {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 件数取得
         const TotalCount = OrganizationList.length
+        // 1. 件数表示エリアに件数を定義
         document.getElementById(
           'RecordCountArea',
         ).innerHTML = `<span class="RecordCount">${TotalCount} 件</span>`
+        // 3. ページング表示開始ページ
         const Start = (CurrentPage - 1) * RECORDS_PER_PAGE
+        // 4. ページング表示終了ページ
         const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
+        // 5. ページング表示データ
         const PageData = OrganizationList.slice(Start, End)
+        // 6. テーブルヘッダー定義
         let TableHtml = `
-          <table class="DataTable">
-            <thead><tr><th>組織名</th><th>拠点</th><th>人数</th><th>設立日</th></tr></thead>
-            <tbody>
-        `
+              <table class="DataTable">
+                <thead><tr><th>組織名</th><th>拠点</th><th>人数</th><th>設立日</th></tr></thead>
+                <tbody>
+            `
+        /* ---------------------------------------------
+         *  2. 件数が1件以上存在する場合
+         * --------------------------------------------- */
         if (PageData.length) {
+          // 1. ページング行を追加
           TableHtml += PageData.map(
-            (O) => `
-              <tr data-id="${O.OrgId}">
-                <td>${EscapeHtml(O.OrgName)}</td>
-                <td>${EscapeHtml(O.BuildName || '')}</td>
-                <td>${EscapeHtml(O.PeopleNum || '')}</td>
-                <td>${FormatDisplayDate(O.FoundedDate)}</td>
-              </tr>
-            `,
+            (Org) => `
+                  <tr data-id="${Org.OrgId}">
+                    <td>${EscapeHtml(Org.OrgName)}</td>
+                    <td>${EscapeHtml(Org.BuildName || '')}</td>
+                    <td>${EscapeHtml(Org.PeopleNum || '')}</td>
+                    <td>${FormatDateTimeWithWeekday(Org.FoundedDate)}</td>
+                  </tr>
+                `,
           ).join('')
         } else {
+          /* ---------------------------------------------
+           *  3. 件数が0件の場合
+           * --------------------------------------------- */
+          // 1. データなし行を追加
           TableHtml +=
             '<tr><td colspan="4" class="NoData">データがありません</td></tr>'
         }
+        /* ---------------------------------------------
+         *  4. 閉じタグ作成
+         * --------------------------------------------- */
         TableHtml += '</tbody></table>'
+
+        /* ---------------------------------------------
+         *  5. テーブルDOMをテーブル表示エリアに設定
+         * --------------------------------------------- */
         document.getElementById('OrgTableArea').innerHTML = TableHtml
+
+        /* ---------------------------------------------
+         *  6. 行ダブルクリックイベント
+         * --------------------------------------------- */
         document
           .querySelectorAll('#OrgTableArea tbody tr[data-id]')
           .forEach((Row) => {
             Row.addEventListener('dblclick', () =>
+              // 1. 組織選択処理呼び出し
               SelectOrganization(Row.dataset.id),
             )
           })
+
+        /* ---------------------------------------------
+         *  7. ページネーションDOM構築
+         * --------------------------------------------- */
+        // 1. ページネーション表示エリア取得
         const PaginationArea = document.getElementById('PaginationArea')
+        // 2. ページネーション表示エリア初期化
         PaginationArea.innerHTML = ''
+        // 3. ページネーションDOMをページネーション表示エリアに設定
         PaginationArea.appendChild(
           CreatePagination(TotalCount, CurrentPage, (Page) => {
             CurrentPage = Page
@@ -2060,127 +2244,336 @@
         )
       }
 
+      /**
+       * 組織選択処理
+       **/
       function SelectOrganization(OrgId) {
-        const Item = OrganizationList.find((O) => O.OrgId == OrgId)
-        if (!Item) return
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 選択行の情報を取得
+        const Item = OrganizationList.find((Org) => Org.OrgId == OrgId)
+
+        /* ---------------------------------------------
+         *  2. バリデーションチェック
+         * --------------------------------------------- */
+        /* 1. 選択行情報が取得できなかった場合 */
+        if (!Item) {
+          // 1. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  3. 選択行情報を入力フォームへ設定
+         * --------------------------------------------- */
+        // 1. 組織IDを設定
         SelectedOrgId = OrgId
+        // 2. 組織名を設定
         document.getElementById('OrgName').value = Item.OrgName || ''
+        // 3. 拠点建物プルダウンの値を設定
         document.getElementById('OrgBaseBuild').value = Item.BaseBuildId || ''
+        // 4. 組織設立年月日
         document.getElementById('OrgFoundedDate').value = Item.FoundedDate || ''
+        // 5. 人員数を設定
         document.getElementById('OrgPeopleNum').value = Item.PeopleNum || ''
+        // 6. 目的を設定
         document.getElementById('OrgPurpose').value = TruncateText(
           Item.Purpose || '',
           30,
         )
+        // 7. 目的をDB登録用フォームへ設定
         document.getElementById('OrgPurposeHidden').value = Item.Purpose || ''
+        // 8. 活動内容を設定
         document.getElementById('OrgActivity').value = TruncateText(
           Item.Activity || '',
           30,
         )
+        // 9. 活動内容をDB登録用フォームへ設定
         document.getElementById('OrgActivityHidden').value = Item.Activity || ''
+
+        /* ---------------------------------------------
+         *  4. 画像パスが存在する場合
+         * --------------------------------------------- */
         if (Item.ImgPath) {
+          // 1. 画像パスの画像を設定
           document.getElementById(
             'OrgImageBox',
           ).innerHTML = `<img src="${API_BASE_URL}${Item.ImgPath}" alt="組織画像">`
         }
+
+        /* ---------------------------------------------
+         *  5. 削除ボタンの状態設定
+         * --------------------------------------------- */
+        // 1. 削除ボタンの取得
         const DeleteBtn = document.getElementById('OrgDeleteButton')
-        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+        // 2. 削除ボタンが存在する場合は表示
+        if (DeleteBtn) {
+          DeleteBtn.classList.remove('Hidden')
+        }
       }
 
+      /**
+       * 組織入力フォームクリア処理
+       **/
       function ClearOrgForm() {
+        // 1. 選択中組織ID初期化
         SelectedOrgId = null
+        // 2. 組織名初期化
         document.getElementById('OrgName').value = ''
+        // 3. 拠点建物初期化
         document.getElementById('OrgBaseBuild').value = ''
+        // 4. 組織設立年月日初期化
         document.getElementById('OrgFoundedDate').value = ''
+        // 5. 人員数初期化
         document.getElementById('OrgPeopleNum').value = ''
+        // 6. 目的初期化
         document.getElementById('OrgPurpose').value = ''
+        // 7. 目的(DB登録用)初期化
         document.getElementById('OrgPurposeHidden').value = ''
+        // 8. 活動内容初期化
         document.getElementById('OrgActivity').value = ''
+        // 9. 活動内容(DB登録用)初期化
         document.getElementById('OrgActivityHidden').value = ''
-        document.getElementById('OrgImageBox').innerHTML =
-          '<span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>'
+        // 10.画像ボックス初期化
+        document.getElementById(
+          'OrgImageBox',
+        ).innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-builder"></i><div>クリックで画像選択</div></div>`
+        // 11.画像パス初期化
+        document.getElementById('OrgImagePath').value = ''
+        // 12.画像入力フォーム(ファイルイベント発火用)初期化
         document.getElementById('OrgImageInput').value = ''
+        // 13.削除ボタン要素取得
         const DeleteBtn = document.getElementById('OrgDeleteButton')
-        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+        // 14.削除ボタンが存在すれば非表示
+        if (DeleteBtn) {
+          DeleteBtn.classList.add('Hidden')
+        }
       }
 
+      /**
+       * 組織保存処理
+       **/
       async function SaveOrganization() {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 組織名取得
         const OrgName = document.getElementById('OrgName').value.trim()
+        // 2. 組織設立年月日取得
+        const FoundedDate = document
+          .getElementById('OrgFoundedDate')
+          .value.trim()
+        // 3. 人員数
+        const PeopleNum = document.getElementById('OrgPeopleNum').value.trim()
+        // 4. 目的取得
+        const Purpose = document.getElementById('OrgPurposeHidden').value.trim()
+        // 5. 活動内容取得
+        const Activity = document
+          .getElementById('OrgActivityHidden')
+          .value.trim()
+        // 6. 拠点建物ID取得
+        const BaseBuildId = document.getElementById('OrgBaseBuild').value.trim()
+        // 7. 選択中の組織ID取得
+        const OrgId = SelectedOrgId || ''
+        // 8. 画像ファイル取得
+        const ImageInput =
+          document.getElementById('OrgImageInput').files[0] || null
+
+        /* ---------------------------------------------
+         *  2. バリデーションチェック
+         * --------------------------------------------- */
+        /* 1. 組織名が未入力の場合 */
         if (!OrgName) {
+          // 1. エラーダイアログ表示
           await ShowErrorDialog('組織名を入力してください')
+          // 2. 処理終了
           return
         }
+
+        /* ---------------------------------------------
+         *  3. API通信
+         * --------------------------------------------- */
         try {
+          /* 1. スピナー表示 */
           ShowSpinner()
-          const FormData = new window.FormData()
-          if (SelectedOrgId) FormData.append('OrgId', SelectedOrgId)
-          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
-          FormData.append('OrgName', OrgName)
-          FormData.append(
-            'FoundedDate',
-            document.getElementById('OrgFoundedDate').value,
-          )
-          FormData.append(
-            'PeopleNum',
-            document.getElementById('OrgPeopleNum').value,
-          )
-          FormData.append(
-            'Purpose',
-            document.getElementById('OrgPurposeHidden').value,
-          )
-          FormData.append(
-            'Activity',
-            document.getElementById('OrgActivityHidden').value,
-          )
-          FormData.append(
-            'BaseBuildId',
-            document.getElementById('OrgBaseBuild').value,
-          )
-          FormData.append('UserId', sessionStorage.getItem('UserId'))
-          const ImageFile = document.getElementById('OrgImageInput').files[0]
-          if (ImageFile) FormData.append('Image', ImageFile)
-          const Response = await fetch(`${API_BASE_URL}/SaveOrganization.php`, {
-            method: 'POST',
-            body: FormData,
+
+          /* 2. API呼び出し */
+          const Response = await CallApi('/SaveOrganization.php', 'POST', {
+            // 1. 組織名
+            OrgName: OrgName,
+            // 2. 作品ID
+            WorkId: sessionStorage.getItem('WorkId'),
+            // 3. ユーザーID
+            UserId: sessionStorage.getItem('UserId'),
+            // 4. 組織設立年月日
+            FoundedDate: FoundedDate,
+            // 5. 人員数
+            PeopleNum: PeopleNum,
+            // 6. 目的
+            Purpose: Purpose,
+            // 7. 活動内容
+            Activity: Activity,
+            // 8. 拠点建物ID
+            BaseBuildId: BaseBuildId,
+            // 9. 組織ID
+            OrgId: OrgId,
+            // 10.選択された画像
+            Image: ImageInput ? 'Attached' : '',
           })
-          const Result = await Response.json()
+
+          /* 2. スピナー削除 */
           HideSpinner()
-          if (Result.Success) {
-            await ShowInfoDialog('保存完了', Result.Data.Message)
+
+          /* 3. 通信成功 */
+          if (Response.Success) {
+            // 1. 情報ダイアログ表示{
+            await ShowInfoDialog('保存完了', Response.Data.Message)
+            // 2. 入力フォームクリア
             ClearOrgForm()
+            // 3. 組織一覧再取得
             await LoadOrganizationList()
           } else {
-            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+            /* 4. 通信失敗 */
+            // 1. エラーダイアログ表示
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
           }
         } catch (Error) {
+          /* ---------------------------------------------
+           *  4. 例外処理
+           * --------------------------------------------- */
+          // 1. スピナー削除
           HideSpinner()
+          // 2. エラーダイアログ表示
           await ShowErrorDialog('保存中にエラーが発生しました')
+          // 3. デバッグログ
+          console.error(Error)
         }
       }
 
+      /**
+       * 組織一覧の削除処理
+       **/
       async function DeleteOrganization() {
-        if (!SelectedOrgId) return
-        if (!(await ShowConfirmDialog('この組織を削除しますか？'))) return
+        /* ---------------------------------------------
+         *  1. バリデーションチェック
+         * --------------------------------------------- */
+        /* 1. 選択された組織IDが取得できない場合 */
+        if (!SelectedOrgId) {
+          // 1. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  2. コンファームにていいえが選択された場合
+         * --------------------------------------------- */
+        if (!(await ShowConfirmDialog('この組織を削除しますか？'))) {
+          // 1. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  3. API通信
+         * --------------------------------------------- */
         try {
+          /* 1. スピナー表示 */
+          ShowSpinner()
+
+          /* 2. API呼び出し */
           const Response = await CallApi('/DeleteOrganization.php', 'POST', {
+            // 1. 組織ID
             OrgId: SelectedOrgId,
+            // 2. 作品ID
             WorkId: sessionStorage.getItem('WorkId'),
+            // 3. ユーザーID
             UserId: sessionStorage.getItem('UserId'),
           })
+
+          /* 3. スピナー削除 */
+          HideSpinner()
+
+          /* 4. 通信成功 */
           if (Response.Success) {
+            // 1. インフォダイアログ表示
             await ShowInfoDialog('削除完了', '組織を削除しました')
+            // 2. 入力フォーム初期化
             ClearOrgForm()
+            // 3. 崇徳処理再発火
             await LoadOrganizationList()
           } else {
+            /* 5. 通信失敗 */
             await ShowErrorDialog(Response.Message || '削除に失敗しました')
           }
         } catch (Error) {
+          /* ---------------------------------------------
+           *  4. 例外処理
+           * --------------------------------------------- */
+          // 1. スピナー削除
+          HideSpinner()
+          // 2. エラーダイアログ
           await ShowErrorDialog('削除中にエラーが発生しました')
         }
       }
 
+      /**
+       * 画像変更時処理
+       **/
+      function HandleOrgImageChange(Event) {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 選択されたファイル取得
+        const File = Event.target.files[0]
+
+        /* ---------------------------------------------
+         *  2. バリデーションチェック
+         * --------------------------------------------- */
+        /* 1. ファイルが存在しない場合 */
+        if (!File) {
+          // 1. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  3. ファイル読み取り用定義
+         * --------------------------------------------- */
+        // 1. FileReaderインスタンス作成
+        const Reader = new FileReader()
+
+        /* ---------------------------------------------
+         *  4. ファイル読み取り処理
+         * --------------------------------------------- */
+        Reader.onload = function (Event) {
+          /* 1. 定義 */
+          // 1. 画像ボックス要素取得
+          const ImageBox = document.getElementById('OrgImageBox')
+          // 2. 画像ボックスに画像を設定
+          ImageBox.innerHTML = `<img src="${Event.target.result}" alt="組織画像">`
+
+          /* 2. 画像ボックスクリックイベント */
+          ImageBox.onclick(async () => {
+            /* 定義 */
+            // 1. 画像ダイアログにて選択された操作の状態を保持する
+            const Deleted = await ShowImageDialog(
+              Event.target.result,
+              CanEdit(),
+            )
+
+            /* 削除の操作が選択された場合 */
+            if (Deleted) {
+              // 1. 画像ソースを初期化
+              ImageBox.innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-building"></i><div>クリックで画像選択</div></div>`
+              // 2. 画像パス初期化
+              document.getElementById('OrgImagePath').value = ''
+              // 3. 画像入力フォーム(ファイルイベント発火用)初期化
+              document.getElementById('OrgImageInput').value = ''
+            }
+          })
+        }
+        Reader.readAsDataURL(File)
+      }
+
       /* ==========================================================================
-       * チーム設定画面 (3.7 TeamInfo)
+       * チーム設定画面
        * ========================================================================== */
       let TeamList = []
       let OrgListForTeam = []
@@ -2193,68 +2586,101 @@
         const CanEditFlg = CanEdit()
 
         ContentArea.innerHTML = `
-          ${CreateContentHeader('チーム設定', 'users')}
-          <div class="FormRow">
-            <div class="FormGroup Flex1">
-              <input type="text" class="InputForm" id="TeamName" placeholder="チーム名" maxlength="150" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-            </div>
-            <div class="FormGroup Flex1">
-              <select class="SelectForm" id="TeamOrgId" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-                <option value="">所属組織を選択</option>
-              </select>
-            </div>
-          </div>
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="TeamDescription" placeholder="説明" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="TeamDescriptionBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="TeamDescriptionHidden">
-          ${
-            CanEditFlg
-              ? `
-          <div class="FormGroup">
-            <div class="ImageUploadArea" id="TeamImageArea">
-              <div class="ImageBox" id="TeamImageBox">
-                <span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>
+              ${CreateContentHeader('チーム設定', 'users')}
+              <div class="FormRow">
+                <div class="Flex1">
+                  <div class="ImageBox" id="TeamImageBox">
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-users"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <input type="file" id="TeamImageInput" accept="image/*" style="display:none;">
-            </div>
-          </div>
-          <div class="ButtonGroup">
-            <button class="ButtonClass ClearButton" id="TeamClearButton"><i class="fas fa-sync"></i> クリア</button>
-            <button class="ButtonClass SaveButton" id="TeamSaveButton"><i class="fas fa-save"></i> 保存</button>
-            <button class="ButtonClass DeleteButton Hidden" id="TeamDeleteButton"><i class="fas fa-trash"></i> 削除</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="TeamTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              <input type="hidden" id="TeamImagePath">
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="TeamName" placeholder="チーム名" maxlength="150" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+                <div class="FormGroup Flex1">
+                  <select class="SelectForm" id="TeamOrgId" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                    <option value="">所属組織を選択</option>
+                  </select>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="TeamDescription" placeholder="説明" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="TeamDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="TeamDescriptionHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="TeamClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="TeamSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="TeamDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="TeamTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
         if (CanEditFlg) {
           document
             .getElementById('TeamDescriptionBtn')
-            .addEventListener('click', () =>
-              ShowInputAreaDialog(
-                'TeamDescription',
-                'TeamDescriptionHidden',
-                CanEditFlg,
-              ),
-            )
+            .addEventListener('click', async () => {
+              const Result = await ShowInputAreaDialog(
+                document.getElementById('TeamDescriptionHidden').value,
+                false,
+              )
+              if (Result !== null && CanEditFlg) {
+                document.getElementById('TeamDescriptionHidden').value = Result
+                document.getElementById('TeamDescription').value = TruncateText(
+                  Result,
+                  30,
+                )
+              }
+            })
+
+          // 4. 画像ボックスクリックイベント
           document
             .getElementById('TeamImageBox')
-            .addEventListener('click', () =>
-              document.getElementById('TeamImageInput').click(),
-            )
+            .addEventListener('click', async () => {
+              const TeamImageBox = document.getElementById('TeamImageBox')
+              const ImgElement = TeamImageBox.querySelector('img')
+
+              if (!ImgElement) {
+                document.getElementById('TeamImageInput').click()
+                return
+              }
+
+              const Deleted = await ShowImageDialog(ImgElement.src, CanEdit())
+
+              if (Deleted) {
+                TeamImageBox.innerHTML = `
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-users"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  `
+                document.getElementById('TeamImagePath').value = ''
+                document.getElementById('TeamImageInput').value = ''
+              }
+            })
+          // 5. 画像入力変更イベント
+
           document
             .getElementById('TeamImageInput')
-            .addEventListener('change', (E) => PreviewImage(E, 'TeamImageBox'))
+            .addEventListener('change', HandleTeamOrgImageChange)
           document
             .getElementById('TeamClearButton')
             .addEventListener('click', ClearTeamForm)
@@ -2303,6 +2729,63 @@
           await ShowErrorDialog('チーム一覧の取得中にエラーが発生しました')
         }
       }
+      /**
+       * チーム画像変更時処理
+       **/
+      function HandleTeamOrgImageChange(Event) {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. 選択されたファイル取得
+        const File = Event.target.files[0]
+
+        /* ---------------------------------------------
+         *  2. バリデーションチェック
+         * --------------------------------------------- */
+        /* 1. ファイルが存在しない場合 */
+        if (!File) {
+          // 1. 処理終了
+          return
+        }
+
+        /* ---------------------------------------------
+         *  3. ファイル読み取り用定義
+         * --------------------------------------------- */
+        // 1. FileReaderインスタンス作成
+        const Reader = new FileReader()
+
+        /* ---------------------------------------------
+         *  4. ファイル読み取り処理
+         * --------------------------------------------- */
+        Reader.onload = function (Event) {
+          /* 1. 定義 */
+          // 1. 画像ボックス要素取得
+          const ImageBox = document.getElementById('TeamImageBox')
+          // 2. 画像ボックスに画像を設定
+          ImageBox.innerHTML = `<img src="${Event.target.result}" alt="チーム画像">`
+
+          /* 2. 画像ボックスクリックイベント */
+          ImageBox.onclick(async () => {
+            /* 定義 */
+            // 1. 画像ダイアログにて選択された操作の状態を保持する
+            const Deleted = await ShowImageDialog(
+              Event.target.result,
+              CanEdit(),
+            )
+
+            /* 削除の操作が選択された場合 */
+            if (Deleted) {
+              // 1. 画像ソースを初期化
+              ImageBox.innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-users"></i><div>クリックで画像選択</div></div>`
+              // 2. 画像パス初期化
+              document.getElementById('TeamImagePath').value = ''
+              // 3. 画像入力フォーム(ファイルイベント発火用)初期化
+              document.getElementById('TeamImageInput').value = ''
+            }
+          })
+        }
+        Reader.readAsDataURL(File)
+      }
 
       function UpdateTeamOrgSelect() {
         const Select = document.getElementById('TeamOrgId')
@@ -2323,19 +2806,21 @@
         const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
         const PageData = TeamList.slice(Start, End)
         let TableHtml = `
-          <table class="DataTable">
-            <thead><tr><th>チーム名</th><th>所属組織</th><th>説明</th></tr></thead>
-            <tbody>
-        `
+              <table class="DataTable">
+                <thead><tr><th>チーム名</th><th>所属組織</th><th>説明</th></tr></thead>
+                <tbody>
+            `
         if (PageData.length) {
           TableHtml += PageData.map(
             (T) => `
-              <tr data-id="${T.TeamId}">
-                <td>${EscapeHtml(T.TeamName)}</td>
-                <td>${EscapeHtml(T.OrgName || '')}</td>
-                <td>${EscapeHtml(TruncateText(T.Description || '', 30))}</td>
-              </tr>
-            `,
+                  <tr data-id="${T.TeamId}">
+                    <td>${EscapeHtml(T.TeamName)}</td>
+                    <td>${EscapeHtml(T.OrgName || '')}</td>
+                    <td>${EscapeHtml(
+                      TruncateText(T.Description || '', 30),
+                    )}</td>
+                  </tr>
+                `,
           ).join('')
         } else {
           TableHtml +=
@@ -2470,48 +2955,48 @@
         const CanEditFlg = CanEdit()
 
         ContentArea.innerHTML = `
-          ${CreateContentHeader('階級設定', 'medal')}
-          <div class="FormRow">
-            <div class="FormGroup Flex1">
-              <input type="text" class="InputForm" id="ClassName" placeholder="階級名" maxlength="150" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-            </div>
-            <div class="FormGroup Flex1">
-              <select class="SelectForm" id="ClassOrgId" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-                <option value="">組織を選択（共通階級の場合は未選択）</option>
-              </select>
-            </div>
-          </div>
-          <div class="FormRow">
-            <div class="FormGroup Flex1">
-              <input type="number" class="InputForm" id="ClassRankOrder" placeholder="序列（数字が小さいほど上位）" min="0" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-            </div>
-          </div>
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="ClassDescription" placeholder="説明" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="ClassDescriptionBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="ClassDescriptionHidden">
-          ${
-            CanEditFlg
-              ? `
-          <div class="ButtonGroup">
-            <button class="ButtonClass ClearButton" id="ClassClearButton"><i class="fas fa-sync"></i> クリア</button>
-            <button class="ButtonClass SaveButton" id="ClassSaveButton"><i class="fas fa-save"></i> 保存</button>
-            <button class="ButtonClass DeleteButton Hidden" id="ClassDeleteButton"><i class="fas fa-trash"></i> 削除</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="ClassTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              ${CreateContentHeader('階級設定', 'medal')}
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="ClassName" placeholder="階級名" maxlength="150" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+                <div class="FormGroup Flex1">
+                  <select class="SelectForm" id="ClassOrgId" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                    <option value="">組織を選択（共通階級の場合は未選択）</option>
+                  </select>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="number" class="InputForm" id="ClassRankOrder" placeholder="序列（数字が小さいほど上位）" min="0" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="ClassDescription" placeholder="説明" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="ClassDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="ClassDescriptionHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="ClassClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="ClassSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="ClassDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="ClassTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
         if (CanEditFlg) {
           document
@@ -2591,20 +3076,22 @@
         const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
         const PageData = ClassList.slice(Start, End)
         let TableHtml = `
-          <table class="DataTable">
-            <thead><tr><th>階級名</th><th>所属組織</th><th>序列</th><th>説明</th></tr></thead>
-            <tbody>
-        `
+              <table class="DataTable">
+                <thead><tr><th>階級名</th><th>所属組織</th><th>序列</th><th>説明</th></tr></thead>
+                <tbody>
+            `
         if (PageData.length) {
           TableHtml += PageData.map(
             (C) => `
-              <tr data-id="${C.ClassId}">
-                <td>${EscapeHtml(C.ClassName)}</td>
-                <td>${EscapeHtml(C.OrgName || '共通')}</td>
-                <td>${C.RankOrder !== null ? C.RankOrder : ''}</td>
-                <td>${EscapeHtml(TruncateText(C.Description || '', 30))}</td>
-              </tr>
-            `,
+                  <tr data-id="${C.ClassId}">
+                    <td>${EscapeHtml(C.ClassName)}</td>
+                    <td>${EscapeHtml(C.OrgName || '共通')}</td>
+                    <td>${C.RankOrder !== null ? C.RankOrder : ''}</td>
+                    <td>${EscapeHtml(
+                      TruncateText(C.Description || '', 30),
+                    )}</td>
+                  </tr>
+                `,
           ).join('')
         } else {
           TableHtml +=
@@ -2720,56 +3207,56 @@
         const CanEditFlg = CanEdit()
 
         ContentArea.innerHTML = `
-          ${CreateContentHeader('元号設定', 'calendar-alt')}
-          <div class="FormRow">
-            <div class="FormGroup Flex1">
-              <input type="text" class="InputForm" id="CalendarEraName" placeholder="元号名" maxlength="100" ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-            </div>
-          </div>
-          <div class="FormRow">
-            <div class="FormGroup InputWithButton Flex1">
-              <input type="text" class="InputForm" id="CalendarStartYear" placeholder="開始年" readonly ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
+              ${CreateContentHeader('元号設定', 'calendar-alt')}
+              <div class="FormRow">
+                <div class="FormGroup Flex1">
+                  <input type="text" class="InputForm" id="CalendarEraName" placeholder="元号名" maxlength="100" ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                </div>
+              </div>
+              <div class="FormRow">
+                <div class="FormGroup InputWithButton Flex1">
+                  <input type="text" class="InputForm" id="CalendarStartYear" placeholder="開始年" readonly ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                  ${
+                    CanEditFlg
+                      ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarStartYearBtn"><i class="fas fa-calendar"></i></button>`
+                      : ''
+                  }
+                </div>
+                <div class="FormGroup InputWithButton Flex1">
+                  <input type="text" class="InputForm" id="CalendarEndYear" placeholder="終了年" readonly ${
+                    !CanEditFlg ? 'disabled' : ''
+                  }>
+                  ${
+                    CanEditFlg
+                      ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarEndYearBtn"><i class="fas fa-calendar"></i></button>`
+                      : ''
+                  }
+                </div>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="CalendarDescription" placeholder="概要" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="CalendarDescriptionHidden">
               ${
                 CanEditFlg
-                  ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarStartYearBtn"><i class="fas fa-calendar"></i></button>`
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="CalendarClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="CalendarSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="CalendarDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
                   : ''
               }
-            </div>
-            <div class="FormGroup InputWithButton Flex1">
-              <input type="text" class="InputForm" id="CalendarEndYear" placeholder="終了年" readonly ${
-                !CanEditFlg ? 'disabled' : ''
-              }>
-              ${
-                CanEditFlg
-                  ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarEndYearBtn"><i class="fas fa-calendar"></i></button>`
-                  : ''
-              }
-            </div>
-          </div>
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="CalendarDescription" placeholder="概要" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="CalendarDescriptionBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="CalendarDescriptionHidden">
-          ${
-            CanEditFlg
-              ? `
-          <div class="ButtonGroup">
-            <button class="ButtonClass ClearButton" id="CalendarClearButton"><i class="fas fa-sync"></i> クリア</button>
-            <button class="ButtonClass SaveButton" id="CalendarSaveButton"><i class="fas fa-save"></i> 保存</button>
-            <button class="ButtonClass DeleteButton Hidden" id="CalendarDeleteButton"><i class="fas fa-trash"></i> 削除</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="CalendarTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="CalendarTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
         /** イベント設定 */
         if (CanEditFlg) {
@@ -2849,20 +3336,23 @@
         const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
         const PageData = CalendarList.slice(Start, End)
         let TableHtml = `
-          <table class="DataTable">
-            <thead><tr><th>元号名</th><th>開始年</th><th>終了年</th><th>概要</th></tr></thead>
-            <tbody>
-        `
+              <table class="DataTable">
+                <thead><tr><th>元号名</th><th>開始年</th><th>終了年</th><th>概要</th></tr></thead>
+                <tbody>
+            `
         if (PageData.length) {
           TableHtml += PageData.map(
             (C) => `
-              <tr data-id="${C.CaleId}">
-                <td>${EscapeHtml(C.EraName || '')}</td>
-                <td>${FormatDate(C.StartYear)}</td>
-                <td>${FormatDate(C.EndYear)}</td>
-                <td>${TruncateText(EscapeHtml(C.Description || ''), 30)}</td>
-              </tr>
-            `,
+                  <tr data-id="${C.CaleId}">
+                    <td>${EscapeHtml(C.EraName || '')}</td>
+                    <td>${FormatDate(C.StartYear)}</td>
+                    <td>${FormatDate(C.EndYear)}</td>
+                    <td>${TruncateText(
+                      EscapeHtml(C.Description || ''),
+                      30,
+                    )}</td>
+                  </tr>
+                `,
           ).join('')
         } else {
           TableHtml +=
@@ -2976,11 +3466,11 @@
         const ContentArea = document.getElementById('ContentArea')
 
         ContentArea.innerHTML = `
-          ${CreateContentHeader('更新履歴', 'history')}
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="HistoryTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              ${CreateContentHeader('更新履歴', 'history')}
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="HistoryTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
         await LoadUpdateHistoryList()
       }
@@ -3017,20 +3507,20 @@
         const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
         const PageData = UpdateHistoryList.slice(Start, End)
         let TableHtml = `
-          <table class="DataTable">
-            <thead><tr><th>更新日時</th><th>機能名</th><th>操作</th><th>更新者</th></tr></thead>
-            <tbody>
-        `
+              <table class="DataTable">
+                <thead><tr><th>更新日時</th><th>機能名</th><th>操作</th><th>更新者</th></tr></thead>
+                <tbody>
+            `
         if (PageData.length) {
           TableHtml += PageData.map(
             (H) => `
-              <tr>
-                <td>${FormatDateTimeWithWeekday(H.RegistDate)}</td>
-                <td>${EscapeHtml(H.FunctionName || '')}</td>
-                <td>${EscapeHtml(H.Operation || '')}</td>
-                <td>${EscapeHtml(H.RegistUser || '')}</td>
-              </tr>
-            `,
+                  <tr>
+                    <td>${FormatDateTimeWithWeekday(H.RegistDate)}</td>
+                    <td>${EscapeHtml(H.FunctionName || '')}</td>
+                    <td>${EscapeHtml(H.Operation || '')}</td>
+                    <td>${EscapeHtml(H.RegistUser || '')}</td>
+                  </tr>
+                `,
           ).join('')
         } else {
           TableHtml +=
@@ -3073,54 +3563,54 @@
          *  2. 入力フォーム作成
          * --------------------------------------------- */
         ContentArea.innerHTML = `
-        ${CreateContentHeader('年表設定', 'stream')}
-        <div class="FormGroup">
-          <input type="text" class="InputForm" id="TimelineTitle" placeholder="出来事タイトル" maxlength="255" ${
-            !CanEditFlg ? 'disabled' : ''
-          }>
-        </div>
-        <div class="FormGroup InputWithButton">
-          <input type="text" class="InputForm" id="TimelineEventDate" placeholder="発生時期" readonly ${
-            !CanEditFlg ? 'disabled' : ''
-          }>
-          ${
-            CanEditFlg
-              ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineEventDateBtn"><i class="fas fa-calendar"></i></button>`
-              : ''
-          }
-        </div>
-        <div class="FormGroup InputWithButton">
-          <input type="text" class="InputForm" id="TimelineEndDate" placeholder="終了時期（任意）" readonly ${
-            !CanEditFlg ? 'disabled' : ''
-          }>
-          ${
-            CanEditFlg
-              ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineEndDateBtn"><i class="fas fa-calendar"></i></button>`
-              : ''
-          }
-        </div>
-        <div class="FormGroup InputWithButton">
-          <input type="text" class="InputForm" id="TimelineContent" placeholder="内容" disabled>
-          <button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineContentBtn"><i class="fas fa-edit"></i></button>
-        </div>
-        <input type="hidden" id="TimelineContentHidden">
-        ${
-          CanEditFlg
-            ? `
-        <div class="ButtonGroup">
-          <button class="ButtonClass SecondaryButton" id="TimelineViewBtn"><i class="fas fa-stream"></i> 年表表示</button>
-          <button class="ButtonClass ClearButton" id="TimelineClearButton"><i class="fas fa-sync"></i> クリア</button>
-          <button class="ButtonClass SaveButton" id="TimelineSaveButton"><i class="fas fa-save"></i> 保存</button>
-          <button class="ButtonClass DeleteButton Hidden" id="TimelineDeleteButton"><i class="fas fa-trash"></i> 削除</button>
-        </div>
-        `
-            : ''
-        }
-        <div id="RecordCountArea" class="MarginTop10"></div>
-        <div class="TableContainer" id="TimelineTableArea"></div>
-        <div id="TimelineVisualArea" style="display:none;"></div>
-        <div id="PaginationArea"></div>
-      `
+            ${CreateContentHeader('年表設定', 'stream')}
+            <div class="FormGroup">
+              <input type="text" class="InputForm" id="TimelineTitle" placeholder="出来事タイトル" maxlength="255" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+            </div>
+            <div class="FormGroup InputWithButton">
+              <input type="text" class="InputForm" id="TimelineEventDate" placeholder="発生時期" readonly ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+              ${
+                CanEditFlg
+                  ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineEventDateBtn"><i class="fas fa-calendar"></i></button>`
+                  : ''
+              }
+            </div>
+            <div class="FormGroup InputWithButton">
+              <input type="text" class="InputForm" id="TimelineEndDate" placeholder="終了時期（任意）" readonly ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+              ${
+                CanEditFlg
+                  ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineEndDateBtn"><i class="fas fa-calendar"></i></button>`
+                  : ''
+              }
+            </div>
+            <div class="FormGroup InputWithButton">
+              <input type="text" class="InputForm" id="TimelineContent" placeholder="内容" disabled>
+              <button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineContentBtn"><i class="fas fa-edit"></i></button>
+            </div>
+            <input type="hidden" id="TimelineContentHidden">
+            ${
+              CanEditFlg
+                ? `
+            <div class="ButtonGroup">
+              <button class="ButtonClass SecondaryButton" id="TimelineViewBtn"><i class="fas fa-stream"></i> 年表表示</button>
+              <button class="ButtonClass ClearButton" id="TimelineClearButton"><i class="fas fa-sync"></i> クリア</button>
+              <button class="ButtonClass SaveButton" id="TimelineSaveButton"><i class="fas fa-save"></i> 保存</button>
+              <button class="ButtonClass DeleteButton Hidden" id="TimelineDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+            </div>
+            `
+                : ''
+            }
+            <div id="RecordCountArea" class="MarginTop10"></div>
+            <div class="TableContainer" id="TimelineTableArea"></div>
+            <div id="TimelineVisualArea" style="display:none;"></div>
+            <div id="PaginationArea"></div>
+          `
 
         /* ---------------------------------------------
          *  3. 編集権限がある場合
@@ -3226,11 +3716,11 @@
 
         if (TimelineList.length === 0) {
           VisualArea.innerHTML = `
-            <div style="text-align:center;padding:40px;color:#999;">
-              <i class="fas fa-stream" style="font-size:48px;margin-bottom:15px;"></i>
-              <p>年表データがありません</p>
-            </div>
-          `
+                <div style="text-align:center;padding:40px;color:#999;">
+                  <i class="fas fa-stream" style="font-size:48px;margin-bottom:15px;"></i>
+                  <p>年表データがありません</p>
+                </div>
+              `
           return
         }
 
@@ -3253,20 +3743,22 @@
             : ''
 
           Html += `
-            <div class="TimelineItem ${PositionClass}">
-              <div class="TimelineContent">
-                <div class="TimelineDate">${EventDateDisplay}${EndDateDisplay}</div>
-                <div class="TimelineTitle">${EscapeHtml(Item.title || '')}</div>
-                ${
-                  Item.content
-                    ? `<div class="TimelineDesc">${EscapeHtml(
-                        Item.content,
-                      )}</div>`
-                    : ''
-                }
-              </div>
-            </div>
-          `
+                <div class="TimelineItem ${PositionClass}">
+                  <div class="TimelineContent">
+                    <div class="TimelineDate">${EventDateDisplay}${EndDateDisplay}</div>
+                    <div class="TimelineTitle">${EscapeHtml(
+                      Item.title || '',
+                    )}</div>
+                    ${
+                      Item.content
+                        ? `<div class="TimelineDesc">${EscapeHtml(
+                            Item.content,
+                          )}</div>`
+                        : ''
+                    }
+                  </div>
+                </div>
+              `
         })
 
         Html += '</div>'
@@ -3522,42 +4014,42 @@
         const CanEditFlg = CanEdit()
 
         ContentArea.innerHTML = `
-          ${CreateContentHeader('能力設定', 'bolt')}
-          <div class="FormGroup">
-            <input type="text" class="InputForm" id="PowerName" placeholder="能力名" maxlength="150" ${
-              !CanEditFlg ? 'disabled' : ''
-            }>
-          </div>
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="PowerDescription" placeholder="説明" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerDescriptionBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="PowerDescriptionHidden">
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="PowerConditions" placeholder="発動条件" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerConditionsBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="PowerConditionsHidden">
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="PowerRisk" placeholder="代償・副作用" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerRiskBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="PowerRiskHidden">
-          ${
-            CanEditFlg
-              ? `
-          <div class="ButtonGroup">
-            <button class="ButtonClass ClearButton" id="PowerClearButton"><i class="fas fa-sync"></i> クリア</button>
-            <button class="ButtonClass SaveButton" id="PowerSaveButton"><i class="fas fa-save"></i> 保存</button>
-            <button class="ButtonClass DeleteButton Hidden" id="PowerDeleteButton"><i class="fas fa-trash"></i> 削除</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="PowerTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              ${CreateContentHeader('能力設定', 'bolt')}
+              <div class="FormGroup">
+                <input type="text" class="InputForm" id="PowerName" placeholder="能力名" maxlength="150" ${
+                  !CanEditFlg ? 'disabled' : ''
+                }>
+              </div>
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="PowerDescription" placeholder="説明" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="PowerDescriptionHidden">
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="PowerConditions" placeholder="発動条件" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerConditionsBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="PowerConditionsHidden">
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="PowerRisk" placeholder="代償・副作用" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="PowerRiskBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="PowerRiskHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="PowerClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="PowerSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="PowerDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="PowerTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
         /** イベント設定 */
         if (CanEditFlg) {
@@ -3654,20 +4146,23 @@
         const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
         const PageData = PowerList.slice(Start, End)
         let TableHtml = `
-          <table class="DataTable">
-            <thead><tr><th>能力名</th><th>説明</th><th>発動条件</th><th>代償・副作用</th></tr></thead>
-            <tbody>
-        `
+              <table class="DataTable">
+                <thead><tr><th>能力名</th><th>説明</th><th>発動条件</th><th>代償・副作用</th></tr></thead>
+                <tbody>
+            `
         if (PageData.length) {
           TableHtml += PageData.map(
             (P) => `
-              <tr data-id="${P.PowerId}">
-                <td>${EscapeHtml(P.PowerName || '')}</td>
-                <td>${TruncateText(EscapeHtml(P.Description || ''), 20)}</td>
-                <td>${TruncateText(EscapeHtml(P.Conditions || ''), 20)}</td>
-                <td>${TruncateText(EscapeHtml(P.Risk || ''), 20)}</td>
-              </tr>
-            `,
+                  <tr data-id="${P.PowerId}">
+                    <td>${EscapeHtml(P.PowerName || '')}</td>
+                    <td>${TruncateText(
+                      EscapeHtml(P.Description || ''),
+                      20,
+                    )}</td>
+                    <td>${TruncateText(EscapeHtml(P.Conditions || ''), 20)}</td>
+                    <td>${TruncateText(EscapeHtml(P.Risk || ''), 20)}</td>
+                  </tr>
+                `,
           ).join('')
         } else {
           TableHtml +=
@@ -3792,40 +4287,40 @@
         const CanEditFlg = CanEdit()
 
         ContentArea.innerHTML = `
-          ${CreateContentHeader('武器設定', 'shield-alt')}
-          <div class="FormGroup">
-            <input type="text" class="InputForm" id="WeaponName" placeholder="武器名" maxlength="150" ${
-              !CanEditFlg ? 'disabled' : ''
-            }>
-          </div>
-          <div class="FormGroup InputWithButton">
-            <input type="text" class="InputForm" id="WeaponDescription" placeholder="説明" disabled>
-            <button class="ButtonClass SecondaryButton ButtonSmall" id="WeaponDescriptionBtn"><i class="fas fa-edit"></i></button>
-          </div>
-          <input type="hidden" id="WeaponDescriptionHidden">
-          ${
-            CanEditFlg
-              ? `
-          <div class="FormGroup">
-            <div class="ImageUploadArea" id="WeaponImageArea">
-              <div class="ImageBox" id="WeaponImageBox">
-                <span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>
+              ${CreateContentHeader('武器設定', 'shield-alt')}
+              <div class="FormGroup">
+                <input type="text" class="InputForm" id="WeaponName" placeholder="武器名" maxlength="150" ${
+                  !CanEditFlg ? 'disabled' : ''
+                }>
               </div>
-              <input type="file" id="WeaponImageInput" accept="image/*" style="display:none;">
-            </div>
-          </div>
-          <div class="ButtonGroup">
-            <button class="ButtonClass ClearButton" id="WeaponClearButton"><i class="fas fa-sync"></i> クリア</button>
-            <button class="ButtonClass SaveButton" id="WeaponSaveButton"><i class="fas fa-save"></i> 保存</button>
-            <button class="ButtonClass DeleteButton Hidden" id="WeaponDeleteButton"><i class="fas fa-trash"></i> 削除</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="WeaponTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              <div class="FormGroup InputWithButton">
+                <input type="text" class="InputForm" id="WeaponDescription" placeholder="説明" disabled>
+                <button class="ButtonClass SecondaryButton ButtonSmall" id="WeaponDescriptionBtn"><i class="fas fa-edit"></i></button>
+              </div>
+              <input type="hidden" id="WeaponDescriptionHidden">
+              ${
+                CanEditFlg
+                  ? `
+              <div class="FormGroup">
+                <div class="ImageUploadArea" id="WeaponImageArea">
+                  <div class="ImageBox" id="WeaponImageBox">
+                    <span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>
+                  </div>
+                  <input type="file" id="WeaponImageInput" accept="image/*" style="display:none;">
+                </div>
+              </div>
+              <div class="ButtonGroup">
+                <button class="ButtonClass ClearButton" id="WeaponClearButton"><i class="fas fa-sync"></i> クリア</button>
+                <button class="ButtonClass SaveButton" id="WeaponSaveButton"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass DeleteButton Hidden" id="WeaponDeleteButton"><i class="fas fa-trash"></i> 削除</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="WeaponTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
         /** イベント設定 */
         if (CanEditFlg) {
@@ -3904,23 +4399,26 @@
         const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
         const PageData = WeaponList.slice(Start, End)
         let TableHtml = `
-          <table class="DataTable">
-            <thead><tr><th>武器名</th><th>説明</th><th>画像</th></tr></thead>
-            <tbody>
-        `
+              <table class="DataTable">
+                <thead><tr><th>武器名</th><th>説明</th><th>画像</th></tr></thead>
+                <tbody>
+            `
         if (PageData.length) {
           TableHtml += PageData.map(
             (W) => `
-              <tr data-id="${W.WeaponId}">
-                <td>${EscapeHtml(W.WeaponName || '')}</td>
-                <td>${TruncateText(EscapeHtml(W.Description || ''), 30)}</td>
-                <td>${
-                  W.ImgPath
-                    ? `<img src="${API_BASE_URL}${W.ImgPath}" class="TableThumbnail" alt="武器画像">`
-                    : '-'
-                }</td>
-              </tr>
-            `,
+                  <tr data-id="${W.WeaponId}">
+                    <td>${EscapeHtml(W.WeaponName || '')}</td>
+                    <td>${TruncateText(
+                      EscapeHtml(W.Description || ''),
+                      30,
+                    )}</td>
+                    <td>${
+                      W.ImgPath
+                        ? `<img src="${API_BASE_URL}${W.ImgPath}" class="TableThumbnail" alt="武器画像">`
+                        : '-'
+                    }</td>
+                  </tr>
+                `,
           ).join('')
         } else {
           TableHtml +=
@@ -4073,46 +4571,48 @@
         const ContentArea = document.getElementById('ContentArea')
         const CanEditFlg = CanEdit()
         ContentArea.innerHTML = `
-          ${CreateContentHeader('相関図作成', 'project-diagram')}
-          ${
-            CanEditFlg
-              ? `
-          <div class="ButtonGroup MarginBottom20">
-            <button class="ButtonClass PrimaryButton" id="RelationSaveBtn"><i class="fas fa-save"></i> 保存</button>
-            <button class="ButtonClass SecondaryButton" id="RelationAddGroupBtn"><i class="fas fa-object-group"></i> グループ追加</button>
-            <select class="SelectForm" id="RelationLineTypeSelect" style="width:auto;">
-              <option value="1">矢印線（感情）</option>
-              <option value="2">直線（関係）</option>
-            </select>
-          </div>
-          <div class="RelationTypeSelector" id="RelationTypeSelector">
-            ${RelationTypes.map(
-              (T, I) =>
-                `<div class="RelationTypeOption ${
-                  I === 0 ? 'selected' : ''
-                }" data-type="${T.name}" data-color="${T.color}" style="color:${
-                  T.color
-                };border-color:${T.color};">${T.name}</div>`,
-            ).join('')}
-          </div>
-          `
-              : ''
-          }
-          <div class="RelationContainer">
-            <div class="RelationSidebar" id="RelationSidebar">
-              <div class="RelationSidebarTitle"><i class="fas fa-users"></i> キャラクター</div>
-              <div id="RelationCharaList"></div>
-            </div>
-            <div class="RelationCanvas" id="RelationCanvas">
-              <svg class="RelationCanvasSvg" id="RelationSvg"></svg>
+              ${CreateContentHeader('相関図作成', 'project-diagram')}
               ${
                 CanEditFlg
-                  ? `<div class="TrashZone" id="TrashZone"><i class="fas fa-trash"></i></div>`
+                  ? `
+              <div class="ButtonGroup MarginBottom20">
+                <button class="ButtonClass PrimaryButton" id="RelationSaveBtn"><i class="fas fa-save"></i> 保存</button>
+                <button class="ButtonClass SecondaryButton" id="RelationAddGroupBtn"><i class="fas fa-object-group"></i> グループ追加</button>
+                <select class="SelectForm" id="RelationLineTypeSelect" style="width:auto;">
+                  <option value="1">矢印線（感情）</option>
+                  <option value="2">直線（関係）</option>
+                </select>
+              </div>
+              <div class="RelationTypeSelector" id="RelationTypeSelector">
+                ${RelationTypes.map(
+                  (T, I) =>
+                    `<div class="RelationTypeOption ${
+                      I === 0 ? 'selected' : ''
+                    }" data-type="${T.name}" data-color="${
+                      T.color
+                    }" style="color:${T.color};border-color:${T.color};">${
+                      T.name
+                    }</div>`,
+                ).join('')}
+              </div>
+              `
                   : ''
               }
-            </div>
-          </div>
-        `
+              <div class="RelationContainer">
+                <div class="RelationSidebar" id="RelationSidebar">
+                  <div class="RelationSidebarTitle"><i class="fas fa-users"></i> キャラクター</div>
+                  <div id="RelationCharaList"></div>
+                </div>
+                <div class="RelationCanvas" id="RelationCanvas">
+                  <svg class="RelationCanvasSvg" id="RelationSvg"></svg>
+                  ${
+                    CanEditFlg
+                      ? `<div class="TrashZone" id="TrashZone"><i class="fas fa-trash"></i></div>`
+                      : ''
+                  }
+                </div>
+              </div>
+            `
         await LoadRelationCharaList()
         await LoadRelationData()
         if (CanEditFlg) SetupRelationEvents()
@@ -4570,32 +5070,32 @@
           const Dialog = document.createElement('div')
           Dialog.className = 'DialogContainer DialogSmall'
           Dialog.innerHTML = `
-            <div class="DialogTitle">${
-              IsEdit ? 'グループ編集' : 'グループ追加'
-            }</div>
-            <div class="DialogContent">
-              <div class="FormGroup">
-                <input type="text" class="InputForm" id="GroupLabelInput" placeholder="グループ名" value="${
-                  Group?.Label || ''
-                }" maxlength="50">
-              </div>
-              <div class="FormGroup">
-                <label class="FormLabel">背景色</label>
-                <div class="ColorPickerWrapper">
-                  <input type="color" class="ColorPicker" id="GroupColorInput" value="${
-                    Group?.BgColor || '#9b59b6'
-                  }">
-                  <input type="text" class="InputForm ColorCodeInput" id="GroupColorCodeInput" placeholder="#9b59b6" value="${
-                    Group?.BgColor || '#9b59b6'
-                  }" maxlength="7">
+                <div class="DialogTitle">${
+                  IsEdit ? 'グループ編集' : 'グループ追加'
+                }</div>
+                <div class="DialogContent">
+                  <div class="FormGroup">
+                    <input type="text" class="InputForm" id="GroupLabelInput" placeholder="グループ名" value="${
+                      Group?.Label || ''
+                    }" maxlength="50">
+                  </div>
+                  <div class="FormGroup">
+                    <label class="FormLabel">背景色</label>
+                    <div class="ColorPickerWrapper">
+                      <input type="color" class="ColorPicker" id="GroupColorInput" value="${
+                        Group?.BgColor || '#9b59b6'
+                      }">
+                      <input type="text" class="InputForm ColorCodeInput" id="GroupColorCodeInput" placeholder="#9b59b6" value="${
+                        Group?.BgColor || '#9b59b6'
+                      }" maxlength="7">
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="DialogButtonArea">
-              <button class="ButtonClass CloseButton" id="GroupDialogClose"><i class="fas fa-times"></i> 閉じる</button>
-              <button class="ButtonClass SaveButton" id="GroupDialogSave"><i class="fas fa-check"></i> 決定</button>
-            </div>
-          `
+                <div class="DialogButtonArea">
+                  <button class="ButtonClass CloseButton" id="GroupDialogClose"><i class="fas fa-times"></i> 閉じる</button>
+                  <button class="ButtonClass SaveButton" id="GroupDialogSave"><i class="fas fa-check"></i> 決定</button>
+                </div>
+              `
           document.body.appendChild(Overlay)
           Overlay.appendChild(Dialog)
 
@@ -4699,21 +5199,21 @@
         const ContentArea = document.getElementById('ContentArea')
         const CanEditFlg = CanEdit()
         ContentArea.innerHTML = `
-          ${CreateContentHeader('ストーリー作成', 'book')}
-          ${
-            CanEditFlg
-              ? `
-          <div class="ButtonGroup MarginBottom20">
-            <button class="ButtonClass PrimaryButton" id="StoryAddBtn"><i class="fas fa-plus"></i> 行追加</button>
-            <button class="ButtonClass SuccessButton" id="StoryExportBtn"><i class="fas fa-file-word"></i> Word出力</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea"></div>
-          <div class="StoryList" id="StoryListArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              ${CreateContentHeader('ストーリー作成', 'book')}
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup MarginBottom20">
+                <button class="ButtonClass PrimaryButton" id="StoryAddBtn"><i class="fas fa-plus"></i> 行追加</button>
+                <button class="ButtonClass SuccessButton" id="StoryExportBtn"><i class="fas fa-file-word"></i> Word出力</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea"></div>
+              <div class="StoryList" id="StoryListArea"></div>
+              <div id="PaginationArea"></div>
+            `
         if (CanEditFlg) {
           document
             .getElementById('StoryAddBtn')
@@ -4762,18 +5262,18 @@
         }
         ListArea.innerHTML = StoryList.map(
           (Item, Index) => `
-          <div class="StoryItem" data-storyid="${
-            Item.StoryId
-          }" data-index="${Index}" ${CanEditFlg ? 'draggable="true"' : ''}>
-            <div class="StoryNumber">${Index + 1}</div>
-            <div class="StoryContent">
-              <div class="StoryNarrator">${
-                Item.Narrator ? `語り手: ${Item.Narrator}` : 'ナレーション'
-              }</div>
-              <div class="StoryText">${Item.Content || ''}</div>
-            </div>
-          </div>
-        `,
+              <div class="StoryItem" data-storyid="${
+                Item.StoryId
+              }" data-index="${Index}" ${CanEditFlg ? 'draggable="true"' : ''}>
+                <div class="StoryNumber">${Index + 1}</div>
+                <div class="StoryContent">
+                  <div class="StoryNarrator">${
+                    Item.Narrator ? `語り手: ${Item.Narrator}` : 'ナレーション'
+                  }</div>
+                  <div class="StoryText">${Item.Content || ''}</div>
+                </div>
+              </div>
+            `,
         ).join('')
         if (CanEditFlg) {
           ListArea.querySelectorAll('.StoryItem').forEach((Item) => {
@@ -4865,59 +5365,63 @@
           const Dialog = document.createElement('div')
           Dialog.className = 'DialogContainer DialogMedium'
           Dialog.innerHTML = `
-            <div class="DialogTitle">${
-              IsEdit ? 'ストーリー編集' : 'ストーリー追加'
-            }</div>
-            <div class="DialogContent">
-              <div class="FormGroup">
-                <div class="CheckboxWrapper">
-                  <input type="checkbox" id="StoryNarratorToggle" ${
-                    Item?.Narrator ? '' : 'checked'
-                  }>
-                  <label>自由入力</label>
+                <div class="DialogTitle">${
+                  IsEdit ? 'ストーリー編集' : 'ストーリー追加'
+                }</div>
+                <div class="DialogContent">
+                  <div class="FormGroup">
+                    <div class="CheckboxWrapper">
+                      <input type="checkbox" id="StoryNarratorToggle" ${
+                        Item?.Narrator ? '' : 'checked'
+                      }>
+                      <label>自由入力</label>
+                    </div>
+                  </div>
+                  <div class="FormGroup" id="StoryNarratorSelectGroup">
+                    <select class="SelectForm" id="StoryNarratorSelect">
+                      <option value="">語り手を選択</option>
+                      ${
+                        RelationCharaList.length
+                          ? RelationCharaList.map(
+                              (C) =>
+                                `<option value="${C.CharaName}" ${
+                                  Item?.Narrator === C.CharaName
+                                    ? 'selected'
+                                    : ''
+                                }>${C.CharaName}</option>`,
+                            ).join('')
+                          : CharacterList.map(
+                              (C) =>
+                                `<option value="${C.CharaName}" ${
+                                  Item?.Narrator === C.CharaName
+                                    ? 'selected'
+                                    : ''
+                                }>${C.CharaName}</option>`,
+                            ).join('')
+                      }
+                    </select>
+                  </div>
+                  <div class="FormGroup Hidden" id="StoryNarratorInputGroup">
+                    <input type="text" class="InputForm" id="StoryNarratorInput" placeholder="語り手（空白でナレーション）" value="${
+                      Item?.Narrator || ''
+                    }">
+                  </div>
+                  <div class="FormGroup">
+                    <textarea class="TextAreaForm" id="StoryContentInput" placeholder="内容" style="min-height:150px;">${
+                      Item?.Content || ''
+                    }</textarea>
+                  </div>
                 </div>
-              </div>
-              <div class="FormGroup" id="StoryNarratorSelectGroup">
-                <select class="SelectForm" id="StoryNarratorSelect">
-                  <option value="">語り手を選択</option>
+                <div class="DialogButtonArea">
+                  <button class="ButtonClass CloseButton" id="StoryDialogClose"><i class="fas fa-times"></i> 閉じる</button>
                   ${
-                    RelationCharaList.length
-                      ? RelationCharaList.map(
-                          (C) =>
-                            `<option value="${C.CharaName}" ${
-                              Item?.Narrator === C.CharaName ? 'selected' : ''
-                            }>${C.CharaName}</option>`,
-                        ).join('')
-                      : CharacterList.map(
-                          (C) =>
-                            `<option value="${C.CharaName}" ${
-                              Item?.Narrator === C.CharaName ? 'selected' : ''
-                            }>${C.CharaName}</option>`,
-                        ).join('')
+                    IsEdit
+                      ? `<button class="ButtonClass DeleteButton" id="StoryDialogDelete"><i class="fas fa-trash"></i> 削除</button>`
+                      : ''
                   }
-                </select>
-              </div>
-              <div class="FormGroup Hidden" id="StoryNarratorInputGroup">
-                <input type="text" class="InputForm" id="StoryNarratorInput" placeholder="語り手（空白でナレーション）" value="${
-                  Item?.Narrator || ''
-                }">
-              </div>
-              <div class="FormGroup">
-                <textarea class="TextAreaForm" id="StoryContentInput" placeholder="内容" style="min-height:150px;">${
-                  Item?.Content || ''
-                }</textarea>
-              </div>
-            </div>
-            <div class="DialogButtonArea">
-              <button class="ButtonClass CloseButton" id="StoryDialogClose"><i class="fas fa-times"></i> 閉じる</button>
-              ${
-                IsEdit
-                  ? `<button class="ButtonClass DeleteButton" id="StoryDialogDelete"><i class="fas fa-trash"></i> 削除</button>`
-                  : ''
-              }
-              <button class="ButtonClass SaveButton" id="StoryDialogSave"><i class="fas fa-save"></i> 保存</button>
-            </div>
-          `
+                  <button class="ButtonClass SaveButton" id="StoryDialogSave"><i class="fas fa-save"></i> 保存</button>
+                </div>
+              `
           document.body.appendChild(Overlay)
           Overlay.appendChild(Dialog)
           const Toggle = Dialog.querySelector('#StoryNarratorToggle')
@@ -5061,21 +5565,21 @@
         const ContentArea = document.getElementById('ContentArea')
         const CanEditFlg = CanEdit()
         ContentArea.innerHTML = `
-          ${CreateContentHeader('プロット作成', 'sitemap')}
-          ${
-            CanEditFlg
-              ? `
-          <div class="ButtonGroup MarginBottom20">
-            <button class="ButtonClass PrimaryButton" id="PlotAddBtn"><i class="fas fa-plus"></i> 行追加</button>
-            <button class="ButtonClass SuccessButton" id="PlotExportBtn"><i class="fas fa-file-word"></i> Word出力</button>
-          </div>
-          `
-              : ''
-          }
-          <div id="RecordCountArea"></div>
-          <div class="StoryList" id="PlotListArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              ${CreateContentHeader('プロット作成', 'sitemap')}
+              ${
+                CanEditFlg
+                  ? `
+              <div class="ButtonGroup MarginBottom20">
+                <button class="ButtonClass PrimaryButton" id="PlotAddBtn"><i class="fas fa-plus"></i> 行追加</button>
+                <button class="ButtonClass SuccessButton" id="PlotExportBtn"><i class="fas fa-file-word"></i> Word出力</button>
+              </div>
+              `
+                  : ''
+              }
+              <div id="RecordCountArea"></div>
+              <div class="StoryList" id="PlotListArea"></div>
+              <div id="PaginationArea"></div>
+            `
         if (CanEditFlg) {
           document
             .getElementById('PlotAddBtn')
@@ -5124,18 +5628,18 @@
         }
         ListArea.innerHTML = PlotList.map(
           (Item, Index) => `
-          <div class="StoryItem" data-plotid="${
-            Item.PlotId
-          }" data-index="${Index}" ${CanEditFlg ? 'draggable="true"' : ''}>
-            <div class="StoryNumber">${Index + 1}</div>
-            <div class="StoryContent">
-              <span class="PlotBadge ${
-                PlotStructureClasses[Item.StructureType] || ''
-              }">${PlotStructureLabels[Item.StructureType] || '?'}</span>
-              <span class="StoryText">${Item.Content || ''}</span>
-            </div>
-          </div>
-        `,
+              <div class="StoryItem" data-plotid="${
+                Item.PlotId
+              }" data-index="${Index}" ${CanEditFlg ? 'draggable="true"' : ''}>
+                <div class="StoryNumber">${Index + 1}</div>
+                <div class="StoryContent">
+                  <span class="PlotBadge ${
+                    PlotStructureClasses[Item.StructureType] || ''
+                  }">${PlotStructureLabels[Item.StructureType] || '?'}</span>
+                  <span class="StoryText">${Item.Content || ''}</span>
+                </div>
+              </div>
+            `,
         ).join('')
         if (CanEditFlg) {
           ListArea.querySelectorAll('.StoryItem').forEach((Item) => {
@@ -5218,36 +5722,36 @@
           const Dialog = document.createElement('div')
           Dialog.className = 'DialogContainer DialogMedium'
           Dialog.innerHTML = `
-            <div class="DialogTitle">${
-              IsEdit ? 'プロット編集' : 'プロット追加'
-            }</div>
-            <div class="DialogContent">
-              <div class="FormGroup">
-                <select class="SelectForm" id="PlotStructureSelect">
-                  ${PlotStructureLabels.map(
-                    (L, I) =>
-                      `<option value="${I}" ${
-                        Item?.StructureType == I ? 'selected' : ''
-                      }>${L}</option>`,
-                  ).join('')}
-                </select>
-              </div>
-              <div class="FormGroup">
-                <textarea class="TextAreaForm" id="PlotContentInput" placeholder="内容" style="min-height:150px;">${
-                  Item?.Content || ''
-                }</textarea>
-              </div>
-            </div>
-            <div class="DialogButtonArea">
-              <button class="ButtonClass CloseButton" id="PlotDialogClose"><i class="fas fa-times"></i> 閉じる</button>
-              ${
-                IsEdit
-                  ? `<button class="ButtonClass DeleteButton" id="PlotDialogDelete"><i class="fas fa-trash"></i> 削除</button>`
-                  : ''
-              }
-              <button class="ButtonClass SaveButton" id="PlotDialogSave"><i class="fas fa-save"></i> 保存</button>
-            </div>
-          `
+                <div class="DialogTitle">${
+                  IsEdit ? 'プロット編集' : 'プロット追加'
+                }</div>
+                <div class="DialogContent">
+                  <div class="FormGroup">
+                    <select class="SelectForm" id="PlotStructureSelect">
+                      ${PlotStructureLabels.map(
+                        (L, I) =>
+                          `<option value="${I}" ${
+                            Item?.StructureType == I ? 'selected' : ''
+                          }>${L}</option>`,
+                      ).join('')}
+                    </select>
+                  </div>
+                  <div class="FormGroup">
+                    <textarea class="TextAreaForm" id="PlotContentInput" placeholder="内容" style="min-height:150px;">${
+                      Item?.Content || ''
+                    }</textarea>
+                  </div>
+                </div>
+                <div class="DialogButtonArea">
+                  <button class="ButtonClass CloseButton" id="PlotDialogClose"><i class="fas fa-times"></i> 閉じる</button>
+                  ${
+                    IsEdit
+                      ? `<button class="ButtonClass DeleteButton" id="PlotDialogDelete"><i class="fas fa-trash"></i> 削除</button>`
+                      : ''
+                  }
+                  <button class="ButtonClass SaveButton" id="PlotDialogSave"><i class="fas fa-save"></i> 保存</button>
+                </div>
+              `
           document.body.appendChild(Overlay)
           Overlay.appendChild(Dialog)
           Dialog.querySelector('#PlotDialogClose').addEventListener(
@@ -5369,22 +5873,22 @@
         const ContentArea = document.getElementById('ContentArea')
         const CanEditFlg = CanEditReview()
         ContentArea.innerHTML = `
-        ${CreateContentHeader('作品レビュー', 'star')}
-        <div class="FormGroup"><input type="text" class="InputForm" id="ReviewerName" placeholder="レビュアー名" maxlength="150" ${
-          !CanEditFlg ? 'disabled' : ''
-        }></div>
-        <div class="FormGroup"><select class="SelectForm" id="ReviewEvaluation" ${
-          !CanEditFlg ? 'disabled' : ''
-        }>${PullDownList('Review')}</select></div>
-        <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ReviewContent" placeholder="レビュー内容" disabled><button class="ButtonClass SecondaryButton ButtonSmall" id="ReviewContentBtn"><i class="fas fa-edit"></i></button></div>
-        <input type="hidden" id="ReviewContentHidden">
-        ${
-          CanEditFlg
-            ? `<div class="ButtonGroup"><button class="ButtonClass ClearButton" id="ReviewClearButton"><i class="fas fa-sync"></i> クリア</button><button class="ButtonClass SaveButton" id="ReviewSaveButton"><i class="fas fa-save"></i> 保存</button><button class="ButtonClass DeleteButton Hidden" id="ReviewDeleteButton"><i class="fas fa-trash"></i> 削除</button></div>`
-            : ''
-        }
-        <div id="RecordCountArea" class="MarginTop20"></div><div class="TableContainer" id="ReviewTableArea"></div><div id="PaginationArea"></div>
-      `
+            ${CreateContentHeader('作品レビュー', 'star')}
+            <div class="FormGroup"><input type="text" class="InputForm" id="ReviewerName" placeholder="レビュアー名" maxlength="150" ${
+              !CanEditFlg ? 'disabled' : ''
+            }></div>
+            <div class="FormGroup"><select class="SelectForm" id="ReviewEvaluation" ${
+              !CanEditFlg ? 'disabled' : ''
+            }>${PullDownList('Review')}</select></div>
+            <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ReviewContent" placeholder="レビュー内容" disabled><button class="ButtonClass SecondaryButton ButtonSmall" id="ReviewContentBtn"><i class="fas fa-edit"></i></button></div>
+            <input type="hidden" id="ReviewContentHidden">
+            ${
+              CanEditFlg
+                ? `<div class="ButtonGroup"><button class="ButtonClass ClearButton" id="ReviewClearButton"><i class="fas fa-sync"></i> クリア</button><button class="ButtonClass SaveButton" id="ReviewSaveButton"><i class="fas fa-save"></i> 保存</button><button class="ButtonClass DeleteButton Hidden" id="ReviewDeleteButton"><i class="fas fa-trash"></i> 削除</button></div>`
+                : ''
+            }
+            <div id="RecordCountArea" class="MarginTop20"></div><div class="TableContainer" id="ReviewTableArea"></div><div id="PaginationArea"></div>
+          `
         if (CanEditFlg) {
           document
             .getElementById('ReviewClearButton')
@@ -5589,17 +6093,17 @@
         SelectedScheduleId = null
         const ContentArea = document.getElementById('ContentArea')
         ContentArea.innerHTML = `
-        ${CreateContentHeader('スケジュール', 'tasks')}
-        <div class="CalendarContainer">
-          <div class="CalendarHeader">
-            <button class="CalendarNavButton" id="CalendarPrev"><i class="fas fa-chevron-left"></i></button>
-            <h3 id="CalendarTitle"></h3>
-            <button class="CalendarNavButton" id="CalendarNext"><i class="fas fa-chevron-right"></i></button>
-          </div>
-          <div class="CalendarGrid" id="CalendarGrid"></div>
-        </div>
-        <div id="RecordCountArea" class="MarginTop20"></div>
-      `
+            ${CreateContentHeader('スケジュール', 'tasks')}
+            <div class="CalendarContainer">
+              <div class="CalendarHeader">
+                <button class="CalendarNavButton" id="CalendarPrev"><i class="fas fa-chevron-left"></i></button>
+                <h3 id="CalendarTitle"></h3>
+                <button class="CalendarNavButton" id="CalendarNext"><i class="fas fa-chevron-right"></i></button>
+              </div>
+              <div class="CalendarGrid" id="CalendarGrid"></div>
+            </div>
+            <div id="RecordCountArea" class="MarginTop20"></div>
+          `
         document
           .getElementById('CalendarPrev')
           .addEventListener('click', () => {
@@ -5758,61 +6262,61 @@
         const Modal = document.createElement('div')
         Modal.className = 'ScheduleModal'
         Modal.innerHTML = `
-        <div class="ScheduleModalContent">
-          <div class="ScheduleModalHeader"><h3>${
-            IsNew ? 'スケジュール追加' : 'スケジュール編集'
-          }</h3><button class="ScheduleModalClose" id="ScheduleModalClose">&times;</button></div>
-          <div class="FormGroup"><input type="text" class="InputForm" id="ModalScheduleTitle" placeholder="タイトル" maxlength="255" value="${
-            Event?.title || ''
-          }" ${!CanEditFlg ? 'disabled' : ''}></div>
-          <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleStartDate" placeholder="開始日" value="${
-            Event?.startdate || DefaultDate || ''
-          }" readonly ${!CanEditFlg ? 'disabled' : ''}>${
+            <div class="ScheduleModalContent">
+              <div class="ScheduleModalHeader"><h3>${
+                IsNew ? 'スケジュール追加' : 'スケジュール編集'
+              }</h3><button class="ScheduleModalClose" id="ScheduleModalClose">&times;</button></div>
+              <div class="FormGroup"><input type="text" class="InputForm" id="ModalScheduleTitle" placeholder="タイトル" maxlength="255" value="${
+                Event?.title || ''
+              }" ${!CanEditFlg ? 'disabled' : ''}></div>
+              <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleStartDate" placeholder="開始日" value="${
+                Event?.startdate || DefaultDate || ''
+              }" readonly ${!CanEditFlg ? 'disabled' : ''}>${
           CanEditFlg
             ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="ModalStartDateBtn"><i class="fas fa-calendar"></i></button>`
             : ''
         }</div>
-          <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleEndDate" placeholder="終了日" value="${
-            Event?.enddate || ''
-          }" readonly ${!CanEditFlg ? 'disabled' : ''}>${
+              <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleEndDate" placeholder="終了日" value="${
+                Event?.enddate || ''
+              }" readonly ${!CanEditFlg ? 'disabled' : ''}>${
           CanEditFlg
             ? `<button class="ButtonClass SecondaryButton ButtonSmall" id="ModalEndDateBtn"><i class="fas fa-calendar"></i></button>`
             : ''
         }</div>
-          ${
-            CanEditFlg
-              ? `<label style="font-size:12px;color:#666;margin-bottom:5px;display:block;">カラー</label><div class="ScheduleColorPicker" id="ColorPicker">${ScheduleColors.map(
-                  (C) =>
-                    `<div class="ColorOption ${
-                      (Event?.color || ScheduleColors[0]) === C
-                        ? 'Selected'
+              ${
+                CanEditFlg
+                  ? `<label style="font-size:12px;color:#666;margin-bottom:5px;display:block;">カラー</label><div class="ScheduleColorPicker" id="ColorPicker">${ScheduleColors.map(
+                      (C) =>
+                        `<div class="ColorOption ${
+                          (Event?.color || ScheduleColors[0]) === C
+                            ? 'Selected'
+                            : ''
+                        }" data-color="${C}" style="background-color:${C};"></div>`,
+                    ).join('')}</div>`
+                  : ''
+              }
+              <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleDescription" placeholder="説明" value="${
+                TruncateText(Event?.description, 30) || ''
+              }" disabled><button class="ButtonClass SecondaryButton ButtonSmall" id="ModalDescriptionBtn"><i class="fas fa-edit"></i></button></div>
+              <input type="hidden" id="ModalScheduleDescriptionHidden" value="${
+                Event?.description || ''
+              }">
+              <input type="hidden" id="ModalScheduleColor" value="${
+                Event?.color || ScheduleColors[0]
+              }">
+              <input type="hidden" id="ModalScheduleId" value="${
+                Event?.scheduleid || ''
+              }">
+              ${
+                CanEditFlg
+                  ? `<div class="ButtonGroup" style="margin-top:20px;"><button class="ButtonClass SaveButton" id="ModalSaveBtn"><i class="fas fa-save"></i> 保存</button>${
+                      !IsNew
+                        ? `<button class="ButtonClass DeleteButton" id="ModalDeleteBtn"><i class="fas fa-trash"></i> 削除</button>`
                         : ''
-                    }" data-color="${C}" style="background-color:${C};"></div>`,
-                ).join('')}</div>`
-              : ''
-          }
-          <div class="FormGroup InputWithButton"><input type="text" class="InputForm" id="ModalScheduleDescription" placeholder="説明" value="${
-            TruncateText(Event?.description, 30) || ''
-          }" disabled><button class="ButtonClass SecondaryButton ButtonSmall" id="ModalDescriptionBtn"><i class="fas fa-edit"></i></button></div>
-          <input type="hidden" id="ModalScheduleDescriptionHidden" value="${
-            Event?.description || ''
-          }">
-          <input type="hidden" id="ModalScheduleColor" value="${
-            Event?.color || ScheduleColors[0]
-          }">
-          <input type="hidden" id="ModalScheduleId" value="${
-            Event?.scheduleid || ''
-          }">
-          ${
-            CanEditFlg
-              ? `<div class="ButtonGroup" style="margin-top:20px;"><button class="ButtonClass SaveButton" id="ModalSaveBtn"><i class="fas fa-save"></i> 保存</button>${
-                  !IsNew
-                    ? `<button class="ButtonClass DeleteButton" id="ModalDeleteBtn"><i class="fas fa-trash"></i> 削除</button>`
-                    : ''
-                }</div>`
-              : ''
-          }
-        </div>`
+                    }</div>`
+                  : ''
+              }
+            </div>`
         document.body.appendChild(Modal)
         const CloseModal = () => Modal.remove()
         Modal.querySelector('#ScheduleModalClose').addEventListener(
@@ -5949,11 +6453,11 @@
         const CanEditFlg = CanEdit()
 
         ContentArea.innerHTML = `
-          ${CreateContentHeader('参加者一覧', 'user-friends')}
-          <div id="RecordCountArea" class="MarginTop20"></div>
-          <div class="TableContainer" id="ParticipantTableArea"></div>
-          <div id="PaginationArea"></div>
-        `
+              ${CreateContentHeader('参加者一覧', 'user-friends')}
+              <div id="RecordCountArea" class="MarginTop20"></div>
+              <div class="TableContainer" id="ParticipantTableArea"></div>
+              <div id="PaginationArea"></div>
+            `
 
         await LoadParticipantList()
       }
@@ -5995,15 +6499,15 @@
         const End = Math.min(Start + RECORDS_PER_PAGE, TotalCount)
         const PageData = ParticipantList.slice(Start, End)
         let TableHtml = `
-          <table class="DataTable">
-            <thead><tr>
-              <th>ユーザーID</th>
-              <th>利用者区分</th>
-              <th>参加日</th>
-              ${CanEditFlg ? '<th>アクセス権限</th>' : ''}
-            </tr></thead>
-            <tbody>
-        `
+              <table class="DataTable">
+                <thead><tr>
+                  <th>ユーザーID</th>
+                  <th>利用者区分</th>
+                  <th>参加日</th>
+                  ${CanEditFlg ? '<th>アクセス権限</th>' : ''}
+                </tr></thead>
+                <tbody>
+            `
         if (PageData.length) {
           TableHtml += PageData.map((P) => {
             console.log('P', P)
@@ -6013,29 +6517,29 @@
               ? 'SuccessButton'
               : 'DangerButton'
             return `
-              <tr data-userid="${EscapeHtml(P.UserId)}">
-                <td>${EscapeHtml(P.UserId || '')}</td>
-                <td>${RoleLabel}</td>
-                <td>${FormatTimestamp(P.RegistDate)}</td>
-                ${
-                  CanEditFlg && !P.IsCreator
-                    ? `<td>
-                        <button
-                          class="ButtonClass ${LockBtnClass} ButtonSmall ParticipantLockBtn"
-                          data-userid="${EscapeHtml(P.UserId)}"
-                          data-locked="${P.UserLockFlg ? 'true' : 'false'}">
-                          <i class="fas fa-${
-                            P.UserLockFlg ? 'lock' : 'unlock'
-                          }"></i>
-                          ${LockBtnLabel}
-                        </button>
-                      </td>`
-                    : CanEditFlg
-                    ? '<td></td>'
-                    : ''
-                }
-              </tr>
-            `
+                  <tr data-userid="${EscapeHtml(P.UserId)}">
+                    <td>${EscapeHtml(P.UserId || '')}</td>
+                    <td>${RoleLabel}</td>
+                    <td>${FormatTimestamp(P.RegistDate)}</td>
+                    ${
+                      CanEditFlg && !P.IsCreator
+                        ? `<td>
+                            <button
+                              class="ButtonClass ${LockBtnClass} ButtonSmall ParticipantLockBtn"
+                              data-userid="${EscapeHtml(P.UserId)}"
+                              data-locked="${P.UserLockFlg ? 'true' : 'false'}">
+                              <i class="fas fa-${
+                                P.UserLockFlg ? 'lock' : 'unlock'
+                              }"></i>
+                              ${LockBtnLabel}
+                            </button>
+                          </td>`
+                        : CanEditFlg
+                        ? '<td></td>'
+                        : ''
+                    }
+                  </tr>
+                `
           }).join('')
         } else {
           TableHtml += `<tr><td colspan="${
@@ -6134,12 +6638,12 @@
       function ShowPlaceholder(Title, Icon) {
         const ContentArea = document.getElementById('ContentArea')
         ContentArea.innerHTML = `
-        ${CreateContentHeader(Title, Icon)}
-        <div style="text-align: center; padding: 50px; color: #999;">
-          <i class="fas fa-${Icon}" style="font-size: 60px; margin-bottom: 20px;"></i>
-          <p>この機能は準備中です</p>
-        </div>
-      `
+            ${CreateContentHeader(Title, Icon)}
+            <div style="text-align: center; padding: 50px; color: #999;">
+              <i class="fas fa-${Icon}" style="font-size: 60px; margin-bottom: 20px;"></i>
+              <p>この機能は準備中です</p>
+            </div>
+          `
       }
     </script>
   </body>
