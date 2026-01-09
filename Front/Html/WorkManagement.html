@@ -4896,8 +4896,8 @@
 
         /** 日付でソート（eventDateの昇順） */
         const SortedList = [...TimelineList].sort((a, b) => {
-          const DateA = (a.eventDate || '').replace(/[^0-9]/g, '')
-          const DateB = (b.eventDate || '').replace(/[^0-9]/g, '')
+          const DateA = (a.eventdate || '').replace(/[^0-9]/g, '')
+          const DateB = (b.eventdate || '').replace(/[^0-9]/g, '')
           return DateA.localeCompare(DateB)
         })
 
@@ -4907,9 +4907,9 @@
         SortedList.forEach((Item, Index) => {
           const IsLeft = Index % 2 === 0
           const PositionClass = IsLeft ? 'TimelineLeft' : 'TimelineRight'
-          const EventDateDisplay = FormatDate(Item.eventDate) || '不明'
-          const EndDateDisplay = Item.endDate
-            ? ` ～ ${FormatDate(Item.endDate)}`
+          const EventDateDisplay = FormatDate(Item.eventdate) || '不明'
+          const EndDateDisplay = Item.enddate
+            ? ` ～ ${FormatDate(Item.enddate)}`
             : ''
 
           Html += `
