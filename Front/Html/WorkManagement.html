@@ -909,64 +909,142 @@
     <script src="../Js/Common.js"></script>
     <script src="../Js/Dialog.js"></script>
     <script>
-      // ページネーション用の1ページあたり件数（デフォルト値）
+      /* ==========================================================================
+      * 定数
+      * ========================================================================== */
+      // 1. ページネーション用の1ページあたり件数
       const PAGE_SIZE = 15
-      /**
-       * WorkManagement.js
-       * 作品管理画面の処理
-       */
 
-      /** グローバル変数 */
+      /* ==========================================================================
+      * グローバル定義
+      * ========================================================================== */
+      /* ---------------------------------------------
+       *  1. 画面情報
+       * --------------------------------------------- */
+      // 1. 作品情報
       let WorkInfo = null
+
+      /* ---------------------------------------------
+       *  2. 制御FLG
+       * --------------------------------------------- */
+      // 1. 作成者FLG
       let IsCreator = false
+      // 2. 管理者FLG
       let IsAdmin = false
+      // 3. アシスタントFLG
       let IsAssistant = false
+
+      /* ---------------------------------------------
+       *  3. 画面制御
+       * --------------------------------------------- */
+      // 1. ページ初期ページ
       let CurrentPage = 1
+
+      /* ---------------------------------------------
+       *  4. 一覧
+       * --------------------------------------------- */
+      // 1. 年表一覧
       let TimelineList = []
+      // 2. スケジュール一覧
       let ScheduleList = []
+      // 3. レビュー一覧
       let ReviewList = []
+      // 4. キャラクター一覧
+      let CharacterList = []
+
+      /* ---------------------------------------------
+       *  5. 選択行ID
+       * --------------------------------------------- */
+      // 1. 年表選択行ID
       let SelectedTimelineId = null
+      // 2. スケジュール選択行ID
       let SelectedScheduleId = null
+      // 3. レビュー選択行ID
       let SelectedReviewId = null
+      // 4. キャラクター選択行ID
+      let SelectedCharacterId = null
+
+      /* ---------------------------------------------
+       *  6. キャラ設定画面プルダウン
+       * --------------------------------------------- */
+      // 1. 組織プルダウン
+      let CharacterOrganizationList = []
+      // 2. チームプルダウン
+      let CharacterTeamList = []
+      // 3. 種族プルダウン
+      let CharacterRaceList = []
+      // 4. 階級プルダウン
+      let CharacterClassList = []
 
       /**
-       * ページ読み込み時の初期化処理
+       * 画面ロード時処理
        */
       document.addEventListener('DOMContentLoaded', function () {
+        // 1. 初期化処理を呼び出し
         InitializeWorkManagementPage()
       })
 
       /**
-       * 作品管理画面の初期化
+       * 作品管理画面の初期化処理
        */
       async function InitializeWorkManagementPage() {
-        /** セッションチェック */
+        /* ==========================================================================
+        * 定義
+        * ========================================================================== */
+        // 1. セッションからユーザーIDを取得
         const UserId = sessionStorage.getItem('UserId')
+        // 2. セッションから作品IDを取得
         const WorkId = sessionStorage.getItem('WorkId')
 
+        /* ==========================================================================
+        * チェック
+        * ========================================================================== */
+        /* ---------------------------------------------
+        *  1. ユーザーIDまたは作品IDが存在しない場合
+        * --------------------------------------------- */
         if (!UserId || !WorkId) {
+          // 1. ログイン画面へ遷移
           window.location.href = '/index.html'
+          // 2. 処理終了
           return
         }
 
+        /* ==========================================================================
+        * 管理者状態を設定
+        * ========================================================================== */
         IsAdmin = sessionStorage.getItem('AuthFlg') === 'true'
 
-        /** メニューイベント設定 */
+        /* ==========================================================================
+        * イベント定義
+        * ========================================================================== */
+        /* ---------------------------------------------
+        *  1. メニューボタン押下時イベント定義
+        * --------------------------------------------- */
         SetupMenuEvents()
 
-        /** モバイルメニュートグル */
+        /* ---------------------------------------------
+        *  2. モバイル版メニューボタン押下時イベント定義
+        * --------------------------------------------- */
         SetupMobileMenu()
 
-        /** セッション監視開始 */
+        /* ==========================================================================
+        * セッション状態監視処理開始
+        * ========================================================================== */
         StartSessionMonitor()
 
-        /** 作品情報取得 */
+        /* ==========================================================================
+        * 作品情報取得処理
+        * ========================================================================== */
         await LoadWorkInfo()
 
-        /** 利用者区分チェック */
+        /* ==========================================================================
+        * 利用者区分判定処理
+        * ========================================================================== */
         await CheckUserPermission()
 
-        /** 初期表示：作品共通情報 */
+        /* ==========================================================================
+        * 作品共通情報表示処理
+        * ========================================================================== */
         ShowWorkCommonInfo()
       }
 
@@ -974,24 +1052,60 @@
        * 作品情報を読み込み
        */
       async function LoadWorkInfo() {
+        /* ==========================================================================
+        * API通信
+        * ========================================================================== */
         try {
+          /* ---------------------------------------------
+          *  1. 定義
+          * --------------------------------------------- */
+          // 1. スピナー表示
+          ShowSpinner()
+          // 2. 作品ID取得
           const WorkId = sessionStorage.getItem('WorkId')
+
+          /* ---------------------------------------------
+          *  2. API呼び出し
+          * --------------------------------------------- */
           const Response = await CallApi(
             `/GetWorkInfo.php?WorkId=${encodeURIComponent(WorkId)}`,
             'GET',
           )
 
+          /* ---------------------------------------------
+          *  3. スピナー削除
+          * --------------------------------------------- */
+          HideSpinner()
+
+          /* ---------------------------------------------
+          *  4. 通信成功
+          * --------------------------------------------- */
           if (Response.Success) {
+            // 1. 作品情報を保持
             WorkInfo = Response.Data
           } else {
+            /* ---------------------------------------------
+            *  5. 通信失敗
+            * --------------------------------------------- */
+            // 1. エラーダイアログ表示
             await ShowErrorDialog(
               Response.Message || '作品情報の取得に失敗しました',
             )
+            // 2. メイン画面へリダイレクト
             window.location.href = 'Main.html'
           }
         } catch (Error) {
+          /* ==========================================================================
+          * 例外処理
+          * ========================================================================== */
+          // 1. スピナー削除
+          HideSpinner()
+          // 2. エラーダイアログを表示
           await ShowErrorDialog('作品情報の取得中にエラーが発生しました')
+          // 3. メイン画面へリダイレクト
           window.location.href = 'Main.html'
+          // 4. デバッグログ
+          console.error(Error)
         }
       }
 
@@ -999,9 +1113,21 @@
        * 利用者区分チェック
        */
       async function CheckUserPermission() {
+        /* ==========================================================================
+        * API通信
+        * ========================================================================== */
         try {
+          /* ---------------------------------------------
+          *  1. 定義
+          * --------------------------------------------- */
+          // 1. ユーザーID
           const UserId = sessionStorage.getItem('UserId')
+          // 2. 作品ID
           const WorkId = sessionStorage.getItem('WorkId')
+
+          /* ---------------------------------------------
+          *  2. API呼び出し
+          * --------------------------------------------- */
           const Response = await CallApi(
             `/GetUserPermission.php?WorkId=${encodeURIComponent(
               WorkId,
@@ -1009,28 +1135,41 @@
             'GET',
           )
 
+          /* ---------------------------------------------
+          *  3. 通信成功
+          * --------------------------------------------- */
           if (Response.Success) {
+            // 1. 作成区分を設定
             IsCreator = Response.Data.IsCreator
+            // 2. アシスタント区分を設定
             IsAssistant = !Response.Data.IsCreator
           }
         } catch (Error) {
-          console.error('権限チェックエラー:', Error)
+          /* ==========================================================================
+          * 例外処理
+          * ========================================================================== */
+          // 1. デバッグログ
+          console.error(Error)
         }
       }
 
       /**
-       * 編集権限があるかチェック（作成者または管理者）
+       * 編集権限があるかチェック
+       * 作成者または管理者であるかを判定する
        * @returns {boolean} 編集権限があるかどうか
        */
       function CanEdit() {
+        // 1. 作成者であるか管理者であるかを返す
         return IsCreator || IsAdmin
       }
 
       /**
-       * レビュー編集権限があるかチェック（アシスタントまたは管理者）
+       * レビュー編集権限があるかチェック
+       * アシスタントまたは管理者
        * @returns {boolean} レビュー編集権限があるかどうか
        */
       function CanEditReview() {
+        // 1. アシスタントであるか管理者であるかを返す
         return IsAssistant || IsAdmin
       }
 
@@ -1038,195 +1177,331 @@
        * メニューイベントの設定
        */
       function SetupMenuEvents() {
-        /** メインへ戻る */
+        /* ---------------------------------------------
+         *  1. メニューボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuBackToMain')
           .addEventListener('click', function () {
+            // 1. メニュー画面へ遷移
             window.location.href = 'Main.html'
           })
 
-        /** 各メニュー項目 */
+        /* ---------------------------------------------
+         *  2. 作品共通情報ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuWorkInfo')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 作品共通情報を表示
             ShowWorkCommonInfo()
           })
 
+        /* ---------------------------------------------
+         *  3. キャラ設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuCharacter')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. キャラ設定画面を表示
             ShowCharacterSetting()
           })
 
+        /* ---------------------------------------------
+         *  4. 組織設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuOrganization')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 組織設定画面を表示
             ShowOrganizationSetting()
           })
 
+        /* ---------------------------------------------
+         *  5. チーム設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuTeam')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. チーム設定画面を表示
             ShowTeamSetting()
           })
 
+        /* ---------------------------------------------
+         *  6. 種族設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuRace')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 種族設定画面を表示
             ShowRaceSetting()
           })
 
+        /* ---------------------------------------------
+         *  7. 階級設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuClass')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 階級設定画面を表示
             ShowClassSetting()
           })
 
+        /* ---------------------------------------------
+         *  8. 元号設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuCalendar')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 元号設定画面を表示
             ShowCalendarSetting()
           })
 
+        /* ---------------------------------------------
+         *  9. 年表設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuTimeline')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 年表設定画面を表示
             ShowTimelineSetting()
           })
 
+        /* ---------------------------------------------
+         *  10.舞台設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuStage')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 舞台設定画面を表示
             ShowStageSetting()
           })
 
+        /* ---------------------------------------------
+         *  11.建物設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuBuilding')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 建物設定画面を表示
             ShowBuildingSetting()
           })
 
+        /* ---------------------------------------------
+         *  12.能力設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuPower')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 能力設定画面を表示
             ShowPowerSetting()
           })
 
+        /* ---------------------------------------------
+         *  13.武器設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuWeapon')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 武器設定画面を表示
             ShowWeaponSetting()
           })
 
+        /* ---------------------------------------------
+         *  14.技設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuMove')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2, 技設定画面を表示
             ShowMoveSetting()
           })
 
+        /* ---------------------------------------------
+         *  15.セリフ設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuSerif')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. セリフ設定画面を表示
             ShowSerifSetting()
           })
-
+        
+        /* ---------------------------------------------
+         *  16.相関図設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuRelation')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 相関図設定画面を表示
             ShowRelationDiagram()
           })
 
+        /* ---------------------------------------------
+         *  17.ストーリー設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuStory')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. ストーリー設定画面を表示
             ShowStoryCreation()
           })
 
+        /* ---------------------------------------------
+         *  18.プロット設定ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuPlot')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. プロット設定画面を表示
             ShowPlotCreation()
           })
 
+        /* ---------------------------------------------
+         *  19.伏線メモボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuClue')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 伏線メモ画面を表示
             ShowClueMemo()
           })
 
+        /* ---------------------------------------------
+         *  20.作品レビューボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuReview')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 作品レビュー画面を表示
             ShowWorkReview()
           })
 
+        /* ---------------------------------------------
+         *  21.作品作成用メモボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuMemo')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 作品作成用メモ画面を表示
             ShowWorkMemo()
           })
 
+        /* ---------------------------------------------
+         *  22.スケジュールボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuSchedule')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. スケジュール画面を表示
             ShowSchedule()
           })
 
+        /* ---------------------------------------------
+         *  21.参加者一覧ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuParticipants')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 参加者一覧画面を表示
             ShowParticipants()
           })
 
+        /* ---------------------------------------------
+         *  21.更新履歴ボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuHistory')
           .addEventListener('click', function () {
+            // 1. 押下されたセクションをアクティブにする
             SetActiveMenu(this)
+            // 2. 更新履歴画面を表示
             ShowUpdateHistory()
           })
 
+        /* ---------------------------------------------
+         *  22.ログアウトボタン押下時
+         * --------------------------------------------- */
         document
           .getElementById('MenuLogout')
-          .addEventListener('click', HandleLogout)
+          .addEventListener('click', SystemLogout)
       }
 
       /**
        * モバイルメニューの設定
        */
       function SetupMobileMenu() {
+        /* ==========================================================================
+         * 定義
+         * ========================================================================== */
+        // 1. メニュートグル要素
         const Toggle = document.getElementById('MenuToggle')
+        // 2. サイドバー要素
         const Sidebar = document.getElementById('Sidebar')
+        // 3. サイドバーオーバーレイ要素
         const Overlay = document.getElementById('SidebarOverlay')
 
+        /* ==========================================================================
+         * メニュートグルクリックイベント定義
+         * ========================================================================== */
         Toggle.addEventListener('click', function () {
+          // 1. サイドバーを表示
           Sidebar.classList.toggle('Open')
+          // 2. サイドバーオーバーレイを表示
           Overlay.classList.toggle('Open')
         })
 
+        /* ==========================================================================
+         * サイドバーオーバーレイクリックイベント定義
+         * ========================================================================== */
         Overlay.addEventListener('click', function () {
+          // 1. サイドバーを表示
           Sidebar.classList.remove('Open')
+          // 2. サイドバーオーバーレイを表示
           Overlay.classList.remove('Open')
         })
       }
@@ -1236,34 +1511,63 @@
        * @param {HTMLElement} Element アクティブにする要素
        */
       function SetActiveMenu(Element) {
+        /* ==========================================================================
+         * すべてのセクションのアクティブを解除
+         * ========================================================================== */
         document.querySelectorAll('.SidebarItem').forEach((Item) => {
+          // 1. アクティブクラスを除去
           Item.classList.remove('Active')
         })
+        /* ==========================================================================
+         * 押下されたセクションにアクティブクラスを設定
+         * ========================================================================== */
         Element.classList.add('Active')
 
+        /* ==========================================================================
+         * 表示クラスを除去
+         * ========================================================================== */
+        // 1. サイドバーの表示クラスを除去
         document.getElementById('Sidebar').classList.remove('Open')
+        // 2. サイドバーオーバーレイの表示クラスを除去
         document.getElementById('SidebarOverlay').classList.remove('Open')
       }
 
       /**
        * ログアウト処理
        */
-      async function HandleLogout() {
+      async function SystemLogout() {
+        /* ---------------------------------------------
+         *  1. 確認ダイアログを表示
+         * --------------------------------------------- */
         const Confirmed = await ShowConfirmDialog('ログアウトしますか？')
+
+        /* ---------------------------------------------
+         *  1. [はい]ボタンを押下した場合
+         * --------------------------------------------- */
         if (Confirmed) {
+          // 1. セッションをクリア
           sessionStorage.clear()
+          // 2. ログイン画面へ遷移
           window.location.href = '/index.html'
         }
       }
 
       /**
        * コンテンツヘッダーを生成
-       * @param {string} Title タイトル
-       * @param {string} Icon アイコン
-       * @returns {string} HTML文字列
+       * @param   {string}  Title タイトル
+       * @param   {string}  Icon  アイコン
+       * @returns {string}  HTML文字列
        */
       function CreateContentHeader(Title, Icon) {
+        /* ---------------------------------------------
+         *  1. 定義
+         * --------------------------------------------- */
+        // 1. ヘッダータイトルを設定
         const WorkTitle = WorkInfo ? WorkInfo.WorkTitle : ''
+        
+        /* ---------------------------------------------
+         *  2. 戻り値を定義
+         * --------------------------------------------- */
         return `
             <div class="WorkTitle">
               <i class="fas fa-book"></i>
@@ -1275,16 +1579,26 @@
           `
       }
 
-      /* ==========================================================================
-       * 作品共通情報
-       * ========================================================================== */
+      /* ======================================================================================================================
+      * ■ 作品共通情報
+      * -----------------------------------------------------------------------------------------------------------------------
+      * ・作品の作品名やジャンルを編集する
+      * ======================================================================================================================= */
       /**
        * 作品共通情報画面を表示
        */
       function ShowWorkCommonInfo() {
+        /* ==========================================================================
+         * 定義
+         * ========================================================================== */
+        // 1. コンテンツエリア要素取得
         const ContentArea = document.getElementById('ContentArea')
+        // 2. 編集可能であるかを判定
         const CanEditFlg = CanEdit()
 
+        /* ==========================================================================
+         * DOM組み立て
+         * ========================================================================== */
         ContentArea.innerHTML = `
             ${CreateContentHeader('作品共通情報', 'info-circle')}
             <div class="FormGroup">
@@ -1311,12 +1625,19 @@
                 : ''
             }
           `
-
+        /* ==========================================================================
+         * 作品情報取得
+         * ========================================================================== */
         if (WorkInfo) {
+          // 1. ジャンルを設定
           document.getElementById('Genre').value = WorkInfo.Genre
         }
 
+        /* ==========================================================================
+         * 編集権限の状態を確認
+         * ========================================================================== */
         if (CanEditFlg) {
+          // 1. 保存ボタンのクリックイベントを定義
           document
             .getElementById('SaveWorkInfoButton')
             .addEventListener('click', SaveWorkInfo)
@@ -1327,52 +1648,114 @@
        * 作品情報を保存
        */
       async function SaveWorkInfo() {
+        /* ==========================================================================
+         * 定義
+         * ========================================================================== */
+        // 1. 作品名取得
         const WorkTitle = document.getElementById('WorkTitle').value.trim()
+        // 2. ジャンルを取得
         const Genre = document.getElementById('Genre').value
 
+        /* ==========================================================================
+         * バリデーションチェック
+         * ========================================================================== */
+        /* ---------------------------------------------
+         *  1. 作品名の入力バリデーションチェック
+         * --------------------------------------------- */
         if (!WorkTitle) {
+          // 1. エラーダイアログを表示
           await ShowErrorDialog('作品名を入力してください')
+          // 2. 処理終了
           return
         }
 
+        /* ==========================================================================
+         * API通信
+         * ========================================================================== */
         try {
+         /* ---------------------------------------------
+          *  1. 定義
+          * --------------------------------------------- */
+          // 1. スピナー表示
+          ShowSpinner()
+          // 2. ユーザーID取得
           const UserId = sessionStorage.getItem('UserId')
+          // 3. 作品ID取得
           const WorkId = sessionStorage.getItem('WorkId')
+
+         /* ---------------------------------------------
+          *  2. API呼び出し
+          * --------------------------------------------- */
           const Response = await CallApi('/UpdateWorkInfo.php', 'POST', {
+            // 1. 作品ID
             WorkId: WorkId,
+            // 2. 作品名
             WorkTitle: WorkTitle,
+            // 3. ジャンル
             Genre: parseInt(Genre),
+            // 4. ユーザーID
             UserId: UserId,
           })
 
+         /* ---------------------------------------------
+          *  3. スピナー削除
+          * --------------------------------------------- */
+          HideSpinner()
+
+         /* ---------------------------------------------
+          *  4. 通信成功
+          * --------------------------------------------- */
           if (Response.Success) {
+            // 1. インフォダイアログを表示
             await ShowInfoDialog('保存完了', '作品情報を保存しました')
+            // 2. 作品情報取得
             await LoadWorkInfo()
+            // 3. 作品情報表示
             ShowWorkCommonInfo()
           } else {
+           /* ---------------------------------------------
+            *  5. 通信失敗
+            * --------------------------------------------- */
+            // 1. エラーダイアログを表示
             await ShowErrorDialog(Response.Message || '保存に失敗しました')
           }
         } catch (Error) {
+         /* ==========================================================================
+          * 例外処理
+          * ========================================================================== */
+          // 1. スピナー削除
+          HideSpinner()
+          // 2. エラーダイアログを表示
           await ShowErrorDialog('保存中にエラーが発生しました')
+          // 3. デバッグログ
+          console.error(Error)
         }
       }
 
-      /* ==========================================================================
-       * キャラ設定画面 (4.1 CharacterInfo)
-       * ========================================================================== */
-      let CharacterList = []
-      let SelectedCharacterId = null
-      let CharacterOrganizationList = []
-      let CharacterTeamList = []
-      let CharacterRaceList = []
-      let CharacterClassList = []
-
+      /* ======================================================================================================================
+      * ■ キャラ設定
+      * -----------------------------------------------------------------------------------------------------------------------
+      * ・キャラクター情報の編集を行う
+      * ======================================================================================================================= */
+      /**
+       * キャラ設定画面を表示
+       * */
       async function ShowCharacterSetting() {
+       /* ==========================================================================
+        * 定義
+        * ========================================================================== */
+        // 1. 初期ページを設定
         CurrentPage = 1
+        // 2. キャラ選択行IDを初期化
         SelectedCharacterId = null
+        // 3. コンテンツエリア要素を取得
         const ContentArea = document.getElementById('ContentArea')
+        // 4. 編集権限状態を取得
         const CanEditFlg = CanEdit()
 
+       /* ==========================================================================
+        * DOM組み立て
+        * ========================================================================== */
         ContentArea.innerHTML = `
               ${CreateContentHeader('キャラ設定', 'user')}
               <div class="TabContainer">
@@ -1529,121 +1912,293 @@
               <div id="PaginationArea"></div>
             `
 
+       /* ==========================================================================
+        * 定義
+        * ========================================================================== */
+        // 1. タブクリックイベントを定義
         SetupCharacterTabEvents()
-        await LoadCharacterMasterData()
-        SetupCharacterFormEvents(CanEditFlg)
+        // 2. キャラ設定画面で使用する各プルダウンの内容を取得
+        await LoadCharacterPulldown()
+        // 3. ボタンクリックイベントを定義
+        CharacButtonEvent(CanEditFlg)
+        // 4. キャラクター一覧を取得
         await LoadCharacterList()
       }
 
+      /**
+       * タブクリックイベントを定義
+       * */
       function SetupCharacterTabEvents() {
-        document.querySelectorAll('.TabButton').forEach((Btn) => {
-          Btn.addEventListener('click', function () {
+       /* ==========================================================================
+        * 各タブのクリックイベントを定義
+        * ========================================================================== */
+        document.querySelectorAll('.TabButton').forEach((TabButton) => {
+          TabButton.addEventListener('click', function () {
+           /* ---------------------------------------------
+            *  1. すべてのタブボタンからアクティブ状態を削除
+            * --------------------------------------------- */
             document
               .querySelectorAll('.TabButton')
-              .forEach((B) => B.classList.remove('Active'))
+              .forEach((Button) => Button.classList.remove('Active'))
+
+           /* ---------------------------------------------
+            *  2. すべてのタブコンテンツからアクティブ状態を削除
+            * --------------------------------------------- */
             document
               .querySelectorAll('.TabContent')
-              .forEach((C) => C.classList.remove('Active'))
+              .forEach((Content) => Content.classList.remove('Active'))
+
+           /* ---------------------------------------------
+            *  3. 押下されたタブにアクティブクラスを付与
+            * --------------------------------------------- */
             this.classList.add('Active')
+
+           /* ---------------------------------------------
+            *  4. タブIDを設定
+            * --------------------------------------------- */
             const TabId = this.dataset.tab
+
+           /* ---------------------------------------------
+            *  5. タブ内容を定義
+            * --------------------------------------------- */
             const TabMap = {
+              // 1. 初期タブ
               basic: 'TabBasic',
+              // 2. 所属情報タブ
               affiliation: 'TabAffiliation',
+              // 3. 詳細タブ
               detail: 'TabDetail',
+              // 4. 画像タブ
               image: 'TabImage',
             }
+
+           /* ---------------------------------------------
+            *  6. 押下されたタブにアクティブ状態を設定
+            * --------------------------------------------- */
             document.getElementById(TabMap[TabId]).classList.add('Active')
           })
         })
       }
 
-      async function LoadCharacterMasterData() {
+      /**
+       * プルダウンの内容取得
+       * */
+      async function LoadCharacterPulldown() {
+       /* ==========================================================================
+        * API通信
+        * ========================================================================== */
         try {
+          /* ---------------------------------------------
+           *  1. 定義
+           * --------------------------------------------- */
+          // 1. 作品IDを取得
           const WorkId = sessionStorage.getItem('WorkId')
-          const [OrgRes, TeamRes, RaceRes, ClassRes] = await Promise.all([
+
+          /* ---------------------------------------------
+           *  2. API呼び出し
+           * --------------------------------------------- */
+          const [OrgResponse, TeamResponse, RaceResponse, ClassResponse] = await Promise.all([
+            /* 1. 組織一覧取得 */
             CallApi(
               `/GetOrganizationList.php?WorkId=${encodeURIComponent(WorkId)}`,
               'GET',
             ),
+            /* 2. チーム一覧取得 */
             CallApi(
               `/GetTeamList.php?WorkId=${encodeURIComponent(WorkId)}`,
               'GET',
             ),
+            /* 3. 種族一覧取得 */
             CallApi(
               `/GetRaceList.php?WorkId=${encodeURIComponent(WorkId)}`,
               'GET',
             ),
+            /* 4. 階級一覧取得 */
             CallApi(
               `/GetClassList.php?WorkId=${encodeURIComponent(WorkId)}`,
               'GET',
             ),
           ])
-          CharacterOrganizationList = OrgRes.Success
-            ? OrgRes.Data.OrganizationList || []
+
+          /* ---------------------------------------------
+           *  3. 組織一覧の内容をプルダウンに保持
+           * --------------------------------------------- */
+          CharacterOrganizationList = OrgResponse.Success
+            ? OrgResponse.Data.OrganizationList || []
             : []
-          CharacterTeamList = TeamRes.Success ? TeamRes.Data.TeamList || [] : []
-          CharacterRaceList = RaceRes.Success ? RaceRes.Data.RaceList || [] : []
-          CharacterClassList = ClassRes.Success
-            ? ClassRes.Data.ClassList || []
+
+          /* ---------------------------------------------
+           *  4. チーム一覧の内容をプルダウンに保持
+           * --------------------------------------------- */
+          CharacterTeamList = TeamResponse.Success ? TeamResponse.Data.TeamList || [] : []
+
+          /* ---------------------------------------------
+           *  5. 種族一覧の内容をプルダウンに保持
+           * --------------------------------------------- */
+          CharacterRaceList = RaceResponse.Success ? RaceResponse.Data.RaceList || [] : []
+
+          /* ---------------------------------------------
+           *  6. 階級一覧の内容をプルダウンに保持
+           * --------------------------------------------- */
+          CharacterClassList = ClassResponse.Success
+            ? ClassResponse.Data.ClassList || []
             : []
-          PopulateCharacterSelects()
+
+          /* ---------------------------------------------
+           *  7. プルダウンのDOMを作成
+           * --------------------------------------------- */
+          CreateCharaPulldown()
         } catch (Error) {
-          console.error('マスタデータ取得エラー:', Error)
+          /* ==========================================================================
+           * 例外処理
+           * ========================================================================== */
+          // 1. デバッグログ
+          console.error(Error)
         }
       }
 
-      function PopulateCharacterSelects() {
+      /**
+       * プルダウンのDOM作成
+       * */
+      function CreateCharaPulldown() {
+        /* ==========================================================================
+         * 定義
+         * ========================================================================== */
+        // 1. 組織プルダウンを取得
         const OrgSelect = document.getElementById('CharaOrganization')
+        // 2. チームプルダウンを取得
         const TeamSelect = document.getElementById('CharaTeam')
+        // 3.  種族プルダウンを取得
         const RaceSelect = document.getElementById('CharaRace')
+        // 4. 階級プルダウンを取得
         const ClassSelect = document.getElementById('CharaClass')
+
+        /* ==========================================================================
+         * プルダウンのDOM作成
+         * ========================================================================== */
+        /* ---------------------------------------------
+         *  1. 組織プルダウンの内容のDOMを作成
+         * --------------------------------------------- */
         OrgSelect.innerHTML =
           '<option value="">組織を選択</option>' +
           CharacterOrganizationList.map(
-            (I) => `<option value="${I.OrgId}">${I.OrgName}</option>`,
+            (Option) => `<option value="${Option.OrgId}">${Option.OrgName}</option>`,
           ).join('')
+
+        /* ---------------------------------------------
+         *  2. チームプルダウンの内容のDOMを作成
+         * --------------------------------------------- */
         TeamSelect.innerHTML =
           '<option value="">チームを選択</option>' +
           CharacterTeamList.map(
-            (I) => `<option value="${I.TeamId}">${I.TeamName}</option>`,
+            (Option) => `<option value="${Option.TeamId}">${Option.TeamName}</option>`,
           ).join('')
+
+        /* ---------------------------------------------
+         *  3. 種族プルダウンの内容のDOMを作成
+         * --------------------------------------------- */
         RaceSelect.innerHTML =
           '<option value="">種族を選択</option>' +
           CharacterRaceList.map(
-            (I) => `<option value="${I.RaceId}">${I.RaceName}</option>`,
+            (Option) => `<option value="${Option.RaceId}">${Option.RaceName}</option>`,
           ).join('')
+
+        /* ---------------------------------------------
+         *  4. 階級プルダウンの内容のDOMを作成
+         * --------------------------------------------- */
         ClassSelect.innerHTML =
           '<option value="">階級を選択</option>' +
           CharacterClassList.map(
-            (I) => `<option value="${I.ClassId}">${I.ClassName}</option>`,
+            (Option) => `<option value="${Option.ClassId}">${Option.ClassName}</option>`,
           ).join('')
       }
 
-      function SetupCharacterFormEvents(CanEditFlg) {
+      /**
+       * キャラ設定画面のボタンのクリックイベントを定義
+       * */
+      function CharacButtonEvent(CanEditFlg) {
+        /* ==========================================================================
+         * 編集可能な権限である場合
+         * ========================================================================== */
         if (CanEditFlg) {
+         /* ---------------------------------------------
+          *  1. 生年月日デートピッカーボタンクリックイベント定義
+          * --------------------------------------------- */
+          // 1. デートピッカーインスタンス作成
           const DatePickerInstance = new DatePicker()
+          // 2. 生年月日デートピッカーボタンクリックイベント定義
           document
             .getElementById('CharaBirthDateBtn')
             ?.addEventListener('click', () =>
               DatePickerInstance.OpenDialog('CharaBirthDate'),
             )
+
+         /* ---------------------------------------------
+          *  2. クリアボタンクリックイベント定義
+          * --------------------------------------------- */
           document
             .getElementById('CharaClearButton')
             .addEventListener('click', ClearCharacterForm)
+
+         /* ---------------------------------------------
+          *  3. 保存ボタンクリックイベント定義
+          * --------------------------------------------- */
           document
             .getElementById('CharaSaveButton')
             .addEventListener('click', SaveCharacter)
+
+         /* ---------------------------------------------
+          *  4. 削除ボタンクリックイベント定義
+          * --------------------------------------------- */
           document
             .getElementById('CharaDeleteButton')
             .addEventListener('click', DeleteCharacter)
+
+         /* ---------------------------------------------
+          *  5. 画像ボックスクリックイベント定義
+          * --------------------------------------------- */
           document
             .getElementById('CharaImageBox')
-            .addEventListener('click', () =>
-              document.getElementById('CharaImageInput').click(),
-            )
+            .addEventListener('click', async () => {
+              /* 1. 定義 */
+              // 1. キャラ画像ボックス要素取得
+              const CharaImageBox = document.getElementById('CharaImageBox')
+              // 2. 画像要素取得
+              const ImgElement = CharaImageBox.querySelector('img')
+              console.log("ImgElement",ImgElement)
+              /* 2. 画像要素が存在しない場合 */
+              if (!ImgElement) {
+                // 1. ファイル選択画面を表示
+                document.getElementById('CharaImageInput').click()
+                // 2. 処理終了
+                return
+              }
+
+              /* 3. 画像ダイアログ呼び出し */
+              const ImgDelete = await ShowImageDialog(ImgElement.src, CanEdit())
+
+              /* 4. 画像ダイアログで削除ボタンを押下した場合 */
+              if (ImgDelete) {
+                // 1. 画像ボックスの内容を初期化
+                CharaImageBox.innerHTML = `
+                    <div class="ImageBoxPlaceholder">
+                      <i class="fas fa-user"></i>
+                      <div>クリックで画像選択</div>
+                    </div>
+                  `
+                // 2. 画像パスを初期化
+                document.getElementById('CharaImagePath').value = ''
+                // 3, ファイル選択入力フォームを初期化
+                document.getElementById('CharaImageInput').value = ''
+              }
+            })
+
+         /* ---------------------------------------------
+          *  6. ファイル選択イベント定義
+          * --------------------------------------------- */
           document
             .getElementById('CharaImageInput')
-            .addEventListener('change', HandleCharacterImageChange)
+            .addEventListener('change', CharaImgChange)
         }
         document
           .getElementById('CharaRoleInfoBtn')
@@ -1692,22 +2247,69 @@
           })
       }
 
-      function HandleCharacterImageChange(E) {
-        const File = E.target.files[0]
-        if (!File) return
-        const Reader = new FileReader()
-        Reader.onload = function (Ev) {
-          const ImageBox = document.getElementById('CharaImageBox')
-          ImageBox.innerHTML = `<img src="${Ev.target.result}" alt="キャラ画像">`
-          // ImageBox.addEventListener('click', async () => {
-          //   const Deleted = await ShowImageDialog(Ev.target.result, CanEdit())
-          //   if (Deleted) {
-          //     ImageBox.innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
-          //     document.getElementById('CharaImagePath').value = ''
-          //     document.getElementById('CharaImageInput').value = ''
-          //   }
-          // })
+      /**
+       * キャラ画像変更時処理
+       **/
+      function CharaImgChange(Event) {
+        /* ==========================================================================
+         * 定義
+         * ========================================================================== */
+        // 1. 選択されたファイル取得
+        const File = Event.target.files[0]
+
+        /* ==========================================================================
+         * バリデーションチェック
+         * ========================================================================== */
+        /* ---------------------------------------------
+         *  1. ファイルが存在しない場合
+         * --------------------------------------------- */
+        if (!File) {
+          // 1. 処理終了
+          return
         }
+
+        /* ==========================================================================
+         * FileReaderインスタンス作成
+         * ========================================================================== */
+        const Reader = new FileReader()
+
+        /* ==========================================================================
+         * ファイル読み取り処理
+         * ========================================================================== */
+        Reader.onload = function (Event) {
+         /* ---------------------------------------------
+          *  1. 定義
+          * --------------------------------------------- */
+          // 1. 画像ボックス要素取得
+          const ImageBox = document.getElementById('CharaImageBox')
+          // 2. 画像ボックスに画像を設定
+          ImageBox.innerHTML = `<img src="${Event.target.result}" alt="キャラ画像">`
+
+         /* ---------------------------------------------
+          *  2. 画像ボックスクリックイベント
+          * --------------------------------------------- */
+          ImageBox.onclick(async () => {
+            /* 1. 定義 */
+            // 1. 画像ダイアログにて選択された操作の状態を保持する
+            const ImgDelete = await ShowImageDialog(
+              Event.target.result,
+              CanEdit(),
+            )
+
+            /* 2. 削除の操作が選択された場合 */
+            if (ImgDelete) {
+              // 1. 画像ソースを初期化
+              ImageBox.innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
+              // 2. 画像パス初期化
+              document.getElementById('CharaImageInput').value = ''
+              // 3. 画像入力フォーム(ファイルイベント発火用)初期化
+              document.getElementById('CharaImagePath').value = ''
+            }
+          })
+        }
+       /* ==========================================================================
+        * ファイルを Base64 形式のデータURLとして読み込む
+        * ========================================================================== */
         Reader.readAsDataURL(File)
       }
 
