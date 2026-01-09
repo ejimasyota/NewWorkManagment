@@ -329,6 +329,22 @@ function SessionTimeout() {
 }
 
 /**
+ * プレースホルダー画面を表示
+ * @param {string} Title タイトル
+ * @param {string} Icon アイコン
+ */
+function ShowPlaceholder(Title, Icon) {
+  const ContentArea = document.getElementById('ContentArea')
+  ContentArea.innerHTML = `
+    ${CreateContentHeader(Title, Icon)}
+      <div style="text-align: center; padding: 50px; color: #999;">
+        <i class="fas fa-${Icon}" style="font-size: 60px; margin-bottom: 20px;"></i>
+          <p>この機能は準備中です</p>
+      </div>
+  `
+}
+
+/**
  * セッション監視を開始する関数
  */
 function StartSessionMonitor() {

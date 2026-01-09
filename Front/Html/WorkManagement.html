@@ -1885,7 +1885,7 @@
                   </div>
                   <div class="FormGroup InputWithButton">
                     <input type="text" class="InputForm" id="CharaRoleInfo" placeholder="役割" disabled>
-                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaRoleInfoBtn"><i class="fas fa-edit"></i></button>
+                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaRoleInfoButton"><i class="fas fa-edit"></i></button>
                   </div>
                   <input type="hidden" id="CharaRoleInfoHidden">
                 </div>
@@ -1930,12 +1930,12 @@
                 <div class="TabContent" id="TabDetail">
                   <div class="FormGroup InputWithButton">
                     <input type="text" class="InputForm" id="CharaPersonality" placeholder="性格" disabled>
-                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaPersonalityBtn"><i class="fas fa-edit"></i></button>
+                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaPersonalityButton"><i class="fas fa-edit"></i></button>
                   </div>
                   <input type="hidden" id="CharaPersonalityHidden">
                   <div class="FormGroup InputWithButton">
                     <input type="text" class="InputForm" id="CharaBiography" placeholder="生い立ち・経歴" disabled>
-                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBiographyBtn"><i class="fas fa-edit"></i></button>
+                    <button class="ButtonClass SecondaryButton ButtonSmall" id="CharaBiographyButton"><i class="fas fa-edit"></i></button>
                   </div>
                   <input type="hidden" id="CharaBiographyHidden">
                 </div>
@@ -2257,45 +2257,75 @@
             .getElementById('CharaImageInput')
             .addEventListener('change', CharaImgChange)
         }
-        document
-          .getElementById('CharaRoleInfoBtn')
+
+        /* ==========================================================================
+         * 権限にかかわらず利用可能なイベント定義
+         * ========================================================================== */
+        /* ---------------------------------------------
+         *  1. キャラ役割詳細ボタン
+         * --------------------------------------------- */
+         document
+          .getElementById('CharaRoleInfoButton')
           .addEventListener('click', async () => {
+            /* 1. 入力エリアダイアログ呼び出し */
             const Result = await ShowInputAreaDialog(
               document.getElementById('CharaRoleInfoHidden').value,
               !CanEditFlg,
             )
+
+            /* 2. 編集可能かつ結果が存在する場合 */
             if (Result !== null && CanEditFlg) {
+              // 1. 入力エリアダイアログの結果を設定
               document.getElementById('CharaRoleInfoHidden').value = Result
+              // 2. 表示用入力フォームへ結果を設定
               document.getElementById('CharaRoleInfo').value = TruncateText(
                 Result,
                 30,
               )
             }
           })
-        document
-          .getElementById('CharaPersonalityBtn')
+
+        /* ---------------------------------------------
+         *  2. キャラ性格詳細ボタン
+         * --------------------------------------------- */
+         document
+          .getElementById('CharaPersonalityButton')
           .addEventListener('click', async () => {
+            /* 1. 入力エリアダイアログ呼び出し */
             const Result = await ShowInputAreaDialog(
               document.getElementById('CharaPersonalityHidden').value,
               !CanEditFlg,
             )
+
+            /* 2. 編集可能かつ結果が存在する場合 */
             if (Result !== null && CanEditFlg) {
+              // 1. 入力エリアダイアログの結果を設定
               document.getElementById('CharaPersonalityHidden').value = Result
+              // 2. 表示用入力フォームへ結果を設定
               document.getElementById('CharaPersonality').value = TruncateText(
                 Result,
                 30,
               )
             }
           })
-        document
-          .getElementById('CharaBiographyBtn')
+
+        /* ---------------------------------------------
+         *  3. 生い立ち・経歴詳細ボタン
+         * --------------------------------------------- */
+         document
+          .getElementById('CharaBiographyButton')
           .addEventListener('click', async () => {
+            /* 1. 入力エリアダイアログ呼び出し */
             const Result = await ShowInputAreaDialog(
               document.getElementById('CharaBiographyHidden').value,
               !CanEditFlg,
             )
+
+            /* 2. 編集可能かつ結果が存在する場合 */
             if (Result !== null && CanEditFlg) {
+              // 1. 入力エリアダイアログの結果を設定
               document.getElementById('CharaBiographyHidden').value = Result
+              // 2. 表示用入力フォームへ結果を設定
               document.getElementById('CharaBiography').value = TruncateText(
                 Result,
                 30,
@@ -4675,16 +4705,19 @@
         )
       }
 
-      /* ==========================================================================
-       * 年表設定
-       * ========================================================================== */
+      /* ======================================================================================================================
+      * ■ 年表設定
+      * -----------------------------------------------------------------------------------------------------------------------
+      * ・作中の年表を設定する
+      * ======================================================================================================================= */
+
       /**
        * 年表設定画面の表示処理
        */
       async function ShowTimelineSetting() {
-        /* ---------------------------------------------
-         *  1. 定義
-         * --------------------------------------------- */
+        /* ==========================================================================
+         * 定義
+         * ========================================================================== */
         // 1. 年表一覧表示ページ
         CurrentPage = 1
         // 2. 行ID
@@ -4696,9 +4729,9 @@
         // 4. 編集権限FLG
         const CanEditFlg = CanEdit()
 
-        /* ---------------------------------------------
-         *  2. 入力フォーム作成
-         * --------------------------------------------- */
+        /* ==========================================================================
+         * DOM組み立て
+         * ========================================================================== */
         ContentArea.innerHTML = `
             ${CreateContentHeader('年表設定', 'stream')}
             <div class="FormGroup">
@@ -4749,9 +4782,9 @@
             <div id="PaginationArea"></div>
           `
 
-        /* ---------------------------------------------
-         *  3. 編集権限がある場合
-         * --------------------------------------------- */
+        /* ==========================================================================
+         * 編集可能な権限である場合
+         * ========================================================================== */
         if (CanEditFlg) {
           /* 1. 定義 */
           // 1. デートピッカーインスタンス
@@ -5011,8 +5044,8 @@
             Row.innerHTML = `<td title="${Item.title}">${TruncateText(
               Item.title,
               20,
-            )}</td><td>${FormatDate(Item.eventDate)}</td><td>${
-              FormatDate(Item.endDate) || '-'
+            )}</td><td>${FormatDate(Item.eventdate)}</td><td>${
+              FormatDate(Item.enddate) || '-'
             }</td><td title="${Item.content || ''}">${
               TruncateText(Item.content, 20) || '-'
             }</td>`
@@ -5049,11 +5082,11 @@
 
       function SelectTimeline(Index) {
         const Item = TimelineList[Index]
-        SelectedTimelineId = Item.timeId
+        SelectedTimelineId = Item.timeid
         document.getElementById('TimelineTitle').value = Item.title
         document.getElementById('TimelineEventDate').value =
-          Item.eventDate || ''
-        document.getElementById('TimelineEndDate').value = Item.endDate || ''
+          Item.eventdate || ''
+        document.getElementById('TimelineEndDate').value = Item.enddate || ''
         document.getElementById('TimelineContent').value = TruncateText(
           Item.content,
           30,
@@ -9413,22 +9446,6 @@
           // 1. エラーダイアログ表示
           await ShowErrorDialog('更新中にエラーが発生しました')
         }
-      }
-
-      /**
-       * プレースホルダー画面を表示
-       * @param {string} Title タイトル
-       * @param {string} Icon アイコン
-       */
-      function ShowPlaceholder(Title, Icon) {
-        const ContentArea = document.getElementById('ContentArea')
-        ContentArea.innerHTML = `
-            ${CreateContentHeader(Title, Icon)}
-            <div style="text-align: center; padding: 50px; color: #999;">
-              <i class="fas fa-${Icon}" style="font-size: 60px; margin-bottom: 20px;"></i>
-              <p>この機能は準備中です</p>
-            </div>
-          `
       }
     </script>
   </body>
