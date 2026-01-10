@@ -58,7 +58,9 @@ try {
             c.secondPerson AS \"SecondPerson\",
             c.imgPath AS \"ImgPath\",
             c.registDate AS \"RegistDate\",
-            c.updateDate AS \"UpdateDate\"
+            c.updateDate AS \"UpdateDate\",
+            c.registUser AS \"RegistUser\",
+            c.updateUser AS \"UpdateUser\"
         FROM CharacterInfo c
         LEFT JOIN RaceInfo r ON c.raceId = r.raceId
         LEFT JOIN OrganizationInfo o ON c.orgId = o.orgId

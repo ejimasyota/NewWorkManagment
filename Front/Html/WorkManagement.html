@@ -972,6 +972,8 @@
       let CharacterList = []
       // 5. 組織一覧
       let OrganizationList = []
+      // 6. チーム一覧
+      let TeamList = []
 
       /* ---------------------------------------------
        *  5. 選択行ID
@@ -986,6 +988,8 @@
       let SelectedCharacterId = null
       // 5. 組織選択行ID
       let SelectedOrgId = null
+      // 6. チーム選択行ID
+      let SelectedTeamId = null
 
       /* ---------------------------------------------
        *  6. キャラ設定画面プルダウン
@@ -1004,6 +1008,11 @@
        * --------------------------------------------- */
       // 1. 建物プルダウン
       let OrgBuildList = []
+
+      /* ---------------------------------------------
+       *  8. チーム設定画面プルダウン
+       * --------------------------------------------- */
+      let TeamOrgList = []
 
       /**
        * 画面ロード時処理
@@ -2520,7 +2529,7 @@
         // 1. ヘッダー要素
         const Thead = document.createElement('thead')
         // 2. ヘッダー定義
-        Thead.innerHTML = `<tr><th>キャラ名</th><th>性別</th><th>年齢</th><th>種族</th><th>組織</th><th>登録日</th></tr>`
+        Thead.innerHTML = `<tr><th>キャラ名</th><th>性別</th><th>年齢</th><th>種族</th><th>組織</th>${UtilityTableHeader()}</tr>`
         // 3. ヘッダー格納
         Table.appendChild(Thead)
 
@@ -2569,7 +2578,12 @@
               Item.Age || '-'
             }</td><td>${Item.RaceName || '-'}</td><td>${
               Item.OrgName || '-'
-            }</td><td>${FormatTimestamp(Item.RegistDate)}</td>`
+            }</td>${UtilityTableBody(
+              Item.RegistDate,
+              Item.UpdateDate,
+              Item.RegistUser,
+              Item.UpdateUser,
+            )}`
 
             /* 3. ダブルクリックイベント定義 */
             Row.addEventListener('dblclick', () =>
@@ -3003,7 +3017,7 @@
         /* ---------------------------------------------
          *  1. 定義
          * --------------------------------------------- */
-        // 1. 現座標次ページ
+        // 1. 現在表示ページ
         CurrentPage = 1
         // 2. 選択中の組織IDを初期化
         SelectedOrgId = null
@@ -3492,7 +3506,6 @@
       }
 
       /**
-           /**
        * 組織保存処理
        **/
       async function SaveOrganization() {
@@ -3740,19 +3753,30 @@
         Reader.readAsDataURL(File)
       }
 
-      /* ==========================================================================
-       * チーム設定画面
-       * ========================================================================== */
-      let TeamList = []
-      let OrgListForTeam = []
-      let SelectedTeamId = null
-
+      /* ======================================================================================================================
+       * ■ チーム設定
+       * -----------------------------------------------------------------------------------------------------------------------
+       * ・作中のチーム(部隊)などに関する設定を行う
+       * ======================================================================================================================= */
+      /**
+       * チーム一覧画面表示
+       * */
       async function ShowTeamSetting() {
+        /* ==========================================================
+         * 定義
+         * ========================================================== */
+        // 1. 現座標次ページ
         CurrentPage = 1
+        // 2. 選択中のチームIDを初期化
         SelectedTeamId = null
+        // 3. コンテンツ表示エリア要素取得
         const ContentArea = document.getElementById('ContentArea')
+        // 4. 編集権限確認
         const CanEditFlg = CanEdit()
 
+        /* ==========================================================
+         * DOM定義
+         * ========================================================== */
         ContentArea.innerHTML = `
               ${CreateContentHeader('チーム設定', 'users')}
               <div class="FormRow">
@@ -3802,16 +3826,27 @@
               <div id="PaginationArea"></div>
             `
 
+        /* ==========================================================
+         * 編集可能である場合
+         * ========================================================== */
         if (CanEditFlg) {
+          /* ---------------------------------------------
+           *  1. 説明詳細ボタン
+           * --------------------------------------------- */
           document
             .getElementById('TeamDescriptionBtn')
             .addEventListener('click', async () => {
+              /* 1. 定義 */
+              // 1. 入力エリアダイアログを表示し結果を取得
               const Result = await ShowInputAreaDialog(
                 document.getElementById('TeamDescriptionHidden').value,
                 false,
               )
+              /* 2. 結果が存在し、編集可能である場合 */
               if (Result !== null && CanEditFlg) {
+                // 1. DB保持用の入力エリアに結果をセット
                 document.getElementById('TeamDescriptionHidden').value = Result
+                // 2. 表示用入力エリアに結果をセット
                 document.getElementById('TeamDescription').value = TruncateText(
                   Result,
                   30,
@@ -3819,33 +3854,45 @@
               }
             })
 
-          // 4. 画像ボックスクリックイベント
+          /* ---------------------------------------------
+           *  2. チーム画像ボックスクリックイベント
+           * --------------------------------------------- */
           document
             .getElementById('TeamImageBox')
             .addEventListener('click', async () => {
+              /* 1. 定義 */
+              // 1. 画像ボックス要素
               const TeamImageBox = document.getElementById('TeamImageBox')
+              // 2. 画像要素
               const ImgElement = TeamImageBox.querySelector('img')
 
+              /* 2. 画像が存在しない場合 */
               if (!ImgElement) {
+                // 1. 画像選択用入力フォームのクリックイベントを発火
                 document.getElementById('TeamImageInput').click()
+                // 2. 処理終了
                 return
               }
 
+              /* 3. 画像ボックスを表示し、結果を取得 */
               const Deleted = await ShowImageDialog(ImgElement.src, CanEdit())
 
+              /* 4. 削除が選択された場合 */
               if (Deleted) {
+                // 1. DOM定義
                 TeamImageBox.innerHTML = `
                     <div class="ImageBoxPlaceholder">
                       <i class="fas fa-users"></i>
                       <div>クリックで画像選択</div>
                     </div>
                   `
+                // 2. 画像パス初期化
                 document.getElementById('TeamImagePath').value = ''
+                // 3. 画像選択入力フォーム初期化
                 document.getElementById('TeamImageInput').value = ''
               }
             })
           // 5. 画像入力変更イベント
-
           document
             .getElementById('TeamImageInput')
             .addEventListener('change', HandleTeamOrgImageChange)
@@ -3884,7 +3931,7 @@
           )
           if (Response.Success) {
             TeamList = Response.Data.TeamList || []
-            OrgListForTeam = Response.Data.OrganizationList || []
+            TeamOrgList = Response.Data.OrganizationList || []
             UpdateTeamOrgSelect()
             RenderTeamTable()
           } else {
@@ -3960,7 +4007,7 @@
         if (!Select) return
         Select.innerHTML =
           '<option value="">所属組織を選択</option>' +
-          OrgListForTeam.map(
+          TeamOrgList.map(
             (O) => `<option value="${O.OrgId}">${O.OrgName}</option>`,
           ).join('')
       }
@@ -3975,7 +4022,7 @@
         const PageData = TeamList.slice(Start, End)
         let TableHtml = `
               <table class="DataTable">
-                <thead><tr><th>チーム名</th><th>所属組織</th><th>説明</th></tr></thead>
+                <thead><tr><th>チーム名</th><th>所属組織</th><th>説明</th>${UtilityTableHeader()}</tr></thead>
                 <tbody>
             `
         if (PageData.length) {
@@ -3987,6 +4034,12 @@
                     <td>${EscapeHtml(
                       TruncateText(T.Description || '', 30),
                     )}</td>
+                    ${UtilityTableBody(
+                      T.RegistDate,
+                      T.UpdateDate,
+                      T.RegistUser,
+                      T.UpdateUser,
+                    )}
                   </tr>
                 `,
           ).join('')
@@ -4024,9 +4077,12 @@
         document.getElementById('TeamDescriptionHidden').value =
           Item.Description || ''
         if (Item.ImgPath) {
-          document.getElementById(
-            'TeamImageBox',
-          ).innerHTML = `<img src="${API_BASE_URL}${Item.ImgPath}" alt="チーム画像">`
+          // 1. 画像ボックス要素
+          const ImageBox = document.getElementById('TeamImageBox')
+          // 2. 画像要素DOM定義
+          ImageBox.innerHTML = `<img src="${Item.ImgPath}" alt="チーム画像">`
+          // 3. 画像パス保持要素
+          document.getElementById('TeamImagePath').value = Item.ImgPath
         }
         const DeleteBtn = document.getElementById('TeamDeleteButton')
         if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
@@ -4039,48 +4095,122 @@
         document.getElementById('TeamDescription').value = ''
         document.getElementById('TeamDescriptionHidden').value = ''
         document.getElementById('TeamImageBox').innerHTML =
-          '<span class="ImagePlaceholder"><i class="fas fa-image"></i> 画像を選択</span>'
+          '<div class="ImageBoxPlaceholder"><i class="fas fa-users"></i><div>クリックで画像選択</div></div>'
         document.getElementById('TeamImageInput').value = ''
         const DeleteBtn = document.getElementById('TeamDeleteButton')
         if (DeleteBtn) DeleteBtn.classList.add('Hidden')
       }
 
+      /**
+       * チームの保存処理
+       * */
       async function SaveTeam() {
-        const TeamName = document.getElementById('TeamName').value.trim()
+        /* ==========================================================================
+         * バリデーションチェック
+         * ========================================================================== */
+        /* ---------------------------------------------
+         *  1. チーム名入力バリデーションチェック
+         * --------------------------------------------- */
         if (!TeamName) {
+          // 1. エラーダイアログ表示
           await ShowErrorDialog('チーム名を入力してください')
+          // 2. 処理終了
           return
         }
+
+        /* ==========================================================================
+         * API通信
+         * ========================================================================== */
         try {
+          /* ---------------------------------------------
+           *  1. 定義
+           * --------------------------------------------- */
+          // 1. スピナー表示
           ShowSpinner()
-          const FormData = new window.FormData()
-          if (SelectedTeamId) FormData.append('TeamId', SelectedTeamId)
-          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
-          FormData.append('TeamName', TeamName)
-          FormData.append('OrgId', document.getElementById('TeamOrgId').value)
-          FormData.append(
-            'Description',
-            document.getElementById('TeamDescriptionHidden').value,
-          )
-          FormData.append('UserId', sessionStorage.getItem('UserId'))
-          const ImageFile = document.getElementById('TeamImageInput').files[0]
-          if (ImageFile) FormData.append('Image', ImageFile)
-          const Response = await fetch(`${API_BASE_URL}/SaveTeam.php`, {
-            method: 'POST',
-            body: FormData,
+          // 2. 作品ID
+          const WorkId = sessionStorage.getItem('WorkId')
+          // 3. ユーザーID
+          const UserId = sessionStorage.getItem('UserId')
+          // 4. 組織ID
+          const OrgId = document.getElementById('TeamOrgId').value
+          // 5. 説明
+          const Description = document.getElementById(
+            'TeamDescriptionHidden',
+          ).value
+          // 6. チーム名
+          const TeamName = document.getElementById('TeamName').value.trim()
+          // 7. チームID
+          const TeamId = SelectedTeamId || ''
+
+          /* ---------------------------------------------
+           *  2. 画像のBase64変換
+           * --------------------------------------------- */
+          /* 1. 定義 */
+          // 1. 画像選択フォーム要素
+          const ImageInput = document.getElementById('TeamImageInput')
+          // 2. Base64文字列を保持
+          let ImageBase64 = null
+
+          /* 2. 画像が選択されている場合 */
+          if (ImageInput.files[0]) {
+            // 1. Base64文字列に変換して保持
+            ImageBase64 = await ConvertFileToBase64(ImageInput.files[0])
+          }
+
+          /* ---------------------------------------------
+           *  3. API通信
+           * --------------------------------------------- */
+          // 1. スピナー表示
+          ShowSpinner()
+
+          /* 2. API呼び出し */
+          const Response = await CallApi('/SaveTeam.php', 'POST', {
+            // 1. チームID
+            TeamId: TeamId,
+            // 2. 作品ID
+            WorkId: WorkId,
+            // 3. ユーザーID
+            UserId: UserId,
+            // 4. 説明
+            TeamName: TeamName,
+            // 5. 組織ID
+            OrgId: OrgId,
+            // 6. 画像データ
+            ImageData: ImageBase64,
           })
-          const Result = await Response.json()
+
+          /* ---------------------------------------------
+           *  4. スピナー削除
+           * --------------------------------------------- */
           HideSpinner()
-          if (Result.Success) {
-            await ShowInfoDialog('保存完了', Result.Data.Message)
+
+          /* ---------------------------------------------
+           *  5. 通信成功
+           * --------------------------------------------- */
+          if (Response.Success) {
+            // 1. インフォダイアログを表示
+            await ShowInfoDialog('保存完了', Response.Data.Message)
+            // 2. 入力フォームのクリア
             ClearTeamForm()
+            // 3. チーム一覧表示
             await LoadTeamList()
           } else {
-            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+            /* ---------------------------------------------
+             *  6. 通信失敗
+             * --------------------------------------------- */
+            // 1. エラーダイアログ表示
+            await ShowErrorDialog(Response.Message || '保存に失敗しました')
           }
         } catch (Error) {
+          /* ---------------------------------------------
+           *  8. 例外処理
+           * --------------------------------------------- */
+          // 1. スピナー削除
           HideSpinner()
+          // 2. エラーダイアログ表示
           await ShowErrorDialog('保存中にエラーが発生しました')
+          // 3. デバッグログ
+          console.error(Error)
         }
       }
 
@@ -5316,7 +5446,9 @@
           )
 
           Html += `
-                <div class="TimelineItem ${PositionClass}" data-index="${OriginalIndex}" data-timeid="${Item.timeid}" style="cursor:pointer;">
+                <div class="TimelineItem ${PositionClass}" data-index="${OriginalIndex}" data-timeid="${
+            Item.timeid
+          }" style="cursor:pointer;">
                   <div class="TimelineContent">
                     <div class="TimelineDate">${EventDateDisplay}${EndDateDisplay}</div>
                     <div class="TimelineTitle">${EscapeHtml(
@@ -7916,7 +8048,7 @@
             // ローカルに存在しない線を先に削除（外部キー制約対応）
             for (const ServerLine of ServerLines) {
               const ExistsLocally = RelationLines.some(
-                (LocalLine) => LocalLine.RelationId == ServerLine.RelationId
+                (LocalLine) => LocalLine.RelationId == ServerLine.RelationId,
               )
               if (!ExistsLocally) {
                 await CallApi('/DeleteRelation.php', 'POST', {
@@ -7930,7 +8062,7 @@
             // ローカルに存在しないオブジェクトを削除
             for (const ServerObj of ServerObjects) {
               const ExistsLocally = RelationObjects.some(
-                (LocalObj) => LocalObj.ObjId == ServerObj.ObjId
+                (LocalObj) => LocalObj.ObjId == ServerObj.ObjId,
               )
               if (!ExistsLocally) {
                 await CallApi('/DeleteRelationObject.php', 'POST', {

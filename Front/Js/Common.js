@@ -267,16 +267,16 @@ async function CallApi(Endpoint, Method = 'GET', Data = null) {
 
 /**
  * ファイルをBase64文字列に変換する共通関数
- * @param {File} file 
+ * @param {File} file
  * @returns {Promise<string>} Base64文字列
  */
 function ConvertFileToBase64(file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result); // データURL（data:image/png;base64,...）を返す
-    reader.onerror = error => reject(error);
-  });
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result) // データURL（data:image/png;base64,...）を返す
+    reader.onerror = (error) => reject(error)
+  })
 }
 
 /* ==========================================================================
@@ -581,6 +581,29 @@ async function CopyToClipboard(Text) {
     console.error('Clipboard Error:', Error)
     return false
   }
+}
+
+/* ==========================================================================
+ * テーブル
+ * ========================================================================== */
+/**
+ * 共通ヘッダー列のDOM文字列を返す
+ */
+function UtilityTableHeader() {
+  return `<th style="min-width:300px">登録年月日</th><th style="min-width:300px">更新年月日</th><th style="min-width:250px">登録者</th><th style="min-width:250px">更新者</th>`
+}
+/**
+ * 共通テーブルボディ列のDOM文字列を返す
+ * @param {string} RegistDate 登録年月日
+ * @param {string} UpdateDate 更新年月日
+ * @param {string} RegistUser 登録者
+ * @param {string} UpdateUser 更新者
+ */
+function UtilityTableBody(RegistDate, UpdateDate, RegistUser, UpdateUser) {
+  return `<td>${FormatDateTimeWithWeekday(EscapeHtml(RegistDate || ''))}</td>
+  <td>${FormatDateTimeWithWeekday(EscapeHtml(UpdateDate))}</td>
+  <td>${EscapeHtml(RegistUser)}</td>
+  <td>${EscapeHtml(UpdateUser)}</td>`
 }
 
 /* ==========================================================================
