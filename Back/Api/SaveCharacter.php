@@ -53,21 +53,33 @@ try {
     $Pdo = Database::GetConnection();
     Database::BeginTransaction();
 
-    /** 画像のバイナリ復元と保存処理 */
+/** 画像のバイナリ復元と保存処理 */
     $ImgPath = null;
     if (!empty($ImageData) && strpos($ImageData, 'data:image') === 0) {
+        // 保存先の絶対パスを生成
         $UploadDir = __DIR__ . '/../../Uploads/Characters/';
+
+        // 1. フォルダが存在しない場合は作成する
+        // 第2引数: 0777 (全権限。環境に応じて 0755 等に調整)
+        // 第3引数: true (親ディレクトリがなくても再帰的に作成)
         if (!is_dir($UploadDir)) {
-            mkdir($UploadDir, 0755, true);
+            if (!mkdir($UploadDir, 0777, true)) {
+                throw new Exception('保存先ディレクトリの作成に失敗しました。パスを確認してください。');
+            }
+            // 作成直後にパーミッションを確実にするための処理（環境によってmkdirのmodeが無視されることがあるため）
+            chmod($UploadDir, 0777);
         }
 
-        // Base64からバイナリデータを抽出
-        // data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...
+        // 2. Base64からバイナリデータを抽出
         list($Header, $Body) = explode(',', $ImageData);
         $BinaryData = base64_decode($Body);
         
-        // 拡張子の抽出
-        $Extension = 'jpg'; // デフォルト
+        if ($BinaryData === false) {
+            throw new Exception('画像のデコードに失敗しました。');
+        }
+
+        // 3. 拡張子の抽出
+        $Extension = 'jpg';
         if (preg_match('/image\/(png|jpeg|jpg|gif|webp)/', $Header, $Matches)) {
             $Extension = $Matches[1];
         }
@@ -75,11 +87,15 @@ try {
         $FileName = uniqid('chara_') . '.' . $Extension;
         $FilePath = $UploadDir . $FileName;
 
-        if (file_put_contents($FilePath, $BinaryData)) {
-            $ImgPath = '/Uploads/Characters/' . $FileName;
-        } else {
-            throw new Exception('画像の保存に失敗しました');
+        // 4. ファイルの書き込み
+        if (file_put_contents($FilePath, $BinaryData) === false) {
+            // 書き込み失敗時のエラー詳細を取得
+            $Error = error_get_last();
+            throw new Exception('ファイルの書き込みに失敗しました。理由: ' . ($Error['message'] ?? '書き込み権限がありません'));
         }
+
+        // DB登録用の相対パス
+        $ImgPath = '/Uploads/Characters/' . $FileName;
     }
 
     if (empty($CharaId)) {
