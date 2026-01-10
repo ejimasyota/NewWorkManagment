@@ -1,7 +1,7 @@
 <?php
 /**
  * SaveCharacter.php
- * キャラ登録・更新API
+ * キャラ登録・更新API (JSON & Base64対応版)
  */
 
 require_once __DIR__ . '/../Common/Database.php';
@@ -12,73 +12,73 @@ $FunctionName = 'キャラ設定';
 $UserId = '';
 
 try {
-    /** リクエストデータを取得（FormData対応） */
-    $CharaId = $_POST['CharaId'] ?? null;
-    $WorkId = $_POST['WorkId'] ?? '';
-    $CharaName = $_POST['CharaName'] ?? '';
-    $Gender = $_POST['Gender'] ?? 0;
-    $BirthDate = $_POST['BirthDate'] ?? null;
-    $Age = $_POST['Age'] ?? null;
-    $Height = $_POST['Height'] ?? null;
-    $Weight = $_POST['Weight'] ?? null;
-    $BloodType = $_POST['BloodType'] ?? null;
-    $RaceId = $_POST['RaceId'] ?? null;
-    $OrgId = $_POST['OrgId'] ?? null;
-    $TeamId = $_POST['TeamId'] ?? null;
-    $ClassId = $_POST['ClassId'] ?? null;
-    $RoleInfo = $_POST['RoleInfo'] ?? null;
-    $Personality = $_POST['Personality'] ?? null;
-    $Biography = $_POST['Biography'] ?? null;
-    $FirstPerson = $_POST['FirstPerson'] ?? null;
-    $SecondPerson = $_POST['SecondPerson'] ?? null;
-    $UserId = $_POST['UserId'] ?? '';
+    /** JSONリクエストデータを取得 */
+    $RawData = file_get_contents('php://input');
+    $Data = json_decode($RawData, true);
+
+    if (!$Data) {
+        Response::Error('リクエストデータが正しく送信されませんでした');
+    }
+
+    // 各項目の取得（空文字はNULLに変換）
+    $CharaId      = !empty($Data['CharaId']) ? $Data['CharaId'] : null;
+    $WorkId       = $Data['WorkId'] ?? '';
+    $CharaName    = $Data['CharaName'] ?? '';
+    $Gender       = $Data['Gender'] ?? 0;
+    $BirthDate    = !empty($Data['BirthDate']) ? $Data['BirthDate'] : null;
+    $Age          = !empty($Data['Age']) ? $Data['Age'] : null;
+    $Height       = !empty($Data['Height']) ? $Data['Height'] : null;
+    $Weight       = !empty($Data['Weight']) ? $Data['Weight'] : null;
+    $BloodType    = !empty($Data['BloodType']) ? $Data['BloodType'] : null;
+    $RaceId       = !empty($Data['RaceId']) ? $Data['RaceId'] : null;
+    $OrgId        = !empty($Data['OrgId']) ? $Data['OrgId'] : null;
+    $TeamId       = !empty($Data['TeamId']) ? $Data['TeamId'] : null;
+    $ClassId      = !empty($Data['ClassId']) ? $Data['ClassId'] : null;
+    $RoleInfo     = !empty($Data['RoleInfo']) ? $Data['RoleInfo'] : null;
+    $Personality  = !empty($Data['Personality']) ? $Data['Personality'] : null;
+    $Biography    = !empty($Data['Biography']) ? $Data['Biography'] : null;
+    $FirstPerson  = !empty($Data['FirstPerson']) ? $Data['FirstPerson'] : null;
+    $SecondPerson = !empty($Data['SecondPerson']) ? $Data['SecondPerson'] : null;
+    $UserId       = $Data['UserId'] ?? '';
+    $ImageData    = $Data['ImageData'] ?? null; // Base64文字列 (data:image/png;base64,...)
 
     $Operation = empty($CharaId) ? '登録' : '更新';
     Logger::Info($FunctionName, $Operation . '処理開始', $UserId);
 
     /** 入力チェック */
-    if (empty($WorkId)) {
-        Response::Error('作品IDが指定されていません');
-    }
-
-    if (empty($CharaName)) {
-        Response::Error('キャラ名を入力してください');
-    }
+    if (empty($WorkId)) Response::Error('作品IDが指定されていません');
+    if (empty($CharaName)) Response::Error('キャラ名を入力してください');
 
     /** DB接続 */
     $Pdo = Database::GetConnection();
     Database::BeginTransaction();
 
-    /** 空文字をNULLに変換 */
-    $CharaId = !empty($CharaId) ? $CharaId : null;
-    $BirthDate = !empty($BirthDate) ? $BirthDate : null;
-    $Age = !empty($Age) ? $Age : null;
-    $Height = !empty($Height) ? $Height : null;
-    $Weight = !empty($Weight) ? $Weight : null;
-    $BloodType = !empty($BloodType) ? $BloodType : null;
-    $RaceId = !empty($RaceId) ? $RaceId : null;
-    $OrgId = !empty($OrgId) ? $OrgId : null;
-    $TeamId = !empty($TeamId) ? $TeamId : null;
-    $ClassId = !empty($ClassId) ? $ClassId : null;
-    $RoleInfo = !empty($RoleInfo) ? $RoleInfo : null;
-    $Personality = !empty($Personality) ? $Personality : null;
-    $Biography = !empty($Biography) ? $Biography : null;
-    $FirstPerson = !empty($FirstPerson) ? $FirstPerson : null;
-    $SecondPerson = !empty($SecondPerson) ? $SecondPerson : null;
-
-    /** 画像アップロード処理 */
+    /** 画像のバイナリ復元と保存処理 */
     $ImgPath = null;
-    if (isset($_FILES['Image']) && $_FILES['Image']['error'] === UPLOAD_ERR_OK) {
+    if (!empty($ImageData) && strpos($ImageData, 'data:image') === 0) {
         $UploadDir = __DIR__ . '/../../Uploads/Characters/';
         if (!is_dir($UploadDir)) {
             mkdir($UploadDir, 0755, true);
         }
-        $Extension = pathinfo($_FILES['Image']['name'], PATHINFO_EXTENSION);
+
+        // Base64からバイナリデータを抽出
+        // data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...
+        list($Header, $Body) = explode(',', $ImageData);
+        $BinaryData = base64_decode($Body);
+        
+        // 拡張子の抽出
+        $Extension = 'jpg'; // デフォルト
+        if (preg_match('/image\/(png|jpeg|jpg|gif|webp)/', $Header, $Matches)) {
+            $Extension = $Matches[1];
+        }
+
         $FileName = uniqid('chara_') . '.' . $Extension;
         $FilePath = $UploadDir . $FileName;
 
-        if (move_uploaded_file($_FILES['Image']['tmp_name'], $FilePath)) {
+        if (file_put_contents($FilePath, $BinaryData)) {
             $ImgPath = '/Uploads/Characters/' . $FileName;
+        } else {
+            throw new Exception('画像の保存に失敗しました');
         }
     }
 
@@ -121,8 +121,8 @@ try {
             ':updateUser' => $UserId
         ]);
 
-        $Result = $Stmt->fetch();
-        $NewCharaId = $Result['charaid'];
+        $ResultRow = $Stmt->fetch();
+        $NewCharaId = $ResultRow['charaid'];
 
     } else {
         /** 更新 */
@@ -172,57 +172,30 @@ try {
             ':secondPerson' => $SecondPerson,
             ':updateUser' => $UserId
         ];
-        if ($ImgPath) {
-            $Params[':imgPath'] = $ImgPath;
-        }
+        if ($ImgPath) $Params[':imgPath'] = $ImgPath;
 
         $Stmt = $Pdo->prepare($Sql);
         $Stmt->execute($Params);
-
         $NewCharaId = $CharaId;
     }
 
-    /** 作品情報の更新年月日を更新 */
-    $UpdateWorkSql = "
-        UPDATE WorkInfo SET
-            updateDate = CURRENT_TIMESTAMP(3),
-            updateUser = :updateUser
-        WHERE workId = :workId
-    ";
-    $UpdateWorkStmt = $Pdo->prepare($UpdateWorkSql);
-    $UpdateWorkStmt->execute([
-        ':workId' => $WorkId,
-        ':updateUser' => $UserId
-    ]);
+    /** 作品情報の更新・履歴登録 */
+    $UpdateWorkSql = "UPDATE WorkInfo SET updateDate = CURRENT_TIMESTAMP(3), updateUser = :updateUser WHERE workId = :workId";
+    $Pdo->prepare($UpdateWorkSql)->execute([':workId' => $WorkId, ':updateUser' => $UserId]);
 
-    /** 更新履歴を登録 */
-    $HistorySql = "
-        INSERT INTO UpdateHistory (
-            workId, functionName, operation, registDate, updateDate, registUser, updateUser
-        ) VALUES (
-            :workId, :functionName, :operation, CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), :registUser, :updateUser
-        )
-    ";
-    $HistoryStmt = $Pdo->prepare($HistorySql);
-    $HistoryStmt->execute([
-        ':workId' => $WorkId,
-        ':functionName' => $FunctionName,
-        ':operation' => $Operation,
-        ':registUser' => $UserId,
-        ':updateUser' => $UserId
+    $HistorySql = "INSERT INTO UpdateHistory (workId, functionName, operation, registDate, updateDate, registUser, updateUser) 
+                   VALUES (:workId, :functionName, :operation, CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), :registUser, :updateUser)";
+    $Pdo->prepare($HistorySql)->execute([
+        ':workId' => $WorkId, ':functionName' => $FunctionName, ':operation' => $Operation, ':registUser' => $UserId, ':updateUser' => $UserId
     ]);
 
     Database::Commit();
-
     Logger::Info($FunctionName, $Operation . '処理終了', $UserId);
 
-    Response::Success([
-        'CharaId' => $NewCharaId,
-        'Message' => 'キャラを' . $Operation . 'しました'
-    ]);
+    Response::Success(['CharaId' => $NewCharaId, 'Message' => 'キャラを' . $Operation . 'しました']);
 
 } catch (Exception $E) {
     Database::Rollback();
     Logger::Error($FunctionName, '保存処理エラー', $UserId, $E->getMessage());
-    Response::Error('キャラの保存に失敗しました');
+    Response::Error($E->getMessage());
 }

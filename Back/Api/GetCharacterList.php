@@ -8,6 +8,11 @@ require_once __DIR__ . '/../Common/Database.php';
 require_once __DIR__ . '/../Common/Logger.php';
 require_once __DIR__ . '/../Common/Response.php';
 
+// GETメソッドのみ許可
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    Response::Error('不正なリクエストです', 405);
+}
+
 $FunctionName = 'キャラ設定';
 $UserId = '';
 

@@ -265,6 +265,20 @@ async function CallApi(Endpoint, Method = 'GET', Data = null) {
   }
 }
 
+/**
+ * ファイルをBase64文字列に変換する共通関数
+ * @param {File} file 
+ * @returns {Promise<string>} Base64文字列
+ */
+function ConvertFileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result); // データURL（data:image/png;base64,...）を返す
+    reader.onerror = error => reject(error);
+  });
+}
+
 /* ==========================================================================
  * スピナー制御
  * ========================================================================== */

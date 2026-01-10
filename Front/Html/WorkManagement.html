@@ -2400,52 +2400,137 @@
         Reader.readAsDataURL(File)
       }
 
+      /***
+       * キャラ一覧表示
+       * */
       async function LoadCharacterList() {
+       /* ==========================================================================
+        * API通信
+        * ========================================================================== */
         try {
+         /* ---------------------------------------------
+          *  1. 定義
+          * --------------------------------------------- */
+          // 1. 作品ID
           const WorkId = sessionStorage.getItem('WorkId')
+
+         /* ---------------------------------------------
+          *  2. API呼び出し
+          * --------------------------------------------- */          
           const Response = await CallApi(
             `/GetCharacterList.php?WorkId=${encodeURIComponent(WorkId)}`,
             'GET',
           )
+
+         /* ---------------------------------------------
+          *  3. 通信成功
+          * --------------------------------------------- */   
           if (Response.Success) {
+            // 1. キャラ一覧保持
             CharacterList = Response.Data || []
+            // 2. 一覧表示
             RenderCharacterTable()
           } else {
+           /* ---------------------------------------------
+            *  4. 通信失敗
+            * --------------------------------------------- */  
             await ShowErrorDialog(
+              // 1. エラーダイアログ表示
               Response.Message || 'キャラ一覧の取得に失敗しました',
             )
           }
         } catch (Error) {
-          console.error(Error)
+         /* ==========================================================================
+          * API通信
+          * ========================================================================== */
+          // 1. エラーダイアログ表示
           await ShowErrorDialog('キャラ一覧の取得中にエラーが発生しました')
+          // 2. デバッグログ
+          console.error(Error)
         }
       }
 
+      /**
+       * キャラ一覧表示
+       * */
       function RenderCharacterTable() {
+       /* ==========================================================================
+        * 定義
+        * ========================================================================== */
+       /* ---------------------------------------------
+        *  1. 表示エリア
+        * --------------------------------------------- */  
+        // 1. テーブル表示エリア要素
         const TableArea = document.getElementById('CharacterTableArea')
+        // 2. 件数表示エリア要素
         const RecordCountArea = document.getElementById('RecordCountArea')
+        // 3. ページネーションエリア要素
         const PaginationArea = document.getElementById('PaginationArea')
+
+       /* ---------------------------------------------
+        *  2. 件数設定
+        * --------------------------------------------- */ 
+        // 1. 件数表示エリア初期化
         RecordCountArea.innerHTML = ''
+        // 2. 件数設定
         RecordCountArea.appendChild(CreateRecordCount(CharacterList.length))
+
+       /* ---------------------------------------------
+        *  3. テーブル
+        * --------------------------------------------- */ 
+        // 1. テーブル要素
         const Table = document.createElement('table')
+        // 2. クラス設定
         Table.className = 'DataTable'
+
+       /* ---------------------------------------------
+        *  4. ヘッダー
+        * --------------------------------------------- */ 
+        // 1. ヘッダー要素
         const Thead = document.createElement('thead')
+        // 2. ヘッダー定義
         Thead.innerHTML = `<tr><th>キャラ名</th><th>性別</th><th>年齢</th><th>種族</th><th>組織</th><th>登録日</th></tr>`
+        // 3. ヘッダー格納
         Table.appendChild(Thead)
+
+       /* ---------------------------------------------
+        *  5. テーブルボディ
+        * --------------------------------------------- */ 
+        // 1. テーブルボディ要素
         const Tbody = document.createElement('tbody')
+
+       /* ---------------------------------------------
+        *  6. ページ設定
+        * --------------------------------------------- */ 
+        // 1. 初期ページ
         const StartIndex = (CurrentPage - 1) * RECORDS_PER_PAGE
+        // 2. 終了ページ
         const EndIndex = Math.min(
           StartIndex + RECORDS_PER_PAGE,
           CharacterList.length,
         )
+        // 3. ページ分割
         const PageData = CharacterList.slice(StartIndex, EndIndex)
+
+       /* ---------------------------------------------
+        *  7. ページが存在しない場合
+        * --------------------------------------------- */ 
         if (PageData.length === 0) {
+          // 1. 表示を設定
           Tbody.innerHTML =
             '<tr><td colspan="6" style="text-align:center;color:#999;">データがありません</td></tr>'
         } else {
+         /* ---------------------------------------------
+          *  8. ページが存在する場合
+          * --------------------------------------------- */ 
           PageData.forEach((Item, Index) => {
+            /* 1. 定義 */
+            // 1. 行要素
             const Row = document.createElement('tr')
+            // 2. カーソル設定
             Row.style.cursor = 'pointer'
+            
+            /* 2. DOM定義 */
             Row.innerHTML = `<td title="${Item.CharaName}">${TruncateText(
               Item.CharaName,
               15,
@@ -2454,16 +2539,29 @@
             }</td><td>${Item.RaceName || '-'}</td><td>${
               Item.OrgName || '-'
             }</td><td>${FormatTimestamp(Item.RegistDate)}</td>`
+
+            /* 3. ダブルクリックイベント定義 */
             Row.addEventListener('dblclick', () =>
+              // 1. 行選択イベント定義
               SelectCharacter(StartIndex + Index),
             )
+
+            /* 4. DOM組み立て */
             Tbody.appendChild(Row)
           })
         }
+       /* ---------------------------------------------
+        *  9. DOM組み立て
+        * --------------------------------------------- */ 
+        // 1. テーブルへボディ格納
         Table.appendChild(Tbody)
+        // 2. テーブルエリア初期化
         TableArea.innerHTML = ''
+        // 3. テーブルエリアへテーブル格納
         TableArea.appendChild(Table)
+        // 4. ページネーション表示エリア初期化
         PaginationArea.innerHTML = ''
+        // 5. ページネーション表示エリアへページネーションを格納
         PaginationArea.appendChild(
           CreatePagination(CharacterList.length, CurrentPage, (Page) => {
             CurrentPage = Page
@@ -2472,163 +2570,229 @@
         )
       }
 
+      /**
+       * 行選択イベントを定義
+       * */
       function SelectCharacter(Index) {
+       /* ==========================================================================
+        * 定義
+        * ========================================================================== */
+        // 1. 選択行の内容を取得
         const Item = CharacterList[Index]
+        // 2. 選択行のIDを保持
         SelectedCharacterId = Item.CharaId
+
+       /* ==========================================================================
+        * 選択行内容反映
+        * ========================================================================== */
+       /* ---------------------------------------------
+        *  1. 各入力フォームへ選択行内容を保持
+        * --------------------------------------------- */ 
+        // 1. キャラ名
         document.getElementById('CharaName').value = Item.CharaName || ''
+        // 2. 性別
         document.getElementById('CharaGender').value = Item.Gender || 0
+        // 3. 生年月日
         document.getElementById('CharaBirthDate').value = Item.BirthDate || ''
+        // 4. 年齢
         document.getElementById('CharaAge').value = Item.Age || ''
+        // 5. 身長
         document.getElementById('CharaHeight').value = Item.Height || ''
+        // 6. 体重
         document.getElementById('CharaWeight').value = Item.Weight || ''
+        // 7. 血液型
         document.getElementById('CharaBloodType').value = Item.BloodType || ''
+        // 8. 一人称
         document.getElementById('CharaFirstPerson').value =
           Item.FirstPerson || ''
+        // 9. 二人称
         document.getElementById('CharaSecondPerson').value =
           Item.SecondPerson || ''
+        // 10.役割
         document.getElementById('CharaRoleInfo').value = TruncateText(
           Item.RoleInfo,
           30,
         )
+        // 11.役割(DB保持内容)
         document.getElementById('CharaRoleInfoHidden').value =
           Item.RoleInfo || ''
+        // 12.種族
         document.getElementById('CharaRace').value = Item.RaceId || ''
+        // 13.組織
         document.getElementById('CharaOrganization').value = Item.OrgId || ''
+        // 14.チーム
         document.getElementById('CharaTeam').value = Item.TeamId || ''
+        // 15.階級
         document.getElementById('CharaClass').value = Item.ClassId || ''
+        // 16.性格
         document.getElementById('CharaPersonality').value = TruncateText(
           Item.Personality,
           30,
         )
+        // 17.性格(DB保持内容)
         document.getElementById('CharaPersonalityHidden').value =
           Item.Personality || ''
+        // 18.生い立ち・経歴
         document.getElementById('CharaBiography').value = TruncateText(
           Item.Biography,
           30,
         )
+        // 19.生い立ち・内容(DB保持内容)
         document.getElementById('CharaBiographyHidden').value =
           Item.Biography || ''
+
+       /* ---------------------------------------------
+        *  2. 画像パスが存在する場合
+        * --------------------------------------------- */ 
         if (Item.ImgPath) {
+          // 1. 画像ボックス要素
           const ImageBox = document.getElementById('CharaImageBox')
+          // 2. 画像要素DOM定義
           ImageBox.innerHTML = `<img src="${Item.ImgPath}" alt="キャラ画像">`
+          // 3. 画像パス保持要素
           document.getElementById('CharaImagePath').value = Item.ImgPath
         }
-        const DeleteBtn = document.getElementById('CharaDeleteButton')
-        if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
+
+       /* ---------------------------------------------
+        *  3. 削除ボタン表示
+        * --------------------------------------------- */ 
+        // 1. 削除ボタン要素
+        const DeleteButton = document.getElementById('CharaDeleteButton')
+        // 2. 削除ボタン表示
+        if (DeleteButton) {
+          DeleteButton.classList.remove('Hidden')
+        }
       }
 
+      /**
+       * キャラクリア処理
+       * */
       function ClearCharacterForm() {
+       /* ==========================================================================
+        * 定義
+        * ========================================================================== */
+        // 1. 選択行ID初期化
         SelectedCharacterId = null
+
+       /* ==========================================================================
+        * 各入力フォーム初期化
+        * ========================================================================== */
+       /* ---------------------------------------------
+        *  1. 各入力フォームの内容を初期化する
+        * --------------------------------------------- */ 
+        // 1. キャラ名
         document.getElementById('CharaName').value = ''
+        // 2. 性別
         document.getElementById('CharaGender').value = 0
+        // 3. 生年月日
         document.getElementById('CharaBirthDate').value = ''
+        // 4. 年齢
         document.getElementById('CharaAge').value = ''
+        // 5. 身長
         document.getElementById('CharaHeight').value = ''
+        // 6. 体重
         document.getElementById('CharaWeight').value = ''
+        // 7. 血液型
         document.getElementById('CharaBloodType').value = ''
+        // 8. 一人称
         document.getElementById('CharaFirstPerson').value = ''
+        // 9. 二人称
         document.getElementById('CharaSecondPerson').value = ''
+        // 10.役割
         document.getElementById('CharaRoleInfo').value = ''
+        // 11.役割(DB保持内容)
         document.getElementById('CharaRoleInfoHidden').value = ''
+        // 12.種族
         document.getElementById('CharaRace').value = ''
+        // 13.組織
         document.getElementById('CharaOrganization').value = ''
+        // 14.チーム
         document.getElementById('CharaTeam').value = ''
+        // 15.階級
         document.getElementById('CharaClass').value = ''
+        // 16.性格
         document.getElementById('CharaPersonality').value = ''
+        // 17.性格(DB保持内容)
         document.getElementById('CharaPersonalityHidden').value = ''
+        // 18.生い立ち・経歴
         document.getElementById('CharaBiography').value = ''
+        // 19.生い立ち・経歴(DB保持内容)
         document.getElementById('CharaBiographyHidden').value = ''
+        // 20.画像初期化
         document.getElementById(
           'CharaImageBox',
         ).innerHTML = `<div class="ImageBoxPlaceholder"><i class="fas fa-user"></i><div>クリックで画像選択</div></div>`
+        // 21.画像パス
         document.getElementById('CharaImagePath').value = ''
+        // 22.画像選択入力フォーム
         document.getElementById('CharaImageInput').value = ''
-        const DeleteBtn = document.getElementById('CharaDeleteButton')
-        if (DeleteBtn) DeleteBtn.classList.add('Hidden')
+
+       /* ---------------------------------------------
+        *  2. 削除ボタン
+        * --------------------------------------------- */ 
+        // 1. 削除ボタン
+        const DeleteButton = document.getElementById('CharaDeleteButton')
+        // 2. 削除ボタンを非表示
+        if (DeleteButton) {
+          DeleteButton.classList.add('Hidden')
+        }
       }
 
+      /**
+       * 登録・更新処理
+       * */
       async function SaveCharacter() {
-        const CharaName = document.getElementById('CharaName').value.trim()
-        if (!CharaName) {
-          await ShowErrorDialog('キャラ名を入力してください')
-          return
-        }
         try {
-          const FormData = new window.FormData()
-          FormData.append('CharaId', SelectedCharacterId || '')
-          FormData.append('WorkId', sessionStorage.getItem('WorkId'))
-          FormData.append('CharaName', CharaName)
-          FormData.append(
-            'Gender',
-            document.getElementById('CharaGender').value,
-          )
-          FormData.append(
-            'BirthDate',
-            document.getElementById('CharaBirthDate').value,
-          )
-          FormData.append('Age', document.getElementById('CharaAge').value)
-          FormData.append(
-            'Height',
-            document.getElementById('CharaHeight').value,
-          )
-          FormData.append(
-            'Weight',
-            document.getElementById('CharaWeight').value,
-          )
-          FormData.append(
-            'BloodType',
-            document.getElementById('CharaBloodType').value,
-          )
-          FormData.append(
-            'FirstPerson',
-            document.getElementById('CharaFirstPerson').value,
-          )
-          FormData.append(
-            'SecondPerson',
-            document.getElementById('CharaSecondPerson').value,
-          )
-          FormData.append(
-            'RoleInfo',
-            document.getElementById('CharaRoleInfoHidden').value,
-          )
-          FormData.append('RaceId', document.getElementById('CharaRace').value)
-          FormData.append(
-            'OrgId',
-            document.getElementById('CharaOrganization').value,
-          )
-          FormData.append('TeamId', document.getElementById('CharaTeam').value)
-          FormData.append(
-            'ClassId',
-            document.getElementById('CharaClass').value,
-          )
-          FormData.append(
-            'Personality',
-            document.getElementById('CharaPersonalityHidden').value,
-          )
-          FormData.append(
-            'Biography',
-            document.getElementById('CharaBiographyHidden').value,
-          )
-          FormData.append('UserId', sessionStorage.getItem('UserId'))
-          const ImageInput = document.getElementById('CharaImageInput')
-          if (ImageInput.files[0]) FormData.append('Image', ImageInput.files[0])
-          ShowSpinner()
-          const Response = await fetch(`${API_BASE_URL}/SaveCharacter.php`, {
-            method: 'POST',
-            body: FormData,
-          })
-          const Result = await Response.json()
-          HideSpinner()
+          const CharaName = document.getElementById('CharaName').value;
+          if (!CharaName) {
+            await ShowErrorDialog('キャラ名を入力してください');
+            return;
+          }
+
+          // 画像の処理
+          const ImageInput = document.getElementById('CharaImageInput');
+          let ImageBase64 = null;
+          if (ImageInput.files[0]) {
+            ImageBase64 = await ConvertFileToBase64(ImageInput.files[0]);
+          }
+
+          // リクエストデータの作成（通常のオブジェクト）
+          const RequestData = {
+            CharaId: SelectedCharacterId || '',
+            WorkId: sessionStorage.getItem('WorkId'),
+            CharaName: CharaName,
+            Gender: document.getElementById('CharaGender').value,
+            BirthDate: document.getElementById('CharaBirthDate').value,
+            Age: document.getElementById('CharaAge').value,
+            Height: document.getElementById('CharaHeight').value,
+            Weight: document.getElementById('CharaWeight').value,
+            BloodType: document.getElementById('CharaBloodType').value,
+            FirstPerson: document.getElementById('CharaFirstPerson').value,
+            SecondPerson: document.getElementById('CharaSecondPerson').value,
+            RoleInfo: document.getElementById('CharaRoleInfoHidden').value,
+            RaceId: document.getElementById('CharaRace').value,
+            OrgId: document.getElementById('CharaOrganization').value,
+            TeamId: document.getElementById('CharaTeam').value,
+            ClassId: document.getElementById('CharaClass').value,
+            Personality: document.getElementById('CharaPersonalityHidden').value,
+            Biography: document.getElementById('CharaBiographyHidden').value,
+            UserId: sessionStorage.getItem('UserId'),
+            ImageData: ImageBase64 // ここにBase64文字列が入る
+          };
+
+          // CallApi関数を使用して送信
+          const Result = await CallApi('/SaveCharacter.php', 'POST', RequestData);
+
           if (Result.Success) {
-            await ShowInfoDialog('保存完了', 'キャラ情報を保存しました')
-            ClearCharacterForm()
-            await LoadCharacterList()
+            await ShowInfoDialog('保存完了', 'キャラ情報を保存しました');
+            ClearCharacterForm();
+            await LoadCharacterList();
           } else {
-            await ShowErrorDialog(Result.Message || '保存に失敗しました')
+            await ShowErrorDialog(Result.Message || '保存に失敗しました');
           }
         } catch (Error) {
-          HideSpinner()
-          await ShowErrorDialog('保存中にエラーが発生しました')
+          console.error(Error);
+          await ShowErrorDialog('保存中にエラーが発生しました');
         }
       }
 
