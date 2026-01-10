@@ -154,69 +154,86 @@ try {
     $SecondPerson = !empty($SecondPerson) ? $SecondPerson : null;
 
    /* ---------------------------------------------
-    *  8. 画像をバイナリに変換
-    * --------------------------------------------- */
+     * 8. 画像の処理（保存・削除の判定）
+     * --------------------------------------------- */
     /* 1. 定義 */
     // 1. 画像パス
     $ImgPath = null;
+    // 2. 画像更新フラグ
+    $IsImageUpdated = false;
 
-    /* 2. 変換処理 */
-    if (!empty($ImageData) && strpos($ImageData, 'data:image') === 0) {
-        /* 保存先ディレクトリの物理パスを定義 */
-        $UploadDir = __DIR__ . '/../../Uploads/Characters/';
+    /* 2. 画像データの内容に応じた分岐処理 */
+    if (!empty($ImageData)) {
+        /* 新しい画像データ（Base64）が送られてきた場合 */
+        if (strpos($ImageData, 'data:image') === 0) {
+            /* 保存先ディレクトリの物理パスを定義 */
+            $UploadDir = __DIR__ . '/../../Uploads/Characters/';
 
-        /* ディレクトリが存在しない場合 */
-        if (!is_dir($UploadDir)) {
-            // 1. ディレクトリの作成に失敗した場合は例外をスロー
-            if (!mkdir($UploadDir, 0777, true)) {
-                throw new Exception('保存先ディレクトリの作成に失敗しました');
+            /* ディレクトリが存在しない場合 */
+            if (!is_dir($UploadDir)) {
+                // 1. ディレクトリの作成に失敗した場合は例外をスロー
+                if (!mkdir($UploadDir, 0777, true)) {
+                    throw new Exception('保存先ディレクトリの作成に失敗しました');
+                }
+                // 2. ディレクトリの権限を確実に設定
+                chmod($UploadDir, 0777);
             }
-            // 2. ディレクトリの権限を確実に設定
-            chmod($UploadDir, 0777);
+
+            /* バイナリデータ復元 */
+            // 1. ヘッダーと本体を分離
+            list($Header, $Body) = explode(',', $ImageData);
+            
+            // 2. Base64文字列をバイナリデータにデコード
+            $BinaryData = base64_decode($Body);
+            
+            // 3. デコードに失敗した場合は例外をスロー
+            if ($BinaryData === false) {
+                throw new Exception('画像のデコードに失敗しました');
+            }
+
+            /* 拡張子の特定とパス生成 */
+            // 1. デフォルト拡張子を設定
+            $Extension = 'jpg';
+            
+            // 2. ヘッダーからMIMEタイプを判定して拡張子を特定
+            if (preg_match('/image\/(png|jpeg|jpg|gif|webp)/', $Header, $Matches)) {
+                $Extension = $Matches[1];
+            }
+
+            // 3. ユニークIDを用いて重複しないファイル名を生成
+            $FileName = uniqid('chara_') . '.' . $Extension;
+            
+            // 4. 保存用のフルパス（物理パス）を生成
+            $FilePath = $UploadDir . $FileName;
+
+            /* サーバーへファイルを書き込み */
+            if (file_put_contents($FilePath, $BinaryData) === false) {
+                // 1. エラーを取得
+                $Error = error_get_last();
+                // 2. 例外を返す
+                throw new Exception('ファイルの書き込みに失敗しました: ' . ($Error['message'] ?? 'Permission denied'));
+            }
+
+            /* DB登録用のWEB公開用パスを格納 */
+            // 1. パスwp設定
+            $ImgPath = '/Uploads/Characters/' . $FileName;
+            // 2. 更新FLGを立てる
+            $IsImageUpdated = true;
+        } else {
+            /* 既存の画像パスがそのまま送られてきた場合 */
+            $IsImageUpdated = false;
         }
-
-        /* バイナリデータ復元 */
-        // 1. ヘッダーと本体を分離
-        list($Header, $Body) = explode(',', $ImageData);
-        
-        // 2. Base64文字列をバイナリデータにデコード
-        $BinaryData = base64_decode($Body);
-        
-        // 3. デコードに失敗した場合は例外をスロー
-        if ($BinaryData === false) {
-            throw new Exception('画像のデコードに失敗しました');
-        }
-
-        /* 拡張子の特定とパス生成 */
-        // 1. デフォルト拡張子を設定
-        $Extension = 'jpg';
-        
-        // 2. ヘッダーからMIMEタイプを判定して拡張子を特定
-        if (preg_match('/image\/(png|jpeg|jpg|gif|webp)/', $Header, $Matches)) {
-            $Extension = $Matches[1];
-        }
-
-        // 3. ユニークIDを用いて重複しないファイル名を生成
-        $FileName = uniqid('chara_') . '.' . $Extension;
-        
-        // 4. 保存用のフルパス（物理パス）を生成
-        $FilePath = $UploadDir . $FileName;
-
-        /* サーバーへファイルを書き込み */
-        if (file_put_contents($FilePath, $BinaryData) === false) {
-            // 1. エラーを取得
-            $Error = error_get_last();
-            // 2. 例外を返す
-            throw new Exception('ファイルの書き込みに失敗しました: ' . ($Error['message'] ?? 'Permission denied'));
-        }
-
-        /* DB登録用のWEB公開用パスを格納 */
-        $ImgPath = '/Uploads/Characters/' . $FileName;
+    } else {
+        /* 2. 画像データが空の場合 */
+        // 1. パスをNULLに設定
+        $ImgPath = null;
+        // 2. 更新FLGを立てる
+        $IsImageUpdated = true;
     }
 
-   /* ---------------------------------------------
-    *  9. ユーザーIDが存在しない場合
-    * --------------------------------------------- */
+    /* ---------------------------------------------
+     * 9. 新規登録処理（CharaIdが空の場合）
+     * --------------------------------------------- */
     if (empty($CharaId)) {
         // 1. クエリを定義
         $Sql = "
@@ -280,13 +297,13 @@ try {
         // 25. キャラID取得
         $NewCharaId = $ResultRow['charaid'];
 
-   /* ---------------------------------------------
-    *  10.ユーザーIDが存在する場合
-    * --------------------------------------------- */
+    /* ---------------------------------------------
+     * 10. 更新処理（CharaIdが存在する場合）
+     * --------------------------------------------- */
     } else {
         /* 2. 更新の場合 */
-        // 1. 画像パス更新用のSQL句を生成
-        $UpdateImgPath = $ImgPath ? ", imgPath = :imgPath" : "";
+        // 1. 画像パス更新用のSQL句を生成（更新フラグがtrueの場合のみ）
+        $UpdateImgPath = $IsImageUpdated ? ", imgPath = :imgPath" : "";
         // 2. クエリを定義
         $Sql = "
             UPDATE CharacterInfo SET
@@ -351,9 +368,9 @@ try {
         $Stmt->bindValue(':secondPerson', $SecondPerson, $SecondPerson === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         // 22. 更新ユーザーID設定
         $Stmt->bindValue(':updateUser',   $UserId,       PDO::PARAM_STR);
-        // 23. 画像パスが設定されている場合のみバインド
-        if ($ImgPath) {
-            $Stmt->bindValue(':imgPath',  $ImgPath,      PDO::PARAM_STR);
+        // 23. 画像パスが更新対象の場合のみバインド（NULLも許容）
+        if ($IsImageUpdated) {
+            $Stmt->bindValue(':imgPath',  $ImgPath,      $ImgPath === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         }
         // 24. SQL実行
         $Stmt->execute();
