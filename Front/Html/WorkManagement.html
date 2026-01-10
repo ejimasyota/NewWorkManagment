@@ -3399,14 +3399,16 @@
         // 9. 活動内容をDB登録用フォームへ設定
         document.getElementById('OrgActivityHidden').value = Item.Activity || ''
 
-        /* ---------------------------------------------
-         *  4. 画像パスが存在する場合
-         * --------------------------------------------- */
+       /* ---------------------------------------------
+        *  4. 画像パスが存在する場合
+        * --------------------------------------------- */ 
         if (Item.ImgPath) {
-          // 1. 画像パスの画像を設定
-          document.getElementById(
-            'OrgImageBox',
-          ).innerHTML = `<img src="${API_BASE_URL}${Item.ImgPath}" alt="組織画像">`
+          // 1. 画像ボックス要素
+          const ImageBox = document.getElementById('OrgImageBox')
+          // 2. 画像要素DOM定義
+          ImageBox.innerHTML = `<img src="${Item.ImgPath}" alt="組織画像">`
+          // 3. 画像パス保持要素
+          document.getElementById('OrgImagePath').value = Item.ImgPath
         }
 
         /* ---------------------------------------------
