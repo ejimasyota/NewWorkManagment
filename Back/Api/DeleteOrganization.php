@@ -1,71 +1,148 @@
 <?php
-/**
- * DeleteOrganization.php
- * 組織削除API
- */
+/* ==========================================================
+ * 組織削除
+ * ----------------------------------------------------------
+ * ・指定された組織を削除する
+ * ----------------------------------------------------------
+ * 更新履歴：
+ * 2026-01-10 作成
+ * ========================================================== */
 
+/* ==========================================================
+ * 1. 共通モジュール読み込み
+ * ========================================================== */
+// 1. データベース接続クラス
 require_once __DIR__ . '/../Common/Database.php';
+// 2. ログ出力クラス
 require_once __DIR__ . '/../Common/Logger.php';
+// 3. レスポンスクラス
 require_once __DIR__ . '/../Common/Response.php';
 
+/* ==========================================================
+ * 2. リクエストチェック
+ * ========================================================== */
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // 1. 例外レスポンスを返す
+    Response::Error('不正なリクエストです', 405);
+}
+
+/* ==========================================================
+ * 3. 共通定義
+ * ========================================================== */
+// 1. 機能名
 $FunctionName = '組織設定';
+// 2. ユーザーID
 $UserId = '';
 
+/* ==========================================================
+ * 4. 処理
+ * ========================================================== */
 try {
-    /** リクエストデータを取得 */
+    /* ---------------------------------------------
+     * 1. リクエスト取得
+     * --------------------------------------------- */
     $Input = Response::GetJsonInput();
-    $OrgId = $Input['OrgId'] ?? null;
+
+    /* ---------------------------------------------
+     * 2. リクエスト内容定義
+     * --------------------------------------------- */
+    // 1. 組織ID
+    $OrgId  = $Input['OrgId'] ?? null;
+    // 2. 作品ID（初期値。DBから再取得することを想定）
     $WorkId = $Input['WorkId'] ?? '';
+    // 3. ユーザーID
     $UserId = $Input['UserId'] ?? '';
 
-    Logger::Info($FunctionName, '削除処理開始', $UserId);
+    /* ---------------------------------------------
+     * 3. 操作設定
+     * --------------------------------------------- */
+    $Operation = '削除';
 
-    /** 入力チェック */
+    /* ---------------------------------------------
+     * 4. バリデーションチェック
+     * --------------------------------------------- */
+    /* 1. 組織ID取得失敗 */
     if (empty($OrgId)) {
         Response::Error('組織IDが指定されていません');
     }
-
-    if (empty($WorkId)) {
-        Response::Error('作品IDが指定されていません');
+    /* 2. ユーザーID取得失敗 */
+    if (empty($UserId)) {
+        Response::Error('ユーザーIDが指定されていません');
     }
 
-    /** DB接続 */
+    /* ---------------------------------------------
+     * 5. 操作ログ出力
+     * --------------------------------------------- */
+    Logger::Info($FunctionName, $Operation . '処理開始', $UserId);
+
+    /* ---------------------------------------------
+     * 6. DB接続
+     * --------------------------------------------- */
+    // 1. 接続開始
     $Pdo = Database::GetConnection();
+    // 2. トランザクション開始
     Database::BeginTransaction();
 
-    /** 削除対象の組織が存在するか確認 */
-    $CheckSql = "SELECT orgId FROM OrganizationInfo WHERE orgId = :orgId AND workId = :workId";
-    $CheckStmt = $Pdo->prepare($CheckSql);
-    $CheckStmt->execute([':orgId' => $OrgId, ':workId' => $WorkId]);
-    $OrgInfo = $CheckStmt->fetch();
+    /* ---------------------------------------------
+     * 7. 事前情報取得
+     * --------------------------------------------- */
+    // 1. 組織のworkIdを確認するために取得
+    $GetWorkSql = "SELECT workId FROM OrganizationInfo WHERE orgId = :orgId";
+    // 2. ステートメント定義
+    $GetWorkStmt = $Pdo->prepare($GetWorkSql);
+    // 3. 実行
+    $GetWorkStmt->execute([':orgId' => $OrgId]);
+    // 4. 結果取得
+    $OrgInfo = $GetWorkStmt->fetch();
 
+    /* 存在チェック */
     if (!$OrgInfo) {
-        Database::Rollback();
-        Response::Error('削除対象の組織が見つかりません');
+        throw new Exception('削除対象の組織が見つかりません');
     }
 
-    /** 組織を削除 */
-    $Sql = "DELETE FROM OrganizationInfo WHERE orgId = :orgId AND workId = :workId";
-    $Stmt = $Pdo->prepare($Sql);
-    $Stmt->execute([
-        ':orgId' => $OrgId,
-        ':workId' => $WorkId
-    ]);
+    // 5. 正式な作品IDを再設定
+    $WorkId = $OrgInfo['workid'];
 
-    /** 作品情報の更新年月日を更新 */
+    /* ---------------------------------------------
+     * 8. 組織削除実行
+     * --------------------------------------------- */
+    // 1. クエリを定義
+    $Sql = "DELETE FROM OrganizationInfo WHERE orgId = :orgId";
+    // 2. ステートメント定義
+    $Stmt = $Pdo->prepare($Sql);
+    // 3. 実行
+    $Stmt->execute([':orgId' => $OrgId]);
+
+    /* ---------------------------------------------
+     * 9. 関連データ削除（任意：相関図等）
+     * --------------------------------------------- */
+    // 1. 相関図オブジェクトからも削除（objType=2:組織 を想定）
+    $DeleteRelationSql = "DELETE FROM RelationObjectInfo WHERE objType = 2 AND targetId = :orgId";
+    $DeleteRelationStmt = $Pdo->prepare($DeleteRelationSql);
+    $DeleteRelationStmt->execute([':orgId' => $OrgId]);
+
+    /* ---------------------------------------------
+     * 10. 作品情報更新
+     * --------------------------------------------- */
+    // 1. クエリを定義
     $UpdateWorkSql = "
         UPDATE WorkInfo SET
             updateDate = CURRENT_TIMESTAMP(3),
             updateUser = :updateUser
         WHERE workId = :workId
     ";
+    // 2. ステートメント定義
     $UpdateWorkStmt = $Pdo->prepare($UpdateWorkSql);
+    // 3. 実行
     $UpdateWorkStmt->execute([
         ':workId' => $WorkId,
         ':updateUser' => $UserId
     ]);
 
-    /** 更新履歴を登録 */
+    /* ---------------------------------------------
+     * 11. 更新履歴登録
+     * --------------------------------------------- */
+    // 1. クエリを定義
     $HistorySql = "
         INSERT INTO UpdateHistory (
             workId, functionName, operation, registDate, updateDate, registUser, updateUser
@@ -73,25 +150,42 @@ try {
             :workId, :functionName, :operation, CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), :registUser, :updateUser
         )
     ";
+    // 2. ステートメント定義
     $HistoryStmt = $Pdo->prepare($HistorySql);
+    // 3. 実行
     $HistoryStmt->execute([
         ':workId' => $WorkId,
         ':functionName' => $FunctionName,
-        ':operation' => '削除',
+        ':operation' => $Operation,
         ':registUser' => $UserId,
         ':updateUser' => $UserId
     ]);
 
+    /* ---------------------------------------------
+     * 12. トランザクションをコミット
+     * --------------------------------------------- */
     Database::Commit();
 
-    Logger::Info($FunctionName, '削除処理終了', $UserId);
+    /* ---------------------------------------------
+     * 13. 操作ログ書き込み
+     * --------------------------------------------- */
+    Logger::Info($FunctionName, $Operation . '処理終了', $UserId);
 
+    /* ---------------------------------------------
+     * 14. 成功レスポンス
+     * --------------------------------------------- */
     Response::Success([
         'Message' => '組織を削除しました'
     ]);
 
 } catch (Exception $E) {
+    /* ==========================================================
+     * 5. 例外処理
+     * ========================================================== */
+    // 1. トランザクションをロールバック
     Database::Rollback();
+    // 2. エラーログ書き込み
     Logger::Error($FunctionName, '削除処理エラー', $UserId, $E->getMessage());
-    Response::Error('組織の削除に失敗しました');
+    // 3. エラーレスポンス
+    Response::Error($E->getMessage());
 }

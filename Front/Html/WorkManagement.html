@@ -951,6 +951,8 @@
       let ReviewList = []
       // 4. キャラクター一覧
       let CharacterList = []
+      // 5. 組織一覧
+      let OrganizationList = []
 
       /* ---------------------------------------------
        *  5. 選択行ID
@@ -963,6 +965,8 @@
       let SelectedReviewId = null
       // 4. キャラクター選択行ID
       let SelectedCharacterId = null
+      // 5. 組織選択行ID
+      let SelectedOrgId = null
 
       /* ---------------------------------------------
        *  6. キャラ設定画面プルダウン
@@ -975,6 +979,12 @@
       let CharacterRaceList = []
       // 4. 階級プルダウン
       let CharacterClassList = []
+    
+      /* ---------------------------------------------
+       *  7. 組織設定画面プルダウン
+       * --------------------------------------------- */
+      // 1. 建物プルダウン
+      let OrgBuildList = []
 
       /**
        * 画面ロード時処理
@@ -2950,19 +2960,11 @@
         }
       }
 
-      /* ==========================================================================
-       * 組織設定画面
-       * ========================================================================== */
-      /* ---------------------------------------------
-       *  1. 定義
-       * --------------------------------------------- */
-      // 1. 組織一覧の内容を保持する
-      let OrganizationList = []
-      // 2. 建物一覧の内容を保持する
-      let BuildListForOrg = []
-      // 3. 選択中の組織IDを保持する
-      let SelectedOrgId = null
-
+      /* ======================================================================================================================
+      * ■ 組織設定
+      * -----------------------------------------------------------------------------------------------------------------------
+      * ・作中の組織などに関する設定を行う
+      * ======================================================================================================================= */
       /**
        * 組織設定画面を表示
        **/
@@ -3209,7 +3211,7 @@
             // 1. 組織一覧を保持
             OrganizationList = Response.Data.OrganizationList || []
             // 2. 建物一覧を保持
-            BuildListForOrg = Response.Data.BuildList || []
+            OrgBuildList = Response.Data.BuildList || []
             // 3. 建物プルダウンの内容更新
             UpdateBuildSelect()
             // 4. 組織一覧表示
@@ -3258,7 +3260,7 @@
          * --------------------------------------------- */
         Select.innerHTML =
           '<option value="">拠点建物を選択</option>' +
-          BuildListForOrg.map(
+          OrgBuildList.map(
             (Build) =>
               `<option value="${Build.BuildId}">${Build.BuildName}</option>`,
           ).join('')
@@ -3457,50 +3459,67 @@
       }
 
       /**
+           /**
        * 組織保存処理
        **/
       async function SaveOrganization() {
-        /* ---------------------------------------------
-         *  1. 定義
-         * --------------------------------------------- */
-        // 1. 組織名取得
-        const OrgName = document.getElementById('OrgName').value.trim()
-        // 2. 組織設立年月日取得
-        const FoundedDate = document
-          .getElementById('OrgFoundedDate')
-          .value.trim()
-        // 3. 人員数
-        const PeopleNum = document.getElementById('OrgPeopleNum').value.trim()
-        // 4. 目的取得
-        const Purpose = document.getElementById('OrgPurposeHidden').value.trim()
-        // 5. 活動内容取得
-        const Activity = document
-          .getElementById('OrgActivityHidden')
-          .value.trim()
-        // 6. 拠点建物ID取得
-        const BaseBuildId = document.getElementById('OrgBaseBuild').value.trim()
-        // 7. 選択中の組織ID取得
-        const OrgId = SelectedOrgId || ''
-        // 8. 画像ファイル取得
-        const ImageInput =
-          document.getElementById('OrgImageInput').files[0] || null
-
-        /* ---------------------------------------------
-         *  2. バリデーションチェック
-         * --------------------------------------------- */
-        /* 1. 組織名が未入力の場合 */
-        if (!OrgName) {
-          // 1. エラーダイアログ表示
-          await ShowErrorDialog('組織名を入力してください')
-          // 2. 処理終了
-          return
-        }
-
-        /* ---------------------------------------------
-         *  3. API通信
-         * --------------------------------------------- */
         try {
-          /* 1. スピナー表示 */
+          /* ---------------------------------------------
+           *  1. 定義
+           * --------------------------------------------- */
+          // 1. 組織名取得
+          const OrgName = document.getElementById('OrgName').value.trim()
+          // 2. 組織設立年月日取得
+          const FoundedDate = document
+            .getElementById('OrgFoundedDate')
+            .value.trim()
+          // 3. 人員数
+          const PeopleNum = document.getElementById('OrgPeopleNum').value.trim()
+          // 4. 目的取得
+          const Purpose = document.getElementById('OrgPurposeHidden').value.trim()
+          // 5. 活動内容取得
+          const Activity = document
+            .getElementById('OrgActivityHidden')
+            .value.trim()
+          // 6. 拠点建物ID取得
+          const BaseBuildId = document.getElementById('OrgBaseBuild').value.trim()
+          // 7. 選択中の組織ID取得
+          const OrgId = SelectedOrgId || ''
+          // 8. 作品ID
+          const WorkId = sessionStorage.getItem('WorkId')
+          // 9. ユーザーID
+          const UserId = sessionStorage.getItem('UserId')
+
+          /* ---------------------------------------------
+           *  2. バリデーションチェック
+           * --------------------------------------------- */
+          /* 1. 組織名が未入力の場合 */
+          if (!OrgName) {
+            // 1. エラーダイアログ表示
+            await ShowErrorDialog('組織名を入力してください')
+            // 2. 処理終了
+            return
+          }
+
+          /* ---------------------------------------------
+           *  3. 画像のBase64変換
+           * --------------------------------------------- */
+          /* 1. 定義 */
+          // 1. 画像選択フォーム要素
+          const ImageInput = document.getElementById('OrgImageInput')
+          // 2. Base64文字列を保持
+          let ImageBase64 = null
+
+          /* 2. 画像が選択されている場合 */
+          if (ImageInput.files[0]) {
+            // 1. Base64文字列に変換して保持
+            ImageBase64 = await ConvertFileToBase64(ImageInput.files[0])
+          }
+
+          /* ---------------------------------------------
+           *  4. API通信
+           * --------------------------------------------- */
+          // 1. スピナー表示
           ShowSpinner()
 
           /* 2. API呼び出し */
@@ -3508,9 +3527,9 @@
             // 1. 組織名
             OrgName: OrgName,
             // 2. 作品ID
-            WorkId: sessionStorage.getItem('WorkId'),
+            WorkId: WorkId,
             // 3. ユーザーID
-            UserId: sessionStorage.getItem('UserId'),
+            UserId: UserId,
             // 4. 組織設立年月日
             FoundedDate: FoundedDate,
             // 5. 人員数
@@ -3523,29 +3542,35 @@
             BaseBuildId: BaseBuildId,
             // 9. 組織ID
             OrgId: OrgId,
-            // 10.選択された画像
-            Image: ImageInput ? 'Attached' : '',
+            // 10. 画像データ
+            ImageData: ImageBase64,
           })
 
-          /* 2. スピナー削除 */
+          /* ---------------------------------------------
+           *  5. スピナー削除
+           * --------------------------------------------- */
           HideSpinner()
 
-          /* 3. 通信成功 */
+          /* ---------------------------------------------
+           *  6. 通信成功
+           * --------------------------------------------- */
           if (Response.Success) {
-            // 1. 情報ダイアログ表示{
+            // 1. 情報ダイアログ表示
             await ShowInfoDialog('保存完了', Response.Data.Message)
             // 2. 入力フォームクリア
             ClearOrgForm()
             // 3. 組織一覧再取得
             await LoadOrganizationList()
           } else {
-            /* 4. 通信失敗 */
+            /* ---------------------------------------------
+             *  7. 通信失敗
+             * --------------------------------------------- */
             // 1. エラーダイアログ表示
             await ShowErrorDialog(Response.Message || '保存に失敗しました')
           }
         } catch (Error) {
           /* ---------------------------------------------
-           *  4. 例外処理
+           *  8. 例外処理
            * --------------------------------------------- */
           // 1. スピナー削除
           HideSpinner()
