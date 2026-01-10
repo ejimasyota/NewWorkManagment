@@ -7804,24 +7804,127 @@
         })
       }
 
-      async function SaveRelationData() {
-        try {
-          const Response = await CallApi('/SaveRelationData.php', 'POST', {
-            WorkId: sessionStorage.getItem('WorkId'),
-            Objects: RelationObjects,
-            Lines: RelationLines,
-            UserId: sessionStorage.getItem('UserId'),
-          })
-          if (Response.Success) {
-            await ShowInfoDialog('保存完了', '相関図を保存しました')
-            await LoadRelationData()
-          } else {
-            await ShowErrorDialog(Response.Message || '保存に失敗しました')
-          }
-        } catch (Error) {
-          await ShowErrorDialog('保存中にエラーが発生しました')
-        }
+// SaveRelationData: RelationObjects/RelationLines を保存する安全なシーケンス実装
+async function SaveRelationData() {
+  try {
+    ShowSpinner && ShowSpinner()
+
+    const WorkId = sessionStorage.getItem('WorkId')
+    const UserId = sessionStorage.getItem('UserId')
+
+    if (!WorkId) {
+      await ShowErrorDialog('作品IDが指定されていません')
+      return
+    }
+
+    // 1) オブジェクト（RelationObjects）を個別に保存する
+    //    - 新規は ObjId が 'new_...' とかのテンポラリになっている前提
+    //    - サーバーから返された ObjId をローカル配列と RelationLines に反映する
+    const tempIdMap = {} // { tempId: realId }
+
+    for (let i = 0; i < RelationObjects.length; i++) {
+      const obj = RelationObjects[i]
+
+      // Prepare payload: ObjId を DB 側でINSERTさせたい場合は null/undefined にする
+      const payload = {
+        WorkId,
+        ObjId: (obj.ObjId && String(obj.ObjId).startsWith('new_')) ? null : obj.ObjId,
+        ObjType: obj.ObjType,        // 1=キャラ, 2=グループ
+        TargetId: obj.TargetId || null,
+        Label: obj.Label || null,
+        PosX: obj.PosX || 0,
+        PosY: obj.PosY || 0,
+        Width: obj.Width || null,
+        Height: obj.Height || null,
+        BgColor: obj.BgColor || null,
+        UserId
       }
+
+      const resp = await CallApi('/SaveRelationObject.php', 'POST', payload)
+
+      if (!resp || !resp.Success) {
+        // サーバー側エラー。中断してエラー表示。
+        await ShowErrorDialog((resp && resp.Message) || 'オブジェクト保存に失敗しました')
+        HideSpinner && HideSpinner()
+        return
+      }
+
+      // SaveRelationObject.php は ObjId を返す想定（Response::Success に { ObjId: ... }）
+      // いくつかの実装パターンに対応して安全に取り出す
+      const newObjId = (resp.Data && resp.Data.ObjId) || resp.ObjId || (resp.Data && resp.Data.objId) || null
+      if (!newObjId) {
+        await ShowErrorDialog('オブジェクト保存レスポンスが不正です')
+        HideSpinner && HideSpinner()
+        return
+      }
+
+      // もし元が新規(temp)ならマップして、配列にも反映
+      if (String(obj.ObjId).startsWith('new_')) {
+        tempIdMap[obj.ObjId] = newObjId
+        obj.ObjId = newObjId
+      } else {
+        // 既存を更新しているケースでも ObjId はそのまま
+        obj.ObjId = newObjId
+      }
+    }
+
+    // 2) RelationLines の Source/Target を tempIdMap によって置換
+    for (let j = 0; j < RelationLines.length; j++) {
+      const line = RelationLines[j]
+      // replace temp ids with real ids if necessary
+      if (String(line.SourceObjId).startsWith('new_') && tempIdMap[line.SourceObjId]) {
+        line.SourceObjId = tempIdMap[line.SourceObjId]
+      }
+      if (String(line.TargetObjId).startsWith('new_') && tempIdMap[line.TargetObjId]) {
+        line.TargetObjId = tempIdMap[line.TargetObjId]
+      }
+    }
+
+    // 3) 関係線を個別に保存（新規は RelationId を null にして登録）
+    for (let k = 0; k < RelationLines.length; k++) {
+      const ln = RelationLines[k]
+      // sanity check: Source/Target must exist (DB側の id)
+      if (!ln.SourceObjId || !ln.TargetObjId) {
+        await ShowErrorDialog('線の接続先が不正です')
+        HideSpinner && HideSpinner()
+        return
+      }
+
+      const payload = {
+        WorkId,
+        RelationId: (ln.RelationId && !String(ln.RelationId).startsWith('new_')) ? ln.RelationId : null,
+        SourceObjId: ln.SourceObjId,
+        TargetObjId: ln.TargetObjId,
+        LineType: ln.LineType || 1,
+        RelationType: ln.RelationType || null,
+        Color: ln.Color || null,
+        UserId
+      }
+
+      const resp = await CallApi('/SaveRelation.php', 'POST', payload)
+      if (!resp || !resp.Success) {
+        await ShowErrorDialog((resp && resp.Message) || '関係線の保存に失敗しました')
+        HideSpinner && HideSpinner()
+        return
+      }
+
+      // サーバーから返ってきた RelationId を更新（新規のとき）
+      const newRelationId = (resp.Data && resp.Data.RelationId) || resp.RelationId || null
+      if (newRelationId) {
+        ln.RelationId = newRelationId
+      }
+    }
+
+    // 4) 全件保存が完了したら再読込
+    await ShowInfoDialog('保存完了', '相関図を保存しました')
+    await LoadRelationData()
+    HideSpinner && HideSpinner()
+  } catch (Error) {
+    HideSpinner && HideSpinner()
+    console.error(Error)
+    await ShowErrorDialog('保存中にエラーが発生しました')
+  }
+}
 
       /* ==========================================================================
        * ストーリー作成画面 (6.2 StoryInfo)
