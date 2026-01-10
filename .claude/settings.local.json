@@ -3,7 +3,12 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(wsl sed:*)",
+      "Bash(php -l:*)",
+      "Bash(php:*)",
+      "Bash(wsl:*)"
     ]
   }
 }
