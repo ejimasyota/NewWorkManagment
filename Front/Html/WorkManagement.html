@@ -2742,57 +2742,157 @@
        * 登録・更新処理
        * */
       async function SaveCharacter() {
+       /* ==========================================================================
+        * API通信
+        * ========================================================================== */
         try {
+         /* ---------------------------------------------
+          *  1. 定義
+          * --------------------------------------------- */ 
+          // 1. 作品ID
+          const WorkId = sessionStorage.getItem('WorkId')
+          // 2. ユーザーID
+          const UserId = sessionStorage.getItem('UserId')
+          // 3. キャラ名
           const CharaName = document.getElementById('CharaName').value;
+          // 4. 性別
+          const Gender       = document.getElementById('CharaGender').value;
+          // 5. 生年月日
+          const BirthDate    = document.getElementById('CharaBirthDate').value;
+          // 6. 年齢
+          const Age          = document.getElementById('CharaAge').value;
+          // 7. 身長
+          const Height       = document.getElementById('CharaHeight').value;
+          // 8. 体重
+          const Weight       = document.getElementById('CharaWeight').value;
+          // 9. 血液型
+          const BloodType    = document.getElementById('CharaBloodType').value;
+          // 10.種族ID
+          const RaceId       = document.getElementById('CharaRace').value;
+          // 11.組織ID
+          const OrgId        = document.getElementById('CharaOrganization').value;
+          // 12.チームID
+          const TeamId       = document.getElementById('CharaTeam').value;
+          // 13.階級ID
+          const ClassId      = document.getElementById('CharaClass').value;
+          // 14.一人称
+          const FirstPerson  = document.getElementById('CharaFirstPerson').value;
+          // 15.二人称
+          const SecondPerson = document.getElementById('CharaSecondPerson').value;
+          // 16.役割
+          const RoleInfo     = document.getElementById('CharaRoleInfoHidden').value;
+          // 17.性格
+          const Personality  = document.getElementById('CharaPersonalityHidden').value;
+          // 18.生い立ち・経歴
+          const Biography    = document.getElementById('CharaBiographyHidden').value;
+          // 19.スピナー表示
+          ShowSpinner()
+
+         /* ---------------------------------------------
+          *  2. キャラ名入力バリデーションチェック
+          * --------------------------------------------- */ 
           if (!CharaName) {
+            // 1. エラーダイアログ表示
             await ShowErrorDialog('キャラ名を入力してください');
+            // 2. 処理終了
             return;
           }
 
-          // 画像の処理
+         /* ---------------------------------------------
+          *  3. 画像のBase64変換
+          * --------------------------------------------- */ 
+          /* 1. 定義 */
+          // 1. 画像選択フォーム要素
           const ImageInput = document.getElementById('CharaImageInput');
+          // 2. Base64文字列を保持する
           let ImageBase64 = null;
+
+          /* 2.画像が選択されている場合 */
           if (ImageInput.files[0]) {
+            // 1. Base64文字列に変換して保持
             ImageBase64 = await ConvertFileToBase64(ImageInput.files[0]);
           }
 
-          // リクエストデータの作成（通常のオブジェクト）
-          const RequestData = {
-            CharaId: SelectedCharacterId || '',
-            WorkId: sessionStorage.getItem('WorkId'),
-            CharaName: CharaName,
-            Gender: document.getElementById('CharaGender').value,
-            BirthDate: document.getElementById('CharaBirthDate').value,
-            Age: document.getElementById('CharaAge').value,
-            Height: document.getElementById('CharaHeight').value,
-            Weight: document.getElementById('CharaWeight').value,
-            BloodType: document.getElementById('CharaBloodType').value,
-            FirstPerson: document.getElementById('CharaFirstPerson').value,
-            SecondPerson: document.getElementById('CharaSecondPerson').value,
-            RoleInfo: document.getElementById('CharaRoleInfoHidden').value,
-            RaceId: document.getElementById('CharaRace').value,
-            OrgId: document.getElementById('CharaOrganization').value,
-            TeamId: document.getElementById('CharaTeam').value,
-            ClassId: document.getElementById('CharaClass').value,
-            Personality: document.getElementById('CharaPersonalityHidden').value,
-            Biography: document.getElementById('CharaBiographyHidden').value,
-            UserId: sessionStorage.getItem('UserId'),
-            ImageData: ImageBase64 // ここにBase64文字列が入る
-          };
+         /* ---------------------------------------------
+          *  4. API呼び出し
+          * --------------------------------------------- */ 
+          const Result = await CallApi('/SaveCharacter.php', 'POST', 
+            {
+              // 1. 作品ID
+              WorkId: WorkId,
+              // 2. ユーザーID
+              UserId: UserId,
+              // 3. キャラID
+              CharaId: CharaId,
+              // 4. キャラ名
+              CharaName: CharaName,
+              // 5. 性別
+              Gender: Gender,
+              // 6. 生年月日
+              BirthDate: BirthDate,
+              // 7. 年齢
+              Age: Age,
+              // 8. 身長
+              Height: Height,
+              // 9. 体重
+              Weight: Weight,
+              // 10.血液型
+              BloodType: BloodType,
+              // 11.種族ID
+              RaceId: RaceId,
+              // 12.組織ID
+              OrgId: OrgId,
+              // 13.チームID
+              TeamId: TeamId,
+              //14.階級ID
+              ClassId: ClassId,
+              // 15.一人称
+              FirstPerson: FirstPerson,
+              // 16.二人称
+              SecondPerson: SecondPerson,
+              // 17.役割
+              RoleInfo: RoleInfo,
+              // 18.性格
+              Personality: Personality,
+              // 19.生い立ち・経歴
+              Biography: Biography,
+              // 20.画像データ
+              ImageData: ImageBase64
+            }
+          );
 
-          // CallApi関数を使用して送信
-          const Result = await CallApi('/SaveCharacter.php', 'POST', RequestData);
+         /* ---------------------------------------------
+          *  5. スピナー削除
+          * --------------------------------------------- */ 
+         HideSpinner()
 
+         /* ---------------------------------------------
+          *  6. 通信成功
+          * --------------------------------------------- */ 
           if (Result.Success) {
+            // 1. インフォダイアログ表示
             await ShowInfoDialog('保存完了', 'キャラ情報を保存しました');
+            // 2. キャラ入力フォーム初期化
             ClearCharacterForm();
+            // 3. キャラ一覧表示
             await LoadCharacterList();
           } else {
+           /* ---------------------------------------------
+            *  7. 通信失敗
+            * --------------------------------------------- */ 
+            // 1. エラーダイアログ表示
             await ShowErrorDialog(Result.Message || '保存に失敗しました');
           }
         } catch (Error) {
-          console.error(Error);
+         /* ==========================================================================
+          * 例外処理
+          * ========================================================================== */
+          // 1. スピナー削除
+          HideSpinner()
+          // 2. エラーダイアログ表示
           await ShowErrorDialog('保存中にエラーが発生しました');
+          // 3. デバッグログ
+          console.error(Error);
         }
       }
 
