@@ -964,6 +964,10 @@
        * --------------------------------------------- */
       // 1. 年表一覧
       let TimelineList = []
+      // 1-1. 年表画面用元号プルダウン
+      let TimelineCalendarList = []
+      // 1-2. 年表画面用関連場所プルダウン
+      let TimelineStageList = []
       // 2. スケジュール一覧
       let ScheduleList = []
       // 3. レビュー一覧
@@ -5293,6 +5297,20 @@
               <button class="ButtonClass SecondaryButton ButtonSmall" id="TimelineContentBtn"><i class="fas fa-edit"></i></button>
             </div>
             <input type="hidden" id="TimelineContentHidden">
+            <div class="FormGroup">
+              <select class="InputForm" id="TimelineCaleId" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+                <option value="">-- 元号を選択（任意） --</option>
+              </select>
+            </div>
+            <div class="FormGroup">
+              <select class="InputForm" id="TimelineRelatedStageId" ${
+                !CanEditFlg ? 'disabled' : ''
+              }>
+                <option value="">-- 関連場所を選択（任意） --</option>
+              </select>
+            </div>
             ${
               CanEditFlg
                 ? `
@@ -5425,8 +5443,8 @@
 
         /** 日付でソート（eventDateの昇順） */
         const SortedList = [...TimelineList].sort((a, b) => {
-          const DateA = (a.eventdate || '').replace(/[^0-9]/g, '')
-          const DateB = (b.eventdate || '').replace(/[^0-9]/g, '')
+          const DateA = (a.EventDate || '').replace(/[^0-9]/g, '')
+          const DateB = (b.EventDate || '').replace(/[^0-9]/g, '')
           return DateA.localeCompare(DateB)
         })
 
@@ -5436,28 +5454,28 @@
         SortedList.forEach((Item, Index) => {
           const IsLeft = Index % 2 === 0
           const PositionClass = IsLeft ? 'TimelineLeft' : 'TimelineRight'
-          const EventDateDisplay = FormatDate(Item.eventdate) || '不明'
-          const EndDateDisplay = Item.enddate
-            ? ` ～ ${FormatDate(Item.enddate)}`
+          const EventDateDisplay = FormatDate(Item.EventDate) || '不明'
+          const EndDateDisplay = Item.EndDate
+            ? ` ～ ${FormatDate(Item.EndDate)}`
             : ''
           /** 元のTimelineList内のインデックスを取得 */
           const OriginalIndex = TimelineList.findIndex(
-            (T) => T.timeid === Item.timeid,
+            (T) => T.TimeId === Item.TimeId,
           )
 
           Html += `
                 <div class="TimelineItem ${PositionClass}" data-index="${OriginalIndex}" data-timeid="${
-            Item.timeid
+            Item.TimeId
           }" style="cursor:pointer;">
                   <div class="TimelineContent">
                     <div class="TimelineDate">${EventDateDisplay}${EndDateDisplay}</div>
                     <div class="TimelineTitle">${EscapeHtml(
-                      Item.title || '',
+                      Item.Title || '',
                     )}</div>
                     ${
-                      Item.content
+                      Item.Content
                         ? `<div class="TimelineDesc">${EscapeHtml(
-                            Item.content,
+                            Item.Content,
                           )}</div>`
                         : ''
                     }
@@ -5506,6 +5524,12 @@
           if (Response.Success) {
             // 1. 取得結果を保持
             TimelineList = Response.Data.TimelineList || []
+            // 1-1. 元号リスト保持
+            TimelineCalendarList = Response.Data.CalendarList || []
+            // 1-2. 関連場所リスト保持
+            TimelineStageList = Response.Data.StageList || []
+            // 1-3. プルダウン描画
+            RenderTimelineDropdowns()
             // 2. 年表一覧表示
             RenderTimelineTable()
           } else {
@@ -5523,6 +5547,35 @@
           await ShowErrorDialog('年表一覧の取得中にエラーが発生しました')
           // 2. デバッグログ
           console.error(Error)
+        }
+      }
+
+      /**
+       * 年表プルダウン描画処理
+       */
+      function RenderTimelineDropdowns() {
+        /* 1. 元号プルダウン描画 */
+        const CaleSelect = document.getElementById('TimelineCaleId')
+        if (CaleSelect) {
+          CaleSelect.innerHTML = '<option value="">元号を選択</option>'
+          TimelineCalendarList.forEach((Item) => {
+            const Option = document.createElement('option')
+            Option.value = Item.caleid
+            Option.textContent = Item.eraname
+            CaleSelect.appendChild(Option)
+          })
+        }
+
+        /* 2. 関連場所プルダウン描画 */
+        const StageSelect = document.getElementById('TimelineRelatedStageId')
+        if (StageSelect) {
+          StageSelect.innerHTML = '<option value="">関連場所を選択</option>'
+          TimelineStageList.forEach((Item) => {
+            const Option = document.createElement('option')
+            Option.value = Item.stageid
+            Option.textContent = Item.stagename
+            StageSelect.appendChild(Option)
+          })
         }
       }
 
@@ -5550,7 +5603,7 @@
         // 8. ヘッダー作成
         const Thead = document.createElement('thead')
         // 9. ヘッダー内容定義
-        Thead.innerHTML = `<tr><th>タイトル</th><th>発生時期</th><th>終了時期</th><th>内容</th></tr>`
+        Thead.innerHTML = `<tr><th>タイトル</th><th>発生時期</th><th>終了時期</th><th>内容</th>${UtilityTableHeader()}</tr>`
         // 10.ヘッダーをテーブルに追加
         Table.appendChild(Thead)
         // 11.テーブルボディ作成
@@ -5586,14 +5639,20 @@
             Row.dataset.index = StartIndex + Index
 
             /* 2. 行内容設定 */
-            Row.innerHTML = `<td title="${Item.title}">${TruncateText(
-              Item.title,
+            Row.innerHTML = `<td title="${Item.Title}">${TruncateText(
+              Item.Title,
               20,
-            )}</td><td>${FormatDate(Item.eventdate)}</td><td>${
-              FormatDate(Item.enddate) || '-'
-            }</td><td title="${Item.content || ''}">${
-              TruncateText(Item.content, 20) || '-'
-            }</td>`
+            )}</td><td>${FormatDate(Item.EventDate)}</td><td>${
+              FormatDate(Item.EndDate) || '-'
+            }</td><td title="${Item.Content || ''}">${
+              TruncateText(Item.Content, 20) || '-'
+            }</td>
+            ${UtilityTableBody(
+              Item.RegistDate,
+              Item.UpdateDate,
+              Item.RegistUser,
+              Item.UpdateUser,
+            )}`
 
             /* 行ダブルクリックイベント定義 */
             Row.addEventListener('dblclick', () =>
@@ -5627,17 +5686,24 @@
 
       function SelectTimeline(Index) {
         const Item = TimelineList[Index]
-        SelectedTimelineId = Item.timeid
-        document.getElementById('TimelineTitle').value = Item.title
+        SelectedTimelineId = Item.TimeId
+        document.getElementById('TimelineTitle').value = Item.Title
         document.getElementById('TimelineEventDate').value =
-          Item.eventdate || ''
-        document.getElementById('TimelineEndDate').value = Item.enddate || ''
+          Item.EventDate || ''
+        document.getElementById('TimelineEndDate').value = Item.EndDate || ''
         document.getElementById('TimelineContent').value = TruncateText(
-          Item.content,
+          Item.Content,
           30,
         )
         document.getElementById('TimelineContentHidden').value =
-          Item.content || ''
+          Item.Content || ''
+        // 5. 元号プルダウン選択
+        const CaleSelect = document.getElementById('TimelineCaleId')
+        if (CaleSelect) CaleSelect.value = Item.caleid || ''
+        // 6. 関連場所プルダウン選択
+        const StageSelect = document.getElementById('TimelineRelatedStageId')
+        if (StageSelect) StageSelect.value = Item.relatedstageid || ''
+        // 7. 削除ボタン表示
         const DeleteBtn = document.getElementById('TimelineDeleteButton')
         if (DeleteBtn) DeleteBtn.classList.remove('Hidden')
       }
@@ -5649,6 +5715,12 @@
         document.getElementById('TimelineEndDate').value = ''
         document.getElementById('TimelineContent').value = ''
         document.getElementById('TimelineContentHidden').value = ''
+        // 5. 元号プルダウンリセット
+        const CaleSelect = document.getElementById('TimelineCaleId')
+        if (CaleSelect) CaleSelect.value = ''
+        // 6. 関連場所プルダウンリセット
+        const StageSelect = document.getElementById('TimelineRelatedStageId')
+        if (StageSelect) StageSelect.value = ''
         const DeleteBtn = document.getElementById('TimelineDeleteButton')
         if (DeleteBtn) DeleteBtn.classList.add('Hidden')
       }
@@ -5673,6 +5745,9 @@
             Title: Title,
             EventDate: EventDate,
             EndDate: document.getElementById('TimelineEndDate').value.trim(),
+            CaleId: document.getElementById('TimelineCaleId')?.value || null,
+            RelatedStageId:
+              document.getElementById('TimelineRelatedStageId')?.value || null,
             Content: document.getElementById('TimelineContentHidden').value,
             UserId: sessionStorage.getItem('UserId'),
           })
@@ -5689,12 +5764,12 @@
       }
 
       async function DeleteTimeline() {
-        if (!SelectedTimelineId) return
         if (!(await ShowConfirmDialog('この年表を削除しますか？'))) return
         try {
           const Response = await CallApi('/DeleteTimeline.php', 'POST', {
             TimeId: SelectedTimelineId,
             UserId: sessionStorage.getItem('UserId'),
+            WorkId: sessionStorage.getItem('WorkId'),
           })
           if (Response.Success) {
             await ShowInfoDialog('削除完了', '年表を削除しました')
@@ -8545,26 +8620,21 @@
       async function ExportStoryToWord() {
         ShowSpinner()
         try {
-          const Response = await fetch('/Back/Api/ExportStory.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              WorkId: sessionStorage.getItem('WorkId'),
-              UserId: sessionStorage.getItem('UserId'),
-            }),
+          const Response = await CallApi('/ExportStory.php', 'POST', {
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
           })
 
-          if (!Response.ok) {
-            throw new Error('出力に失敗しました')
+          if (Response.Success) {
+            // Base64からBlobを作成してダウンロード
+            const Blob = ConvertBase64ToBlob(Response.Data.FileData, Response.Data.MimeType)
+            DownloadFile(Blob, Response.Data.FileName)
+            HideSpinner()
+            await ShowInfoDialog('出力完了', 'Wordファイルをダウンロードしました')
+          } else {
+            HideSpinner()
+            await ShowErrorDialog(Response.Message || '出力に失敗しました')
           }
-
-          const Blob = await Response.blob()
-          const WorkTitle = WorkInfo?.WorkTitle || '作品'
-          DownloadFile(Blob, `${WorkTitle}_ストーリー.docx`)
-
-          HideSpinner()
-
-          await ShowInfoDialog('出力完了', 'Wordファイルをダウンロードしました')
         } catch (Error) {
           console.error(Error)
           HideSpinner()
@@ -8860,23 +8930,25 @@
       }
 
       async function ExportPlotToWord() {
+        ShowSpinner()
         try {
-          ShowSpinner()
-          const Response = await fetch(`${API_BASE_URL}/ExportPlot.php`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              WorkId: sessionStorage.getItem('WorkId'),
-              UserId: sessionStorage.getItem('UserId'),
-            }),
+          const Response = await CallApi('/ExportPlot.php', 'POST', {
+            WorkId: sessionStorage.getItem('WorkId'),
+            UserId: sessionStorage.getItem('UserId'),
           })
-          if (!Response.ok) throw new Error('出力に失敗しました')
-          const Blob = await Response.blob()
-          const WorkTitle = WorkInfo?.WorkTitle || '作品'
-          DownloadFile(Blob, `${WorkTitle}_プロット.docx`)
-          HideSpinner()
-          await ShowInfoDialog('出力完了', 'Wordファイルをダウンロードしました')
+
+          if (Response.Success) {
+            // Base64からBlobを作成してダウンロード
+            const Blob = ConvertBase64ToBlob(Response.Data.FileData, Response.Data.MimeType)
+            DownloadFile(Blob, Response.Data.FileName)
+            HideSpinner()
+            await ShowInfoDialog('出力完了', 'Wordファイルをダウンロードしました')
+          } else {
+            HideSpinner()
+            await ShowErrorDialog(Response.Message || '出力に失敗しました')
+          }
         } catch (Error) {
+          console.error(Error)
           HideSpinner()
           await ShowErrorDialog('出力中にエラーが発生しました')
         }

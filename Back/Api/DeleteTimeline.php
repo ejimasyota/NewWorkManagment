@@ -13,12 +13,16 @@ require_once __DIR__ . '/../Common/Response.php';
  */
 function DeleteTimeline(): void
 {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        // 1. エラーを返す
+        Response::Error('不正なリクエストです', 405);
+    }
     $FunctionName = '年表設定';
     $UserId = '';
 
     try {
         /** リクエストデータを取得 */
-        $Input = GetJsonInput();
+        $Input = Response::GetJsonInput();
         $TimeId = $Input['TimeId'] ?? null;
         $WorkId = $Input['WorkId'] ?? '';
         $UserId = $Input['UserId'] ?? '';
@@ -27,12 +31,12 @@ function DeleteTimeline(): void
 
         /** 入力チェック */
         if (empty($TimeId)) {
-            SendError('年表IDが指定されていません');
+            Response::Error('年表IDが指定されていません');
             return;
         }
 
         if (empty($WorkId)) {
-            SendError('作品IDが指定されていません');
+            Response::Error('作品IDが指定されていません');
             return;
         }
 
@@ -52,7 +56,7 @@ function DeleteTimeline(): void
 
         if ($DeletedCount === 0) {
             Database::Rollback();
-            SendError('削除対象の年表が見つかりません');
+            Response::Error('削除対象の年表が見つかりません');
             return;
         }
 
@@ -90,14 +94,14 @@ function DeleteTimeline(): void
 
         Logger::Info($FunctionName, '削除処理終了', $UserId);
 
-        SendSuccess([
+        Response::Success([
             'Message' => '年表を削除しました'
         ]);
 
     } catch (Exception $E) {
         Database::Rollback();
         Logger::Error($FunctionName, '削除処理エラー', $UserId, $E->getMessage());
-        SendError('年表の削除に失敗しました');
+        Response::Error('年表の削除に失敗しました');
     }
 }
 

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php'; // Composerのオートローダ
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../Common/Database.php';
 require_once __DIR__ . '/../Common/Logger.php';
 require_once __DIR__ . '/../Common/Response.php';
@@ -7,7 +7,7 @@ require_once __DIR__ . '/../Common/Response.php';
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 
-$FunctionName = 'ストーリーWord出力';
+$FunctionName = 'プロットWord出力';
 $UserId = '';
 
 try {
@@ -28,29 +28,40 @@ try {
 
     $Pdo = Database::GetConnection();
 
+    // 作品情報取得
     $WorkStmt = $Pdo->prepare('SELECT workTitle FROM WorkInfo WHERE workId = :workId');
     $WorkStmt->execute([':workId' => $WorkId]);
     $WorkRow = $WorkStmt->fetch();
-    $WorkTitle = $WorkRow ? $WorkRow['workTitle'] : '作品';
+    $WorkTitle = $WorkRow ? $WorkRow['worktitle'] : '作品';
 
-    $StoryStmt = $Pdo->prepare('SELECT indexNum, narrator, content FROM StoryInfo WHERE workId = :workId ORDER BY indexNum ASC');
-    $StoryStmt->execute([':workId' => $WorkId]);
-    $Stories = $StoryStmt->fetchAll();
+    // プロット一覧取得
+    $PlotStmt = $Pdo->prepare('SELECT indexNum, structureType, content FROM PlotInfo WHERE workId = :workId ORDER BY indexNum ASC');
+    $PlotStmt->execute([':workId' => $WorkId]);
+    $Plots = $PlotStmt->fetchAll();
 
+    // 起承転結ラベル
+    $StructureLabels = ['起', '承', '転', '結'];
+
+    // Wordドキュメント作成
     $phpWord = new PhpWord();
     $section = $phpWord->addSection();
-    $section->addTitle($WorkTitle . '　ストーリー一覧', 1);
+    $section->addTitle($WorkTitle . '　プロット一覧', 1);
 
-    foreach ($Stories as $Story) {
-        $text = $Story['indexNum'] . '. ';
-        $text .= ($Story['narrator'] ? '語り手: ' . $Story['narrator'] : 'ナレーション');
+    foreach ($Plots as $Plot) {
+        $structureLabel = isset($Plot['structuretype']) && $Plot['structuretype'] !== null
+            ? ($StructureLabels[$Plot['structuretype']] ?? '')
+            : '';
+        $text = $Plot['indexnum'] . '. ';
+        if ($structureLabel) {
+            $text .= '[' . $structureLabel . '] ';
+        }
         $section->addText($text, ['bold' => true]);
-        $section->addText($Story['content']);
+        $section->addText($Plot['content']);
         $section->addTextBreak();
     }
 
     // 一時ファイルに保存
-    $tempFile = tempnam(sys_get_temp_dir(), 'story') . '.docx';
+    $tempFile = tempnam(sys_get_temp_dir(), 'plot') . '.docx';
     $writer = IOFactory::createWriter($phpWord, 'Word2007');
     $writer->save($tempFile);
 
@@ -62,7 +73,7 @@ try {
     unlink($tempFile);
 
     // ファイル名を生成
-    $fileName = $WorkTitle . '_ストーリー.docx';
+    $fileName = $WorkTitle . '_プロット.docx';
 
     Logger::Info($FunctionName, 'Word出力処理終了', $UserId);
 

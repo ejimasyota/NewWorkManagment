@@ -36,20 +36,20 @@ function GetTimelineList(): void
         /** 年表一覧を取得 */
         $Sql = "
             SELECT
-                t.timeId,
-                t.workId,
+                t.timeId AS \"TimeId\",
+                t.workId ,
                 t.caleId,
                 c.eraName,
-                t.eventDate,
-                t.endDate,
-                t.title,
-                t.content,
+                t.eventDate AS \"EventDate\",
+                t.endDate AS \"EndDate\",
+                t.title AS \"Title\",
+                t.content AS \"Content\",
                 t.relatedStageId,
                 s.stageName,
-                t.registDate,
-                t.updateDate,
-                t.registUser,
-                t.updateUser
+                t.registDate AS \"RegistDate\",
+                t.updateDate AS \"UpdateDate\",
+                t.registUser AS \"RegistUser\",
+                t.updateUser AS \"UpdateUser\"
             FROM TimelineInfo t
             LEFT JOIN CalendarInfo c ON t.caleId = c.caleId
             LEFT JOIN StageInfo s ON t.relatedStageId = s.stageId

@@ -279,6 +279,22 @@ function ConvertFileToBase64(file) {
   })
 }
 
+/**
+ * Base64文字列をBlobに変換する共通関数
+ * @param {string} base64 Base64文字列
+ * @param {string} mimeType MIMEタイプ
+ * @returns {Blob} Blobオブジェクト
+ */
+function ConvertBase64ToBlob(base64, mimeType) {
+  const byteCharacters = atob(base64)
+  const byteNumbers = new Array(byteCharacters.length)
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i)
+  }
+  const byteArray = new Uint8Array(byteNumbers)
+  return new Blob([byteArray], { type: mimeType })
+}
+
 /* ==========================================================================
  * スピナー制御
  * ========================================================================== */
